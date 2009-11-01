@@ -46,4 +46,3 @@
   u target-v
   ;; Timestamp of the arbiter (from space)
   stamp)
-                             (contact-jn-acc contact))))))
