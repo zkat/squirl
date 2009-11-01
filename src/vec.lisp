@@ -34,18 +34,16 @@
         (vec-x vec)))
 
 (defun vec+ (&rest vectors)
-  (vec (reduce #'+ (mapcar #'vec-x vectors))
-       (reduce #'+ (mapcar #'vec-y vectors))))
+  (vec (reduce #'+ vectors :key #'vec-x)
+       (reduce #'+ vectors :key #'vec-y)))
 
 (defun vec-neg (vec)
   (vec (- (vec-x vec))
        (- (vec-y vec))))
 
 (defun vec- (&rest vectors)
-  (unless (cdr vectors)
-    (push (vec 0 0) vectors))
-  (vec (reduce #'- (mapcar #'vec-x vectors))
-       (reduce #'- (mapcar #'vec-y vectors))))
+  (vec (reduce #'- vectors :key #'vec-x)
+       (reduce #'- vectors :key #'vec-y)))
 
 (defun vec* (vec s)
   (vec (* (vec-x vec) s)
