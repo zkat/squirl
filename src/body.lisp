@@ -17,25 +17,23 @@
   ;; Function that is called to integrate the body's position.
   (position-fun *body-update-position-default* :type function)
 
-  ;; Mass Properties
-  %mass %inertia
+  ;; Mass properties, and cached inverses
+  %mass inverse-mass %inertia inverse-inertia
 
   ;; Linear components of motion
   (position +zero-vector+ :type vec)
   (velocity +zero-vector+ :type vec)
   (force    +zero-vector+ :type vec)
 
-  ;; Angular components of motion
-  %angle (angular-velocity 0) (torque 0)
-
-  ;; User Definable Slots
-  data
+  ;; Angular components of motion, and cached rotation vector
+  (%angle 0) (rotation (load-time-value (angle->vec 0)))
+  (angular-velocity 0) (torque 0)
 
   ;; Velocity bias values used when solving penetrations and correcting constraints.
   (velocity-bias +zero-vector+) (angular-velocity-bias 0)
 
-  ;; cached stuff
-  inverse-mass inverse-inertia rotation)
+  ;; User Definable Slots
+  data)
 
 ;; Since we're caching some stuff, let's wrap the generated accessors...
 (defun body-mass (body)
