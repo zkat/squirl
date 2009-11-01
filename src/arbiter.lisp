@@ -15,7 +15,7 @@
   distance
   ;; Calculated by arbiter-prestep
   r1 r2
-  n-mass t-mass bounce
+  normal-mass tangent-mass bounce
   ;; Persistant contact information
   (jn-acc 0) (jt-acc 0) (j-bias 0)
   bias
@@ -61,3 +61,4 @@
                 contacts))
         (arbiter-contacts arbiter))
   (values))
+
