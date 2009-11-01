@@ -67,7 +67,7 @@
 (defun body-inverse-mass (body)
   (/ 1 (body-mass body)))
 (defun body-rotation (body)
-  (angle->vector (body-angle body)))
+  (angle->vec (body-angle body)))
 
 (defun body-slew (body pos dt)
   "Modify the velocity of the body so that it will move to the specified absolute coordinates in
@@ -77,17 +77,17 @@ Intended for objects that are moved manually with a custom velocity integration 
     (setf (body-velocity body)
           (vec* delta (/ 1 dt)))))
 
-(defun body-local->world (body vector)
+(defun body-local->world (body vec)
   "Convert body local to world coordinates."
   ;; C version:
   ;; return cpvadd(body->p, cpvrotate(v, body->rot));
   (vec+ (body-position body)
-        (vector-rotate vector (body-rotation body))))
+        (vec-rotate vec (body-rotation body))))
 
-(defun world->body-local (body vector)
+(defun world->body-local (body vec)
   "Convert world to body local coordinates"
   ;; return cpvunrotate(cpvsub(v, body->p), body->rot);
-  (vector-unrotate (vec- vector (body-position body))
+  (vec-unrotate (vec- vec (body-position body))
                    (body-rotation body)))
 
 (defun body-apply-impulse (body j r)
@@ -115,21 +115,21 @@ of gravity (also in world coordinates)."
   "Apply a damped spring force between two bodies.
 Warning: Large damping values can be unstable. Use a DAMPED-SPRING constraint for this instead."
   (let* (;; Calculate the world space anchor coordinates.
-         (r1 (vector-rotate anchor1 (body-rotation body1)))
-         (r2 (vector-rotate anchor2 (body-rotation body2)))
+         (r1 (vec-rotate anchor1 (body-rotation body1)))
+         (r2 (vec-rotate anchor2 (body-rotation body2)))
 
          (delta (vec- (vec+ (body-position body2) r2)
                       (vec+ (body-position body1) r1)))
-         (distance (vector-length delta))
+         (distance (vec-length delta))
          (n (if (zerop distance) +zero-vector+ (vec* delta (/ 1 distance))))
 
          (f-spring (* k (- distance rlen)))
 
          ;; Calculate the world relative velocities of the anchor points.
          (v1 (vec+ (body-velocity body1)
-                   (vec* (vector-perp r1) (body-angular-velocity body1))))
+                   (vec* (vec-perp r1) (body-angular-velocity body1))))
          (v2 (vec+ (body-velocity body2)
-                   (vec* (vector-perp r2) (body-angular-velocity body2))))
+                   (vec* (vec-perp r2) (body-angular-velocity body2))))
 
          ;; Calculate the damping force.
          ;; This really sholud be in the impulse solvel and can produce problems when
@@ -140,4 +140,4 @@ Warning: Large damping values can be unstable. Use a DAMPED-SPRING constraint fo
          (f (vec* n (+ f-spring f-damp))))
     ;; Apply!
     (body-apply-force body1 f r1)
-    (body-apply-force body2 (vector-neg f) r2)))
+    (body-apply-force body2 (vec-neg f) r2)))
