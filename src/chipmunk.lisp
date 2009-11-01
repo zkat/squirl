@@ -38,7 +38,7 @@ A solid circle has an inner diameter of 0."
         (offset (vec* (vec+ a b) 1/2)))
     (+
      (* m length (/ length 12))
-     (* m vec. offset offset))))
+     (* m (vec. offset offset)))))
 
 (defun moment-for-poly (m num-verts verts offset)
   "Calculate the moment of inertia for a solid palygon shape."
