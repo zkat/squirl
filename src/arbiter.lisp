@@ -31,10 +31,9 @@
 (defun contacts-sum-impulses-with-friction (&rest contacts)
   (reduce (lambda (sum contact)
             (vec+ sum
-                  (vec* (vec-perp (contact-normal contact))
-                        (contact-jt-acc contact))
-                  (vec* (contact-normal contact)
-                        (contact-jn-acc contact))))
+                  (vec-rotate (contact-normal contact)
+                              (vec (contact-jt-acc contact)
+                                   (contact-jn-acc contact)))))
           contacts :initial-value +zero-vector+))
 
 (defstruct (arbiter (:constructor make-arbiter (contacts shape-a shape-b stamp)))
