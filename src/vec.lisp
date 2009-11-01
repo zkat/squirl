@@ -3,18 +3,19 @@
 
 (declaim (optimize speed safety))
 
-(deftype vec ()
-  '(cons real real))
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (deftype vec ()
+    '(cons real real))
 
-(declaim (ftype (function (real real) vec) vec))
-(defun vec (x y)
-  (cons x y))
+  (declaim (ftype (function (real real) vec) vec))
+  (defun vec (x y)
+    (cons x y))
 
-(declaim (ftype (function (vec) real) vec-x vec-y))
-(defun vec-x (vec)
-  (car vec))
-(defun vec-y (vec)
-  (cdr vec))
+  (declaim (ftype (function (vec) real) vec-x vec-y))
+  (defun vec-x (vec)
+    (car vec))
+  (defun vec-y (vec)
+    (cdr vec)))
 
 (defconstant +zero-vector+ (vec 0 0))
 
@@ -114,7 +115,7 @@
 (defun vec-normalize-safe (vec)
   (if (and (= 0 (vec-x vec))
            (= 0 (vec-y vec)))
-      +zero-vec+
+      +zero-vector+
       (vec-normalize vec)))
 
 (defun vec-clamp (vec len)
