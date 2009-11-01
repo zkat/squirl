@@ -1,6 +1,8 @@
+;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
-(declaim (inline min max clamp))
+(declaim (optimize safety debug))
+
 (defun max (a b)
   (if (> a b) a b))
 
@@ -21,7 +23,7 @@
   "Calculate the moment of inertia for a circle. r1 and r2 are the inner and outer diameters.
 A solid circle has an inner diameter of 0."
   ;; c version: return (1.0f/2.0f)*m*(inner*inner + outer*outer) + m*cpvdot(offset, offset);
-  (+ 
+  (+
    (* m 1/2 (+ (expt inner-diameter 2)
                (expt outer-diameter 2)))
    (* m (vector-dot offset offset))))
@@ -43,21 +45,21 @@ A solid circle has an inner diameter of 0."
   ;; C version:
   ;; cpVect *tVerts = (cpVect *)calloc(numVerts, sizeof(cpVect));
   ;; for(int i=0; i<numVerts; i++)
-  ;; 	tVerts[i] = cpvadd(verts[i], offset);
-	
+  ;;  tVerts[i] = cpvadd(verts[i], offset);
+
   ;; cpFloat sum1 = 0.0f;
   ;; cpFloat sum2 = 0.0f;
   ;; for(int i=0; i<numVerts; i++){
-  ;; 	cpVect v1 = tVerts[i];
-  ;; 	cpVect v2 = tVerts[(i+1)%numVerts];
-		
-  ;; 	cpFloat a = cpvcross(v2, v1);
-  ;; 	cpFloat b = cpvdot(v1, v1) + cpvdot(v1, v2) + cpvdot(v2, v2);
-		
-  ;; 	sum1 += a*b;
-  ;; 	sum2 += a;
+  ;;  cpVect v1 = tVerts[i];
+  ;;  cpVect v2 = tVerts[(i+1)%numVerts];
+
+  ;;  cpFloat a = cpvcross(v2, v1);
+  ;;  cpFloat b = cpvdot(v1, v1) + cpvdot(v1, v2) + cpvdot(v2, v2);
+
+  ;;  sum1 += a*b;
+  ;;  sum2 += a;
   ;; }
-	
+
   ;; free(tVerts);
   ;; return (m*sum1)/(6.0f*sum2);
   (let ((t-verts (make-array num-verts)))
@@ -73,4 +75,3 @@ A solid circle has an inner diameter of 0."
          (incf sum2 a)
        finally (return (/ (* m sum1)
                           (* 6 sum2))))))
-

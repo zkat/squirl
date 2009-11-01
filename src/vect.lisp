@@ -1,4 +1,7 @@
+;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
+
+(declaim (optimize speed safety))
 
 (defun vector-x (vector)
   (svref vector 0))
@@ -119,4 +122,3 @@
 (defun vector-near (v1 v2 dist)
   (< (vector-dist-sq v1 v2)
      (* dist dist)))
-

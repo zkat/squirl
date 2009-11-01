@@ -1,4 +1,7 @@
+;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
+
+(declaim (optimize safety debug))
 
 (defun body-update-velocity (body gravity damping dt)
   (setf (body-velocity body)
@@ -28,7 +31,6 @@
               dt)))
   (setf (body-velocity-bias body) +zero-vector+)
   (setf (body-angular-velocity-bias body) 0))
-
 
 (defparameter *body-update-velocity-default* #'body-update-velocity)
 (defparameter *body-update-position-default* #'body-update-position)
@@ -74,7 +76,6 @@ Intended for objects that are moved manually with a custom velocity integration 
   (let ((delta (vector-subtract pos (body-position body))))
     (setf (body-velocity body)
           (vector-multiply delta (/ 1 dt)))))
-
 
 (defun body-local->world (body vector)
   "Convert body local to world coordinates."
@@ -140,4 +141,3 @@ Warning: Large damping values can be unstable. Use a DAMPED-SPRING constraint fo
     ;; Apply!
     (body-apply-force body1 f r1)
     (body-apply-force body2 (vector-neg f) r2)))
-
