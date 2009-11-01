@@ -3,4 +3,5 @@
 (in-package :cl-user)
 
 (defpackage squirl
-  (:use :cl))
+  (:use :cl)
+  (:shadow cl:space))

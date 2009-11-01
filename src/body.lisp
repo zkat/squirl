@@ -35,6 +35,8 @@
   ;; User Definable Slots
   data)
 
+;;; Wraps the mass, inertia, and angle slots so that setting them updates
+;;; the inverse-mass, inverse-inertia, and rotation slots.
 (macrolet ((wrap (external internal cached wrapper)
              `(progn (defun ,external (body) (,internal body))
                      (defun (setf ,external) (new-value body)
