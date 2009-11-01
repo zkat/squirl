@@ -36,58 +36,63 @@ WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
 
 (defun vec-zerop (vec)
   "Checks whether VEC is a zero vector"
-  (or (eq vec +zero-vector+) ; Optimization!
-      (and (zerop (vec-x vec))
-           (zerop (vec-y vec)))))
+  (with-vec vec
+    (or (eq vec +zero-vector+)          ; Optimization!
+        (and (zerop vec.x) (zerop vec.y)))))
 
 ;; TODO - Am I sure C uses radians, like lisp?
 (defun angle->vec (angle)
   "Convert radians to a normalized vector"
-  (vec (cos angle)
-       (sin angle)))
+  (vec (cos angle) (sin angle)))
 
 (defun vec->angle (vec)
   "Convert a vector to radians."
-  (atan (vec-y vec)
-        (vec-x vec)))
+  (with-vec vec
+    (atan vec.y vec.x)))
 
 (defun vec+ (&rest vectors)
   (vec (reduce #'+ vectors :key #'vec-x)
        (reduce #'+ vectors :key #'vec-y)))
 
 (defun vec-neg (vec)
-  (vec (- (vec-x vec))
-       (- (vec-y vec))))
+  (with-vec vec
+    (vec (- vec.x) (- vec.y))))
 
 (defun vec- (minuend &rest subtrahends)
-  (if (null subtrahends) (vec-neg minuend)
-      (vec (reduce #'- subtrahends :key #'vec-x
-                   :initial-value (vec-x minuend))
-           (reduce #'- subtrahends :key #'vec-y
-                   :initial-value (vec-y minuend)))))
+  (with-vec minuend
+    (if (null subtrahends) (vec-neg minuend)
+        (vec (reduce #'- subtrahends :key #'vec-x
+                     :initial-value minuend.x)
+             (reduce #'- subtrahends :key #'vec-y
+                     :initial-value minuend.y)))))
 
 (defun vec* (vec scalar)
   "Multiplies VEC by SCALAR"
-  (vec (* (vec-x vec) scalar)
-       (* (vec-y vec) scalar)))
+  (with-vec vec
+    (vec (* vec.x scalar)
+         (* vec.y scalar))))
 
 (defun vec. (v1 v2)
   "Dot product of two vectors"
-  (+ (* (vec-x v1) (vec-x v2))
-     (* (vec-y v1) (vec-y v2))))
+  (with-vecs (v1 v2)
+    (+ (* v1.x v2.x)
+       (* v1.y v2.y))))
 
 (defun vecx (v1 v2)
   "Cross product of two vectors"
-  (- (* (vec-x v1) (vec-y v2))
-     (* (vec-y v1) (vec-x v2))))
+  (with-vecs (v1 v2)
+    (- (* v1.x v2.y)
+       (* v1.y v2.x))))
 
 (defun vec-perp (vec)
   "Returns a new vector rotated PI/2 counterclockwise from VEC"
-  (vec (- (vec-y vec)) (vec-x vec)))
+  (with-vec vec
+    (vec (- vec.y) vec.x)))
 
 (defun vec-rperp (vec)
   "Returns a new vector rotated PI/2 clockwise from VEC"
-  (vec (vec-y vec) (- (vec-x vec))))
+  (with-vec vec
+    (vec vec.y (- vec.x))))
 
 (defun vec-project (v1 v2)
   "Returns the projection of V1 onto V2"
@@ -95,17 +100,19 @@ WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
 
 (defun vec-rotate (vec rot)
   "Rotates VEC by (vec->angle ROT) radians. ROT should be a unit vec."
-  (vec (- (* (vec-x vec) (vec-x rot))
-          (* (vec-y vec) (vec-y rot)))
-       (+ (* (vec-x vec) (vec-y rot))
-          (* (vec-y vec) (vec-x rot)))))
+  (with-vecs (vec rot)
+    (vec (- (* vec.x rot.x)
+            (* vec.y rot.y))
+         (+ (* vec.x rot.y)
+            (* vec.y rot.x)))))
 
 (defun vec-unrotate (vec rot)
   "Rotates VEC by (- (vec->angle ROT)) radians. ROT should be a unit vec."
-  (vec (+ (* (vec-x vec) (vec-x rot))
-          (* (vec-y vec) (vec-y rot)))
-       (- (* (vec-y vec) (vec-x rot))
-          (* (vec-x vec) (vec-y rot)))))
+  (with-vecs (vec rot)
+    (vec (+ (* vec.x rot.x)
+            (* vec.y rot.y))
+         (- (* vec.y rot.x)
+            (* vec.x rot.y)))))
 
 (defun vec-length-sq (vec)
   "Returns the square of a vector's length"
