@@ -7,10 +7,12 @@
   :components
   ((:module "src"
             :components
-            ((:file "body")
-             :depends-on ("vect"))
-            ((:file "bounding-box")
-             :depends-on ("vect"))
-            ((:file "chipmunk")
-             :depends-on ("vect"))
-            ((:file "vect")))))
+            ((:file "body"
+                    :depends-on ("vect"))
+             (:file "bounding-box"
+                    :depends-on ("vect"))
+             (:file "chipmunk"
+                    :depends-on ("vect"))
+             (:file "package")
+             (:file "vect"
+                    :depends-on ("package"))))))
