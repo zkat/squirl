@@ -31,19 +31,17 @@
   (velocity-bias +zero-vector+) (angular-velocity-bias 0))
 
 (defun body-update-velocity (body gravity damping dt)
-  (setf (body-velocity body)
-        (vec+ (vec* (body-velocity body) damping)
-              (vec* (vec+ gravity
-                          (vec* (body-force body)
-                                (body-inverse-inertia body)))
-                    dt)))
-  (setf (body-angular-velocity body)
-        (+
-         (* (body-angular-velocity body)
-            damping)
-         (* (body-torque body)
-            (body-inverse-inertia body)
-            dt))))
+  (with-accessors ((angular-velocity body-angular-velocity)
+                   (inv-inertia body-inverse-inertia)
+                   (velocity body-velocity)
+                   (torque body-torque)
+                   (force body-force)) body
+    (setf velocity
+          (vec+ (vec* velocity damping)
+                (vec* (vec+ gravity (vec* force inv-inertia)) dt)))
+    (setf angular-velocity
+          (+ (* angular-velocity damping)
+             (* torque inv-inertia dt)))))
 
 (defun body-update-position (body dt)
   (setf (body-position body)
