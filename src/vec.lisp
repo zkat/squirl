@@ -39,7 +39,7 @@
 
 (defun vec-neg (vec)
   (vec (- (vec-x vec))
-          (- (vec-y vec))))
+       (- (vec-y vec))))
 
 (defun vec- (&rest vectors)
   (unless (cdr vectors)
@@ -49,7 +49,7 @@
 
 (defun vec* (vec s)
   (vec (* (vec-x vec) s)
-          (* (vec-y vec) s)))
+       (* (vec-y vec) s)))
 
 (defun vec. (v1 v2)
   "Dot product of two vectors"
