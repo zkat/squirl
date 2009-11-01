@@ -35,7 +35,7 @@
 (defparameter *body-update-velocity-default* #'body-update-velocity)
 (defparameter *body-update-position-default* #'body-update-position)
 
-(defstruct (body (:constructor %make-body (mass inertia)))
+(defstruct (body (:constructor make-body (mass inertia)))
   ;; Function that is called to integrate the body's velocity. (Defaults to cpBodyUpdateVelocity)
   (velocity-fun *body-update-velocity-default*)
 
