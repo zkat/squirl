@@ -23,11 +23,10 @@
   hash)
 
 (defun contacts-sum-impulses (&rest contacts)
-  (loop with sum = (vec 0 0)
-     for contact in contacts do
-       (setf sum (vec+ sum (vec* (contact-normal contact)
-                                 (contact-jn-acc contact))))
-     finally (return sum)))
+  (reduce (lambda (sum contact)
+            (vec+ sum (vec* (contact-normal contact)
+                            (contact-jn-acc contact))))
+          contacts :initial-value +zero-vector+))
 
 (defun contacts-sum-impulses-with-friction (&rest contacts)
   (loop with sum = (vec 0 0)
@@ -38,7 +37,6 @@
                        (vec* (contact-normal contact)
                              (contact-jn-acc contact))))))
 
-
 (defstruct (arbiter (:constructor make-arbiter (contacts shape-a shape-b stamp)))
   ;; Information on the contact points between the objects
   contacts
@@ -48,3 +46,4 @@
   u target-v
   ;; Timestamp of the arbiter (from space)
   stamp)
+                             (contact-jn-acc contact))))))
