@@ -23,7 +23,7 @@
   hash)
 
 (defun contacts-sum-impulses (&rest contacts)
-  (loop with sum = (vector 0 0)
+  (loop with sum = (vec 0 0)
      for contact in contacts do
        (setf sum (vec+ sum (vec* (contact-normal contact)
                                  (contact-jn-acc contact))))
