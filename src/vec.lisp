@@ -19,6 +19,11 @@
 
 (defconstant +zero-vector+ (vec 0 0))
 
+(defun vec-zerop (vec)
+  "Checks whether VEC is a zero vector"
+  (or (eq vec +zero-vector+) ; Optimization!
+      (and (zerop (vec-x vec))
+           (zerop (vec-y vec)))))
 
 ;; TODO - Am I sure C uses radians, like lisp?
 (defun angle->vec (angle)
