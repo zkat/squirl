@@ -45,6 +45,7 @@
           (* (vector-y vector) s)))
 
 (defun vec. (v1 v2)
+  "Dot product of two vectors"
   (+
    (* (vector-x v1)
       (vector-x v2))
@@ -52,6 +53,7 @@
       (vector-y v2))))
 
 (defun vecx (v1 v2)
+  "Cross product of two vectors"
   (-
    (* (vector-x v1)
       (vector-y v2))
