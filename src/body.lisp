@@ -94,6 +94,15 @@ gravity (also in world coordinates)."
     (setf velocity (vec+ velocity (vec* impulse inverse-mass)))
     (incf angular-velocity (* inverse-inertia (vecx relative impulse)))))
 
+(defun body-apply-bias-impulse (body impulse relative)
+  ;; From C: "Not intended for external use. Used by cpArbiter.c and cpConstraint.c."
+  (with-accessors ((angular-velocity-bias body-angular-velocity-bias)
+                   (inverse-inertia body-inverse-inertia)
+                   (inverse-mass body-inverse-mass)
+                   (velocity-bias body-velocity-bias)) body
+    (setf velocity-bias (vec+ velocity-bias (vec* impulse inverse-mass)))
+    (incf angular-velocity-bias (* inverse-inertia (vecx relative impulse)))))
+
 (defun body-reset-forces (body)
   "Zero the forces on a body."
   (setf (body-force body) +zero-vector+
