@@ -16,4 +16,6 @@
              (:file "package")
              (:file "vec"
                     :depends-on ("package"))
-             (:file "arbiter")))))
+             (:file "arbiter")
+             (:file "space" :depends-on ("vec"))))))
+
