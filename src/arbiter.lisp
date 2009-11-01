@@ -32,8 +32,8 @@
   (reduce #'vec+ contacts :initial-value +zero-vector+
           :key (lambda (contact)
                  (vec-rotate (contact-normal contact)
-                             (vec (contact-jt-acc contact)
-                                  (contact-jn-acc contact))))))
+                             (vec (contact-jn-acc contact)
+                                  (contact-jt-acc contact))))))
 
 (defstruct (arbiter (:constructor make-arbiter (contacts shape-a shape-b stamp)))
   ;; Information on the contact points between the objects
