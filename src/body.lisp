@@ -6,7 +6,7 @@
 (defvar *body-update-velocity-default*)
 (defvar *body-update-position-default*)
 
-(defstruct (body (:constructor make-body (mass inertia)))
+(defstruct (body (:constructor %make-body))
   ;; Function that is called to integrate the body's velocity.
   (velocity-fun *body-update-velocity-default* :type function)
 
@@ -32,6 +32,13 @@
 
   ;; cached stuff
   inverse-mass inverse-inertia rotation)
+
+(defun make-body (mass inertia)
+  (let ((body (%make-body)))
+    (setf (body-mass body) mass
+          (body-inertia body) inertia
+          (body-angle body) 0)
+    body))
 
 ;; Since we're caching some stuff, let's wrap the generated accessors...
 (defun body-mass (body)
