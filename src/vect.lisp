@@ -107,7 +107,7 @@
   (if (and (= 0 (vector-x vector))
            (= 0 (vector-y vector)))
       +zero-vector+
-      (vector-nermalize vector)))
+      (vector-normalize vector)))
 
 (defun vector-clamp (vector len)
   (if (> (vec. vector vector)
