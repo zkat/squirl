@@ -7,21 +7,19 @@
 (defvar *body-update-position-default*)
 
 (defstruct (body (:constructor make-body (mass inertia)))
-  ;; Function that is called to integrate the body's velocity. (Defaults to cpBodyUpdateVelocity)
-  (velocity-fun *body-update-velocity-default*)
+  ;; Function that is called to integrate the body's velocity.
+  (velocity-fun *body-update-velocity-default* :type functon)
 
-  ;; Function that is called to integrate the body's position. (Defaults to cpBodyUpdatePosition)
-  (position-fun *body-update-position-default*)
+  ;; Function that is called to integrate the body's position.
+  (position-fun *body-update-position-default* :type function)
 
   ;; Mass Properties
   mass inertia
 
-  ;; Positional Properties
-
   ;; Linear components of motion
-  (position +zero-vector+)
-  (velocity +zero-vector+)
-  (force +zero-vector+)
+  (position +zero-vector+ :type vec)
+  (velocity +zero-vector+ :type vec)
+  (force    +zero-vector+ :type vec)
 
   ;; Angular components of motion
   angle (angular-velocity 0) (torque 0)
@@ -29,7 +27,6 @@
   ;; User Definable Slots
   data
 
-  ;; Internal slots
   ;; Velocity bias values used when solving penetrations and correcting constraints.
   (velocity-bias +zero-vector+) (angular-velocity-bias 0))
 
