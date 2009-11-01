@@ -3,12 +3,6 @@
 
 (declaim (optimize safety debug))
 
-(defun max (a b)
-  (if (> a b) a b))
-
-(defun min (a b)
-  (if (< a b) a b))
-
 (defun clamp (n min max)
   (min (max n min) max))
 
