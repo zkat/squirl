@@ -78,17 +78,19 @@
   "Returns the projection of V1 onto V2"
   (vec* v2 (/ (vec. v1 v2) (vec. v2 v2))))
 
-(defun vec-rotate (v1 v2)
-  (vec (- (* (vec-x v1) (vec-x v2))
-          (* (vec-y v1) (vec-y v2)))
-       (+ (* (vec-x v1) (vec-y v2))
-          (* (vec-y v1) (vec-x v2)))))
+(defun vec-rotate (vec rot)
+  "Rotates VEC by (vec->angle ROT) radians. ROT should be a unit vec."
+  (vec (- (* (vec-x vec) (vec-x rot))
+          (* (vec-y vec) (vec-y rot)))
+       (+ (* (vec-x vec) (vec-y rot))
+          (* (vec-y vec) (vec-x rot)))))
 
-(defun vec-unrotate (v1 v2)
-  (vec (+ (* (vec-x v1) (vec-x v2))
-          (* (vec-y v1) (vec-y v2)))
-       (- (* (vec-y v1) (vec-x v2))
-          (* (vec-x v1) (vec-y v2)))))
+(defun vec-unrotate (vec rot)
+  "Rotates VEC by (- (vec->angle ROT)) radians. ROT should be a unit vec."
+  (vec (+ (* (vec-x vec) (vec-x rot))
+          (* (vec-y vec) (vec-y rot)))
+       (- (* (vec-y vec) (vec-x rot))
+          (* (vec-x vec) (vec-y rot)))))
 
 (defun vec-length-sq (vec)
   "Returns the square of a vector's length"
