@@ -35,24 +35,14 @@
   ;; User Definable Slots
   data)
 
-;; Since we're caching some stuff, let's wrap the generated accessors...
-(defun body-mass (body)
-  (body-%mass body))
-(defun body-inertia (body)
-  (body-%inertia body))
-(defun body-angle (body)
-  (body-%angle body))
-
-;; And wrap the setters so that we cache properly...
-(defun (setf body-mass) (mass body)
-  (setf (body-inverse-mass body) (/ mass)
-        (body-%mass body) mass))
-(defun (setf body-inertia) (inertia body)
-  (setf (body-inverse-inertia body) (/ inertia)
-        (body-%inertia body) inertia))
-(defun (setf body-angle) (angle body)
-  (setf (body-rotation body) (angle->vec angle)
-        (body-%angle body) angle))
+(macrolet ((wrap (external internal cached wrapper)
+             `(progn (defun ,external (body) (,internal body))
+                     (defun (setf ,external) (new-value body)
+                       (setf (,internal body) new-value
+                             (,cached body) (,wrapper new-value))))))
+  (wrap body-mass body-%mass body-inverse-mass /)
+  (wrap body-inertia body-%inertia body-inverse-inertia /)
+  (wrap body-angle body-%angle body-rotation angle->vec))
 
 (defun body-update-velocity (body gravity damping dt)
   (with-accessors ((angular-velocity body-angular-velocity)
