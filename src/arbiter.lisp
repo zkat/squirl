@@ -35,6 +35,16 @@
                              (vec (contact-jn-acc contact)
                                   (contact-jt-acc contact))))))
 
+(defun contacts-estimate-crushing-impulse (&rest contacts)
+  (let ((fsum 0) (vsum +zero-vector+))
+    (dolist (contact contacts)
+      (let ((j (vec-rotate (contact-normal contact)
+                           (vec (contact-jn-acc contact)
+                                  (contact-jt-acc contact)))))
+        (incf fsum (vec-length j))
+        (setf vsum (vec+ vsum j))))
+    (- 1 (/ (vec-length vsum) fsum))))
+
 (defstruct (arbiter (:constructor make-arbiter (contacts shape-a shape-b stamp)))
   ;; Information on the contact points between the objects
   contacts
