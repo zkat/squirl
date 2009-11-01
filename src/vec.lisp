@@ -54,31 +54,25 @@
 
 (defun vec. (v1 v2)
   "Dot product of two vectors"
-  (+
-   (* (vec-x v1)
-      (vec-x v2))
-   (* (vec-y v1)
-      (vec-y v2))))
+  (+ (* (vec-x v1) (vec-x v2))
+     (* (vec-y v1) (vec-y v2))))
 
 (defun vecx (v1 v2)
   "Cross product of two vectors"
-  (-
-   (* (vec-x v1)
-      (vec-y v2))
-   (* (vec-y v1)
-      (vec-x v2))))
+  (- (* (vec-x v1) (vec-y v2))
+     (* (vec-y v1) (vec-x v2))))
 
 (defun vec-perp (vec)
-  (vec (- (vec-y vec))
-          (vec-x vec)))
+  "Returns a new vector rotated PI/2 counterclockwise from VEC"
+  (vec (- (vec-y vec)) (vec-x vec)))
 
 (defun vec-rperp (vec)
-  (vec (vec-y vec)
-          (- (vec-x vec))))
+  "Returns a new vector rotated PI/2 clockwise from VEC"
+  (vec (vec-y vec) (- (vec-x vec))))
 
 (defun vec-project (v1 v2)
-  (vec* v2 (/ (vec. v1 v2)
-              (vec. v2 v2))))
+  "Returns the projection of V1 onto V2"
+  (vec* v2 (/ (vec. v1 v2) (vec. v2 v2))))
 
 (defun vec-rotate (v1 v2)
   (vec (- (* (vec-x v1)
