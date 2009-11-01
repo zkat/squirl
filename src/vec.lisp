@@ -33,11 +33,9 @@
   (atan (vec-y vec)
         (vec-x vec)))
 
-(defun vec+ (v1 v2)
-  (vec (+ (vec-x v1)
-             (vec-x v2))
-          (+ (vec-y v1)
-             (vec-y v2))))
+(defun vec+ (&rest vectors)
+  (vec (reduce #'+ (mapcar #'vec-x vectors))
+       (reduce #'+ (mapcar #'vec-y vectors))))
 
 (defun vec-neg (vec)
   (vec (- (vec-x vec))
