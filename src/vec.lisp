@@ -51,9 +51,10 @@
            (reduce #'- subtrahends :key #'vec-y
                    :initial-value (vec-y minuend)))))
 
-(defun vec* (vec s)
-  (vec (* (vec-x vec) s)
-       (* (vec-y vec) s)))
+(defun vec* (vec scalar)
+  "Multiplies VEC by SCALAR"
+  (vec (* (vec-x vec) scalar)
+       (* (vec-y vec) scalar)))
 
 (defun vec. (v1 v2)
   "Dot product of two vectors"
@@ -78,24 +79,16 @@
   (vec* v2 (/ (vec. v1 v2) (vec. v2 v2))))
 
 (defun vec-rotate (v1 v2)
-  (vec (- (* (vec-x v1)
-                (vec-x v2))
-             (* (vec-y v1)
-                (vec-y v2)))
-          (+ (* (vec-x v1)
-                (vec-y v2))
-             (* (vec-y v1)
-                (vec-x v2)))))
+  (vec (- (* (vec-x v1) (vec-x v2))
+          (* (vec-y v1) (vec-y v2)))
+       (+ (* (vec-x v1) (vec-y v2))
+          (* (vec-y v1) (vec-x v2)))))
 
 (defun vec-unrotate (v1 v2)
-  (vec (+ (* (vec-x v1)
-                (vec-x v2))
-             (* (vec-y v1)
-                (vec-y v2)))
-          (- (* (vec-y v1)
-                (vec-x v2))
-             (* (vec-x v1)
-                (vec-y v2)))))
+  (vec (+ (* (vec-x v1) (vec-x v2))
+          (* (vec-y v1) (vec-y v2)))
+       (- (* (vec-y v1) (vec-x v2))
+          (* (vec-x v1) (vec-y v2)))))
 
 (defun vec-length-sq (vec)
   "Returns the square of a vector's length"
@@ -106,22 +99,21 @@
   (sqrt (vec-length-sq vec)))
 
 (defun vec-lerp (v1 v2 ratio)
-  (vec+
-   (vec* v1 (- 1 ratio))
-   (vec* v2 ratio)))
+  "Linear interpolation of the vectors and ratio"
+  (vec+ (vec* v1 (- 1 ratio))
+        (vec* v2 ratio)))
 
 (defun vec-normalize (vec)
-  (vec* vec (/ 1 (vec-length vec))))
+  "Normalizes a nonzero vector"
+  (vec* vec (/ (vec-length vec))))
 
 (defun vec-normalize-safe (vec)
-  (if (and (= 0 (vec-x vec))
-           (= 0 (vec-y vec)))
-      +zero-vector+
+  "Normalizes a vector"
+  (if (vec-zerop vec) +zero-vector+
       (vec-normalize vec)))
 
 (defun vec-clamp (vec len)
-  (if (> (vec. vec vec)
-         (* len len))
+  (if (> (vec-length-sq vec) (* len len))
       (vec* (vec-normalize vec) len)
       vec))
 
