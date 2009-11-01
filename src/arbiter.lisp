@@ -21,3 +21,10 @@
   bias
   ;; Hash value used as a (mostly) unique ID
   hash)
+
+(defun contacts-sum-impulses (&rest contacts)
+  (loop with sum = (vector 0 0)
+     for contact in contacts do
+       (setf sum (vec+ sum (vec* (contact-normal contact)
+                                 (contact-jn-acc contact))))
+     finally (return sum)))
