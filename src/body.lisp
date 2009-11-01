@@ -3,6 +3,36 @@
 
 (declaim (optimize safety debug))
 
+(defvar *body-update-velocity-default*)
+(defvar *body-update-position-default*)
+
+(defstruct (body (:constructor make-body (mass inertia)))
+  ;; Function that is called to integrate the body's velocity. (Defaults to cpBodyUpdateVelocity)
+  (velocity-fun *body-update-velocity-default*)
+
+  ;; Function that is called to integrate the body's position. (Defaults to cpBodyUpdatePosition)
+  (position-fun *body-update-position-default*)
+
+  ;; Mass Properties
+  mass inertia
+
+  ;; Positional Properties
+
+  ;; Linear components of motion
+  (position +zero-vector+)
+  (velocity +zero-vector+)
+  (force +zero-vector+)
+
+  ;; Angular components of motion
+  angle (angular-velocity 0) (torque 0)
+
+  ;; User Definable Slots
+  data
+
+  ;; Internal slots
+  ;; Velocity bias values used when solving penetrations and correcting constraints.
+  (velocity-bias +zero-vector+) (angular-velocity-bias 0))
+
 (defun body-update-velocity (body gravity damping dt)
   (setf (body-velocity body)
         (vec+ (vec* (body-velocity body) damping)
@@ -34,33 +64,6 @@
 
 (defparameter *body-update-velocity-default* #'body-update-velocity)
 (defparameter *body-update-position-default* #'body-update-position)
-
-(defstruct (body (:constructor make-body (mass inertia)))
-  ;; Function that is called to integrate the body's velocity. (Defaults to cpBodyUpdateVelocity)
-  (velocity-fun *body-update-velocity-default*)
-
-  ;; Function that is called to integrate the body's position. (Defaults to cpBodyUpdatePosition)
-  (position-fun *body-update-position-default*)
-
-   ;;; Mass Properties
-  mass inertia
-
-   ;;; Positional Properties
-
-  ;; Linear components of motion
-  (position +zero-vector+)
-  (velocity +zero-vector+)
-  (force +zero-vector+)
-
-  ;; Angular components of motion
-  angle (angular-velocity 0) (torque 0)
-
-   ;;; User Definable Slots
-  data
-
-   ;;; Internal slots
-  ;; Velocity bias values used when solving penetrations and correcting constraints.
-  (velocity-bias +zero-vector+) (angular-velocity-bias 0))
 
 (defun body-inverse-inertia (body)
   (/ 1 (body-inertia body)))
