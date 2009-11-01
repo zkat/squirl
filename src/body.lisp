@@ -58,10 +58,11 @@
 (defparameter *body-update-velocity-default* #'body-update-velocity)
 (defparameter *body-update-position-default* #'body-update-position)
 
+;;; These should eventually be cached, like in the C version  - Adlai
 (defun body-inverse-inertia (body)
-  (/ 1 (body-inertia body)))
+  (/ (body-inertia body)))
 (defun body-inverse-mass (body)
-  (/ 1 (body-mass body)))
+  (/ (body-mass body)))
 (defun body-rotation (body)
   (angle->vec (body-angle body)))
 
