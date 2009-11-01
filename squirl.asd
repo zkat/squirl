@@ -15,4 +15,5 @@
                     :depends-on ("vect"))
              (:file "package")
              (:file "vect"
-                    :depends-on ("package"))))))
+                    :depends-on ("package"))
+             (:file "arbiter")))))
