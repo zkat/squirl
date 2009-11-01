@@ -14,7 +14,7 @@
   (position-fun *body-update-position-default* :type function)
 
   ;; Mass Properties
-  mass inertia
+  %mass %inertia
 
   ;; Linear components of motion
   (position +zero-vector+ :type vec)
@@ -22,13 +22,35 @@
   (force    +zero-vector+ :type vec)
 
   ;; Angular components of motion
-  angle (angular-velocity 0) (torque 0)
+  %angle (angular-velocity 0) (torque 0)
 
   ;; User Definable Slots
   data
 
   ;; Velocity bias values used when solving penetrations and correcting constraints.
-  (velocity-bias +zero-vector+) (angular-velocity-bias 0))
+  (velocity-bias +zero-vector+) (angular-velocity-bias 0)
+
+  ;; cached stuff
+  inverse-mass inverse-inertia rotation)
+
+;; Since we're caching some stuff, let's wrap the generated accessors...
+(defun body-mass (body)
+  (body-%mass body))
+(defun body-inertia (body)
+  (body-%inertia body))
+(defun body-angle (body)
+  (body-%angle body))
+
+;; And wrap the setters so that we cache properly...
+(defun (setf body-mass) (mass body)
+  (setf (body-inverse-mass body) (/ mass)
+        (body-%mass body) mass))
+(defun (setf body-inertia) (inertia body)
+  (setf (body-inverse-inertia body) (/ inertia)
+        (body-%inertia body) inertia))
+(defun (setf body-angle) (angle body)
+  (setf (body-rotation body) (angle->vec angle)
+        (body-%angle body) angle))
 
 (defun body-update-velocity (body gravity damping dt)
   (with-accessors ((angular-velocity body-angular-velocity)
@@ -57,14 +79,6 @@
 
 (defparameter *body-update-velocity-default* #'body-update-velocity)
 (defparameter *body-update-position-default* #'body-update-position)
-
-;;; These should eventually be cached, like in the C version  - Adlai
-(defun body-inverse-inertia (body)
-  (/ (body-inertia body)))
-(defun body-inverse-mass (body)
-  (/ (body-mass body)))
-(defun body-rotation (body)
-  (angle->vec (body-angle body)))
 
 (defun body-slew (body pos dt)
   "Modify the velocity of the body so that it will move to the specified absolute coordinates in
