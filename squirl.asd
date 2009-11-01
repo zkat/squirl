@@ -8,12 +8,12 @@
   ((:module "src"
             :components
             ((:file "body"
-                    :depends-on ("vect"))
+                    :depends-on ("vec"))
              (:file "bounding-box"
-                    :depends-on ("vect"))
+                    :depends-on ("vec"))
              (:file "chipmunk"
-                    :depends-on ("vect"))
+                    :depends-on ("vec"))
              (:file "package")
-             (:file "vect"
+             (:file "vec"
                     :depends-on ("package"))
              (:file "arbiter")))))
