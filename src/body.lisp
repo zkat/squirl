@@ -84,15 +84,15 @@ Intended for objects that are moved manually with a custom velocity integration 
   (vec-unrotate (vec- vec (body-position body))
                 (body-rotation body)))
 
-(defun body-apply-impulse (body j r)
+(defun body-apply-impulse (body impulse relative)
   "Apply an impulse (in world coordinates) to the body at a point relative to the center of
 gravity (also in world coordinates)."
-  (setf (body-velocity body)
-        (vec+ (body-velocity body)
-              (vec* j (body-inverse-mass body))))
-  (incf (body-angular-velocity body)
-        (* (body-inverse-inertia body)
-           (vecx r j))))
+  (with-accessors ((angular-velocity body-angular-velocity)
+                   (inverse-inertia body-inverse-inertia)
+                   (inverse-mass body-inverse-mass)
+                   (velocity body-velocity)) body
+    (setf velocity (vec+ velocity (vec* impulse inverse-mass)))
+    (incf angular-velocity (* inverse-inertia (vecx relative impulse)))))
 
 (defun body-reset-forces (body)
   "Zero the forces on a body."
