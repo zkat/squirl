@@ -8,7 +8,7 @@
 
 (defstruct (body (:constructor make-body (mass inertia)))
   ;; Function that is called to integrate the body's velocity.
-  (velocity-fun *body-update-velocity-default* :type functon)
+  (velocity-fun *body-update-velocity-default* :type function)
 
   ;; Function that is called to integrate the body's position.
   (position-fun *body-update-position-default* :type function)
