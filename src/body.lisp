@@ -70,22 +70,19 @@
   "Modify the velocity of the body so that it will move to the specified absolute coordinates in
 the next timestep.
 Intended for objects that are moved manually with a custom velocity integration function."
-  (let ((delta (vec- pos (body-position body))))
-    (setf (body-velocity body)
-          (vec* delta (/ 1 dt)))))
+  (setf (body-velocity body)
+        (vec* (vec- pos (body-position body))
+              (/ dt))))
 
 (defun body-local->world (body vec)
   "Convert body local to world coordinates."
-  ;; C version:
-  ;; return cpvadd(body->p, cpvrotate(v, body->rot));
   (vec+ (body-position body)
         (vec-rotate vec (body-rotation body))))
 
 (defun world->body-local (body vec)
   "Convert world to body local coordinates"
-  ;; return cpvunrotate(cpvsub(v, body->p), body->rot);
   (vec-unrotate (vec- vec (body-position body))
-                   (body-rotation body)))
+                (body-rotation body)))
 
 (defun body-apply-impulse (body j r)
   "Apply an impulse (in world coordinates) to the body at a point relative to the center of
