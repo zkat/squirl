@@ -46,3 +46,18 @@
   u target-v
   ;; Timestamp of the arbiter (from space)
   stamp)
+
+;;; TODO: Verify correctness of docstring
+(defun arbiter-inject (arbiter &rest contacts)
+  "Replaces ARBITER's contacts with the supplied set, saving state for persistent contacts."
+  (mapc (lambda (old-contact)
+          (mapc (lambda (new-contact)
+                  (when (= (contact-hash new-contact)
+                           (contact-hash old-contact))
+                    (setf (contact-jn-acc new-contact)
+                          (contact-jn-acc old-contact)
+                          (contact-jt-acc new-contact)
+                          (contact-jt-acc new-contact))))
+                contacts))
+        (arbiter-contacts arbiter))
+  (values))
