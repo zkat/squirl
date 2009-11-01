@@ -19,8 +19,6 @@
 
 (defconstant +zero-vector+ (vec 0 0))
 
-(defun vec-length (vec)
-  (sqrt (vec. vec vec)))
 
 ;; TODO - Am I sure C uses radians, like lisp?
 (defun angle->vec (angle)
@@ -95,7 +93,12 @@
                 (vec-y v2)))))
 
 (defun vec-length-sq (vec)
+  "Returns the square of a vector's length"
   (vec. vec vec))
+
+(defun vec-length (vec)
+  "Returns the vector's length"
+  (sqrt (vec-length-sq vec)))
 
 (defun vec-lerp (v1 v2 ratio)
   (vec+
@@ -117,11 +120,11 @@
       (vec* (vec-normalize vec) len)
       vec))
 
-(defun vec-dist (v1 v2)
-  (vec-length (vec- v1 v2)))
-
 (defun vec-dist-sq (v1 v2)
   (vec-length-sq (vec- v1 v2)))
+
+(defun vec-dist (v1 v2)
+  (vec-length (vec- v1 v2)))
 
 (defun vec-near (v1 v2 dist)
   (< (vec-dist-sq v1 v2)
