@@ -37,3 +37,14 @@
                              (contact-jt-acc contact))
                        (vec* (contact-normal contact)
                              (contact-jn-acc contact))))))
+
+
+(defstruct (arbiter (:constructor make-arbiter (contacts shape-a shape-b stamp)))
+  ;; Information on the contact points between the objects
+  contacts
+  ;; The two shapes involved in the collision
+  shape-a shape-b
+  ;; Calculated by arbiter-prestep
+  u target-v
+  ;; Timestamp of the arbiter (from space)
+  stamp)
