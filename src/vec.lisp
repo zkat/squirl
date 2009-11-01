@@ -42,8 +42,10 @@
        (- (vec-y vec))))
 
 (defun vec- (&rest vectors)
-  (vec (reduce #'- vectors :key #'vec-x)
-       (reduce #'- vectors :key #'vec-y)))
+  (if vectors
+      (vec (reduce #'- vectors :key #'vec-x)
+           (reduce #'- vectors :key #'vec-y))
+      +zero-vector+))
 
 (defun vec* (vec s)
   (vec (* (vec-x vec) s)
