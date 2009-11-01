@@ -12,68 +12,64 @@
          (* (body-angular-velocity body)
             damping)
          (* (body-torque body)
-            (body-inverse-inertia)
+            (body-inverse-inertia body)
             dt))))
 
 (defun body-update-position (body dt)
-  ;; todo
-  )
+  (setf (body-position body)
+        (vector-add (body-position body)
+                    (vector-multiply (vector-add (body-velocity body)
+                                                 (body-velocity-bias body))
+                                     dt)))
+  (setf (body-angle body)
+        (+ (body-angle body)
+           (* (body-angular-velocity body)
+              (body-angular-velocity-bias body)
+              dt)))
+  (setf (body-velocity-bias body) +zero-vector+)
+  (setf (body-angular-velocity-bias body) 0))
+
 
 (defparameter *body-update-velocity-default* #'body-update-velocity)
 (defparameter *body-update-position-default* #'body-update-position)
 
-(defclass body ()
-  ( ;; Function that is called to integrate the body's velocity. (Defaults to cpBodyUpdateVelocity)
-   (velocity-fun :initform *body-update-velocity-default*)
+(defstruct (body (:constructor (mass inertia)))
+   ;; Function that is called to integrate the body's velocity. (Defaults to cpBodyUpdateVelocity)
+   (velocity-fun *body-update-velocity-default*)
 
    ;; Function that is called to integrate the body's position. (Defaults to cpBodyUpdatePosition)
-   (position-fun :initform *body-update-position-default*)
+   (position-fun *body-update-position-default*)
 
    ;;; Mass Properties
-  
-   ;; Mass and its inverse
-   ;; Always use BODY-SET-MASS when changing the mass as these values must agree.
-   mass inverse-mass
-
-   ;; Moment of inertia and its inverse
-   ;; Always use BODY-SET-MASS when changing the mass as these values must agree.
-   inertia inverse-inertia
+   mass inertia
 
    ;;; Positional Properties
-  
+
    ;; Linear components of motion
-   (position :initform +zero-vector+)
-   (velocity :initform +zero-vector+)
-   (force :initform +zero-vector+)
+   (position +zero-vector+)
+   (velocity +zero-vector+)
+   (force +zero-vector+)
 
    ;; Angular components of motion
-   ;; Always use BODY-SET-ANGLE to set the angle of the body, as angle and rotation must agree.
-   angle (angular-velocity :initform 0) (torque :initform 0)
-
-   ;; Cached unit length vector representing the angle of the body.
-   ;; Used for fast vector rotation using VECTOR-ROTATE
-   rotation
+   angle (angular-velocity 0) (torque 0)
 
    ;;; User Definable Slots
-  
-   ;; User defined data.
    data
 
    ;;; Internal slots
-  
    ;; Velocity bias values used when solving penetrations and correcting constraints.
-   (velocity-bias :initform +zero-vector+) (angular-velocity-bias :initform 0)))
+   (velocity-bias +zero-vector+) (angular-velocity-bias 0))
 
-(defun make-body (m i)
-  (let ((body (make-instance 'body)))
-    (setf (body-mass body) m
-          (body-moment body) i
-          (body-angle body) 0)
-    body))
+(defun body-inverse-inertia (body)
+  (/ 1 (body-inertia body)))
+(defun body-inverse-mass (body)
+  (/ 1 (body-mass body)))
+(defun body-rotation (body)
+  (angle->vector (body-angle body)))
 
 (defun body-slew (body pos dt)
   "Modify the velocity of the body so that it will move to the specified absolute coordinates in
-the next timestep. 
+the next timestep.
 Intended for objects that are moved manually with a custom velocity integration function."
   (let ((delta (vector-subtract pos (body-position body))))
     (setf (body-velocity body)
@@ -105,17 +101,43 @@ gravity (also in world coordinates)."
 
 (defun body-reset-forces (body)
   "Zero the forces on a body."
-  ;; todo
-  )
+  (setf (body-force body) +zero-vector+
+        (body-torque body) 0))
 
-(defun body-apply-force (body f r)
+(defun body-apply-force (body force r)
   "Apply a force (in world coordinates) to a body at a point relative to the center
 of gravity (also in world coordinates)."
-  ;; todo
-  )
+  (setf (body-force body) (vector-add (body-force body) force))
+  (incf (body-torque body) (vector-cross r force)))
 
 (defun apply-damped-spring (body1 body2 anchor1 anchor2 rlen k dmp dt)
   "Apply a damped spring force between two bodies.
 Warning: Large damping values can be unstable. Use a DAMPED-SPRING constraint for this instead."
-  ;; todo
-  )
+  (let* (;; Calculate the world space anchor coordinates.
+         (r1 (vector-rotate anchor1 (body-rotation body1)))
+         (r2 (vector-rotate anchor2 (body-rotation body2)))
+
+         (delta (vector-subtract (vector-add (body-position body2) r2)
+                                 (vector-add (body-position body1) r1)))
+         (distance (vector-length delta))
+         (n (if (zerop distance) +zero-vector+ (vector-multiply delta (/ 1 distance))))
+
+         (f-spring (* k (- distance rlen)))
+
+         ;; Calculate the world relative velocities of the anchor points.
+         (v1 (vector-add (body-velocity body1)
+                         (vector-multiply (vector-perp r1) (body-angular-velocity body1))))
+         (v2 (vector-add (body-velocity body2)
+                         (vector-multiply (vector-perp r2) (body-angular-velocity body2))))
+
+         ;; Calculate the damping force.
+         ;; This really sholud be in the impulse solvel and can produce problems when
+         ;; using large damping values.
+         (vrn (vector-dot (vector-subtract v2 v1) n))
+         (f-damp (* vrn (min dmp (/ 1 (* dt (+ (body-inverse-mass body1)
+                                               (body-inverse-mass body2)))))))
+         (f (vector-multiply n (+ f-spring f-damp))))
+    ;; Apply!
+    (body-apply-force body1 f r1)
+    (body-apply-force body2 (vector-neg f) r2)))
+
