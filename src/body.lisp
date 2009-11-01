@@ -94,7 +94,7 @@ Intended for objects that are moved manually with a custom velocity integration 
   "Apply an impulse (in world coordinates) to the body at a point relative to the center of
 gravity (also in world coordinates)."
   (setf (body-velocity body)
-        (vec+ (body-velocity)
+        (vec+ (body-velocity body)
               (vec* j (body-inverse-mass body))))
   (incf (body-angular-velocity body)
         (* (body-inverse-inertia body)
