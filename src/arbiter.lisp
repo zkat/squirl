@@ -28,3 +28,12 @@
        (setf sum (vec+ sum (vec* (contact-normal contact)
                                  (contact-jn-acc contact))))
      finally (return sum)))
+
+(defun contacts-sum-impulses-with-friction (&rest contacts)
+  (loop with sum = (vec 0 0)
+     for contact in contacts do
+       (setf sum (vec+ sum
+                       (vec* (vec-perp (contact-normal contact))
+                             (contact-jt-acc contact))
+                       (vec* (contact-normal contact)
+                             (contact-jn-acc contact))))))
