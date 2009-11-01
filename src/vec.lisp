@@ -41,11 +41,11 @@
   (vec (- (vec-x vec))
           (- (vec-y vec))))
 
-(defun vec- (v1 v2)
-  (vec (- (vec-x v1)
-             (vec-x v2))
-          (- (vec-y v1)
-             (vec-y v2))))
+(defun vec- (&rest vectors)
+  (unless (cdr vectors)
+    (push (vec 0 0) vectors))
+  (vec (reduce #'- (mapcar #'vec-x vectors))
+       (reduce #'- (mapcar #'vec-y vectors))))
 
 (defun vec* (vec s)
   (vec (* (vec-x vec) s)
