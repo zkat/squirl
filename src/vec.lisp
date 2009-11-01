@@ -19,6 +19,21 @@
 
 (defconstant +zero-vector+ (vec 0 0))
 
+(defmacro with-vec (form &body body)
+  "FORM is either a symbol bound to a `vec', or a list of the form:
+  (name form)
+where NAME is a symbol, and FORM evaluates to a `vec'.
+WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
+  (let ((name (if (listp form) (first form) form))
+        (place (if (listp form) (second form) form)))
+    `(with-accessors ((,(intern (format nil "~A.X" name)) vec-x)
+                      (,(intern (format nil "~A.Y" name)) vec-y))
+         ,place ,@body)))
+
+(defmacro with-vecs ((form &rest forms) &body body)
+  "Convenience macro for nesting WITH-VEC forms"
+  `(with-vec ,form ,@(if forms `((with-vecs ,forms ,@body)) body)))
+
 (defun vec-zerop (vec)
   "Checks whether VEC is a zero vector"
   (or (eq vec +zero-vector+) ; Optimization!
