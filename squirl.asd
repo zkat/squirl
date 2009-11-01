@@ -16,8 +16,8 @@
              (:file "chipmunk"
                     :depends-on ("vec"))
              (:file "package")
-             (:file "space"
-                    :depends-on ("vec"))
              (:file "vec"
-                    :depends-on ("package"))))))
+                    :depends-on ("package"))
+             (:file "world"
+                    :depends-on ("vec"))))))
 

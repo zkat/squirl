@@ -3,7 +3,7 @@
 
 (defvar *contact-persistence*)
 
-(defstruct space
+(defstruct world
   ;; User definable slots
   ;; --------------------
 
@@ -22,7 +22,7 @@
   ;; Internal slots
   ;; --------------
 
-  ;; Time stamp, incremented on every call to SPACE-STEP
+  ;; Time stamp, incremented on every call to WORLD-STEP
   stamp
 
   ;; Static and active shape spatial hashes

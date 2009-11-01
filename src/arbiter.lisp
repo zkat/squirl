@@ -44,7 +44,7 @@
   shape-a shape-b
   ;; Calculated by arbiter-prestep
   u target-v
-  ;; Timestamp of the arbiter (from space)
+  ;; Timestamp of the arbiter (from world)
   stamp)
 
 (defun arbiter-inject (arbiter &rest contacts)
