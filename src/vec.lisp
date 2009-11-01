@@ -41,13 +41,12 @@
   (vec (- (vec-x vec))
        (- (vec-y vec))))
 
-(defun vec- (&rest vectors)
-  (cond
-    ((null vectors) +zero-vector+)
-    ((null (rest vectors))
-     (vec-neg (car vectors)))
-    (t (vec (reduce #'- vectors :key #'vec-x)
-            (reduce #'- vectors :key #'vec-y)))))
+(defun vec- (minuend &rest subtrahends)
+  (if (null subtrahends) (vec-neg minuend)
+      (vec (reduce #'- subtrahends :key #'vec-x
+                   :initial-value (vec-x minuend))
+           (reduce #'- subtrahends :key #'vec-y
+                   :initial-value (vec-y minuend)))))
 
 (defun vec* (vec s)
   (vec (* (vec-x vec) s)
