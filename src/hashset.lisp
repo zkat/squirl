@@ -27,3 +27,22 @@
 
 (defun hashset-size (set)
   (length (hashset-table set)))
+
+(defun set-full-p (set)
+  (> (hashset-entries set)
+     (hashset-size set)))
+
+(defun set-resize (set &aux (new-size (next-prime (1+ (hashset-size set)))))
+  (let ((new-table (make-array new-size :element-type 'hashset-bin)))
+    (loop for initial-bin across (hashset-table set)
+       do (loop
+             for bin = initial-bin then next
+             for next = (hashset-bin-next bin)
+             with index = (mod (hashset-bin-hash bin) new-size)
+             while bin do ; Note that these are sequential, not parallel:
+               (setf (hashset-bin-next bin) (aref new-table index)
+                     (aref new-table index) bin))
+       finally
+         (setf (hashset-table set) new-table
+               (hashset-size set) new-size)))
+  set)
