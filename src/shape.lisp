@@ -57,7 +57,7 @@
   ;; I'm not sure if this is supposed to return true/false/some value. Returning 0 for now.
   ;; C version:
   ;; if(!(group && shape->group && group == shape->group) && (layers&shape->layers)){
-  ;; 	return shape->klass->pointQuery(shape, p);
+  ;;    return shape->klass->pointQuery(shape, p);
   ;; }
   ;; return 0;
   (if (and (not (and group (shape-group shape) (eq group (shape-group shape))))
@@ -82,15 +82,20 @@
   trans-normal ;transformed normal (world space coords)
   )
 
-
-
 (defun segment-query-info-print (info)
   ;; TODO
   )
 
 (defun shape-segment-query (shape a b layers group info)
-  ;; TODO
-  )
+  ;; if(!(group && shape->group && group == shape->group) && (layers&shape->layers)){
+  ;;    shape->klass->segmentQuery(shape, a, b, info);
+  ;; }
+
+  ;; return (info->shape != NULL);
+  (when (and (not (and group (shape-group shape) (eq group (shape-group shape))))
+             (logand layers (shape-layers shape)))
+    (funcall (shape-klass-segment-query (shape-klass shape)) shape a b info))
+  (null (shape-info shape)))
 
 (defun segment-query-hit-point (start end info)
   ;; TODO - We haven't done info yet. This accessor is probably wrong.
