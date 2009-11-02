@@ -54,6 +54,7 @@
 
 (defun poly-transform-vertices (poly position rotation)
   (setf (poly-transformed-vertices poly)
+        ;; this'll have to become a MAP-INTO, I think.
         (map 'list (lambda (vert) (vec+ position (vec-rotate vert rotation)))
              (poly-vertices poly))))
 
