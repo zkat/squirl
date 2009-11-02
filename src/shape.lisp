@@ -1,3 +1,4 @@
+;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
 (defparameter *shape-id-counter* 0)
