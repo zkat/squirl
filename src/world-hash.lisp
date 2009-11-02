@@ -16,24 +16,27 @@
 (defun release-handle (handle)
   (decf (handle-retain handle)))
 
-(defstruct world-hash
-  "The spatial hash is SquirL's default (and currently only) spatial index"
-  cell-size                             ; Size of the hash's cells
-  bbox-function                         ; Bounding box callback
-  handle-set                            ; `hash-set' of all handles
-  table                                 ; Bins in use
-  junk-bins                             ; The "recycle bin"
-  )
-
-(defun world-hash-size (hash)
-  (length (world-hash-table hash)))
-
-(defun world-hash-reset-table (hash size)
-  (setf (world-hash-table hash)
-        (make-array size :initial-element nil)))
-
 ;;; Used for the `world-hash-handle-set'
 (defun handle-equal (object handle)
   (eql object (handle-object handle)))
 (defun handle-transform (object)
   (make-handle object))
+
+(defun make-world-hash-table (size)
+  (make-array size :initial-element nil))
+
+(defstruct (world-hash
+             (:constructor make-world-hash
+                           (cell-size size bbox-function &aux
+                                      (table (make-world-hash-table size)))))
+  "The spatial hash is SquirL's default (and currently only) spatial index"
+  cell-size                             ; Size of the hash's cells
+  bbox-function                         ; Bounding box callback
+  (handle-set (make-hash-set 0 #'handle-equal)) ; `hash-set' of all handles
+  table                                         ; Bins in use
+  (junk-bins nil)                               ; The "recycle bin"
+  (stamp 1)            ; Incremented on each query; see `handle-stamp'
+  )
+
+(defun world-hash-size (hash)
+  (length (world-hash-table hash)))
