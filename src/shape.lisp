@@ -81,7 +81,7 @@
 ;;;
 ;;; Circles
 ;;;
-(defstruct (circle-shape (:include shape))
+(defstruct (circle (:include shape))
   center ; Center in body space coordinates.
   radius
   transformed-center; Transformed center. (world space coordinates)
