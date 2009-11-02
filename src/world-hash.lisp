@@ -75,3 +75,19 @@ list structure into the `world-hash-junk'."
 (defun hash (x y n)
   "Hash X, Y, and N to generate a hash code"
   (expt-mod (* x 2185031351) (* y 4232417593) n))
+
+(defun hash-handle (hash handle bbox)
+  (let* ((size (world-hash-size hash))
+         (dim (world-hash-cell-size hash))
+         (bb.t (floor (/ (bbox-top    bbox) dim)))
+         (bb.l (floor (/ (bbox-left   bbox) dim)))
+         (bb.r (floor (/ (bbox-right  bbox) dim)))
+         (bb.b (floor (/ (bbox-bottom bbox) dim))))
+    (loop for i from bb.l to bb.r
+       do (loop for j from bb.b to bb.t
+             for index = (hash i j size)
+             for chain list = (world-hash-chain hash index)
+             unless (find handle chain :key #'eq) do
+               (let ((node (get-new-node hash)))
+                 (setf (car node) handle)
+                 (push-cons node (world-hash-chain hash index)))))))
