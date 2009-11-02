@@ -45,3 +45,19 @@
        finally
          (setf (hash-set-table set) new-table)))
   set)
+
+(defun hash-set-insert (set hash ptr data
+                        &aux (index (mod hash (hash-set-size set))))
+  (let ((bin (aref (hash-set-table set) index)))
+    (loop while (and bin (not (funcall (hash-set-test set) ptr
+                                       (hash-set-bin-elt bin))))
+       do (setf bin (hash-set-bin-next bin)))
+    (unless bin
+      (setf bin (make-hash-set-bin
+                 :hash hash :elt (funcall (hash-set-transformer set) ptr data)
+                 :next (aref (hash-set-table set) index))
+            (aref (hash-set-table set) index) bin)
+      (incf (hash-set-entries set))
+      (when (hash-set-full-p set)
+        (hash-set-resize set))
+      (hash-set-bin-elt bin))))
