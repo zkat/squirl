@@ -71,3 +71,7 @@ list structure into the `world-hash-junk'."
   "Get a recycled node or cons a new one"
   (let ((node (pop (world-hash-junk hash))))
     (if (null node) (cons nil nil) node)))
+
+(defun hash (x y n)
+  "Hash X, Y, and N to generate a hash code"
+  (mod (expt (* x 2185031351) (* y 4232417593)) n))
