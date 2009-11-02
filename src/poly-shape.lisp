@@ -3,3 +3,7 @@
 
 (defstruct poly-shape-axis
   normal distance)
+
+(defstruct (poly-shape (:constructor %make-poly-shape (body vertices offset))
+                       (:include shape))
+  vertices axes transformed-vertices transformed-axes)
