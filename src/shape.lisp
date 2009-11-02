@@ -43,10 +43,13 @@
   )
 
 (defun shape-cache-bbox (shape)
-  (setf (shape-bbox shape)
-        (shape-cache-data shape)))
+  (let* ((body (shape-body shape))
+         (position (body-position body))
+         (rotation (body-rotation body)))
+    (setf (shape-bbox shape)
+          (shape-cache-data shape position rotation))))
 
-(defgeneric shape-cache-data (shape)
+(defgeneric shape-cache-data (shape position rotation)
   (:documentation "Cache the BBox of the shape."))
 
 (defgeneric shape-point-query (shape point)
@@ -61,7 +64,7 @@
                (logand layers (shape-layers shape)))
       (call-next-method))))
 
-(defgeneric shape-segment-query (x)
+(defgeneric shape-segment-query (shape a b layers group info)
   (:method :around ((shape shape) a b layers group info)
     ;; if(!(group && shape->group && group == shape->group) && (layers&shape->layers)){
     ;;    shape->klass->segmentQuery(shape, a, b, info);
@@ -93,3 +96,28 @@
              (+ (vec-x vec) r)
              (+ (vec-y vec) r)))
 
+(defmethod shape-cache-data ((circle circle) position rotation)
+  (setf (circle-transformed-center circle)
+        (vec+ position (vec-rotate (circle-center circle) rotation)))
+  (bbox-from-circle (circle-transformed-center circle) (circle-radius circle)))
+
+(defmethod shape-point-query ((circle circle) point)
+  (vec-near (circle-transformed-center circle) point (circle-radius circle)))
+
+(defmethod shape-segment-query ((circle circle) a b layers group info)
+  (declare (ignore layers group))
+  (let* ((center (circle-transformed-center circle))
+         (radius (circle-radius circle))
+         (a (vec- a center))
+         (b (vec- b center))
+         (qa (+ (- (vec. a a) (* 2 (vec. a b))) (vec. b b)))
+         (qb (- (* 2 (vec. a b)) (* 2 (vec. a a))))
+         (qc (- (vec. a a) (expt radius 2)))
+         (det (- (expt qb 2) (* 4 qa qc))))
+    (unless (not (minusp det))
+      (let ((t (/ (- (- qb) (sqrt det))
+                  (* 2 qa))))
+        (when (and (not (minusp t)) (<= t 1))
+          (setf (segment-query-info-shape info) circle
+                (segment-query-info-t info) t
+                (segment-query-info-n info) (vec-normalize (vec-lerp a b t))))))))
