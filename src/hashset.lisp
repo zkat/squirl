@@ -89,3 +89,16 @@
      do (loop while bin do
              (funcall function (hash-set-bin-elt bin) data)
              (setf bin (hash-set-bin-next bin)))))
+
+(defun hash-set-reject (set function data)
+  (loop for index below (length (hash-set-table set))
+     for bin = (aref (hash-set-table set) index) with prev-bin
+     do (loop while bin with next = (hash-set-bin-next bin)
+           do (if (funcall function (hash-set-bin-elt bin) data)
+                  (setf prev-bin bin)
+                  (progn
+                    (if prev-bin
+                        (setf (hash-set-bin-next prev-bin) next)
+                        (setf (aref (hash-set-table set) index) next))
+                    (decf (hash-set-entries set))))
+             (setf bin next))))
