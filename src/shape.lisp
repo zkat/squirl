@@ -149,13 +149,16 @@
                      (seg-a segment-a) (seg-b segment-b) (seg-tnormal segment-trans-normal)
                      (seg-normal segment-normal))
         seg
+      ;; calculate normal distance from segment
       (let* ((dn (- (vec. seg-tn point) (vec. seg-ta seg-tnormal)))
              (dist (- (abs dn) seg-r)))
         (if (plusp dist)
             (return t)
+            ;; calculate tangential distance along segment
             (let ((dt (- (vecx seg-tnormal point)))
                   (dt-min (- (vecx seg-tnormal seg-ta)))
                   (dt-max (- (vecx seg-tnormal seg-tb))))
+              ;; decision tree to decide which feature of the segment to collide with
               (if (<= dt dt-min)
                   (if (< dt (- dt-min seg-r))
                       (return nil)
