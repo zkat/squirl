@@ -14,8 +14,14 @@
 
 (defun validate-vertices (vertices)
   "Check that a set of vertices has a correct winding, and that they form a convex polygon."
-  ;; todo
-  )
+  (loop with length = (length vertices)
+     for i from 0
+     for vert-a in vertices
+     for vert-b = (mod (elt vertices (1+ i)) length)
+     for vert-c = (mod (elt vertices (+ i 2)) length)
+     unless (minusp (vecx (vec- vert-b vert-a) (vec- vert-c vert-b)))
+     return nil
+     finally (return t)))
 
 (defun num-vertices (poly)
   (length (poly-vertices poly)))
@@ -101,3 +107,4 @@
                                                      (length vertices))))))
                    (when (<= dt-min dt dt-max)
                      (values poly ratio normal))))))))))
+
