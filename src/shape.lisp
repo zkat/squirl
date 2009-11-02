@@ -80,11 +80,17 @@
 ;;;
 ;;; Circles
 ;;;
-(defstruct (circle (:include shape))
+(defstruct (circle (:constructor %make-circle (body radius center))
+                   (:include shape))
   center ; Center in body space coordinates.
   radius
   transformed-center; Transformed center. (world space coordinates)
   )
+
+(defun make-circle (body radius offset)
+  (let ((circle (%make-circle body radius center)))
+    (shared-shape-init circle)
+    circle))
 
 (defun bbox-from-circle (vec r)
   (make-bbox (- (vec-x vec) r)
