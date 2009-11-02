@@ -62,8 +62,8 @@ insertion was made, or NIL if DATA was already present in the table."
 
 (defun hash-set-find (set hash data)
   "Searches for DATA in `hash-set' SET, using hash value HASH. On success, two
-values are returned: the datum found within SET, and T. On failure, returns
-the `hash-set-default-value' for SET, and NIL. See `cl:gethash'."
+values are returned: the datum found within SET, and T. On failure, the values
+are the `hash-set-default-value' for SET, and NIL. See `cl:gethash'."
   (let ((chain (aref (hash-set-table set)
                      (mod hash (hash-set-size set)))))
     (dolist (bin chain (values (hash-set-default-value set) nil))
@@ -71,15 +71,16 @@ the `hash-set-default-value' for SET, and NIL. See `cl:gethash'."
         (return (values (cdr bin) t))))))
 
 (defun hash-set-remove (set hash data)
-  "Removes DATA from `hash-set' SET, using hash value HASH. Returns the datum
-removed from SET, or NIL if no such datum was found."
-  (let ((found (hash-set-find set hash data)))
+  "Removes DATA from `hash-set' SET, using hash value HASH. On success, two
+values are returned: the datum removed from SET, and T. On failure, the values
+are the `hash-set-default-value' for SET, and NIL. See `cl:remhash'."
+  (multiple-value-bind (datum found) (hash-set-find set hash data)
     (when found
       (let ((index (mod hash (hash-set-size set))))
         (setf (aref (hash-set-table set) index)
-              (delete data (aref (hash-set-table set) index)
-                      :test (hash-set-test set) :key #'cdr))
-        found))))
+              (delete datum (aref (hash-set-table set) index)
+                      :test #'eq :key #'cdr))))
+    (values datum found)))
 
 (defun hash-set-map (set function)
   (loop for bin across (hash-set-table set)
