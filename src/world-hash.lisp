@@ -110,3 +110,10 @@ list structure into the `world-hash-junk'."
     (hash-set-map (lambda (handle &aux (object (handle-object handle)))
                     (hash-handle hash handle (funcall bbox-fn object)))
                   (world-hash-handle-set hash))))
+
+(defun world-hash-remove (hash object id)
+  (multiple-value-bind (handle foundp)
+      (hash-set-remove (world-hash-handle-set hash) id object)
+    (when foundp
+      (setf (handle-object handle) nil)
+      (release-handle handle))))
