@@ -7,10 +7,10 @@
 (defvar *body-update-position-default*)
 
 (defstruct (body
-            (:constructor
-             make-body (%mass %inertia &aux
-                              (inverse-mass (/ %mass))
-                              (inverse-inertia (/ %inertia)))))
+             (:constructor
+              make-body (%mass %inertia &aux
+                               (inverse-mass (/ %mass))
+                               (inverse-inertia (/ %inertia)))))
   ;; Function that is called to integrate the body's velocity.
   (velocity-fun *body-update-velocity-default* :type function)
 
