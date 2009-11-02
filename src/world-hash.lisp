@@ -151,3 +151,26 @@ list structure into the `world-hash-junk'."
              for index = (hash i j size) do
                (query function hash (world-hash-chain hash index) object))))
   (incf (world-hash-stamp hash)))
+
+(defun world-hash-query-rehash (function hash)
+  (clear-world-hash hash)
+  (hash-set-map (lambda (handle &aux (object (handle-object handle)))
+                  (let* ((size (world-hash-size hash))
+                         (dim (world-hash-cell-size hash))
+                         (bbox (funcall (world-hash-bbox-function hash) object))
+                         (bb.t (floor (/ (bbox-top    bbox) dim)))
+                         (bb.l (floor (/ (bbox-left   bbox) dim)))
+                         (bb.r (floor (/ (bbox-right  bbox) dim)))
+                         (bb.b (floor (/ (bbox-bottom bbox) dim))))
+                    (loop for i from bb.l to bb.r
+                       do (loop for j from bb.b to bb.t
+                             for index = (hash i j size)
+                             for chain = (world-hash-chain hash index)
+                             unless (find handle chain) do
+                               (retain-handle handle)
+                               (query function hash chain object)
+                               (let ((node (get-new-node hash)))
+                                 (setf (car node) handle)
+                                 (push-cons node (world-hash-chain hash index))))))
+                  (incf (world-hash-stamp hash)))
+                (world-hash-handle-set hash)))
