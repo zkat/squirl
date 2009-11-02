@@ -41,17 +41,12 @@
 
 (defun hash-set-resize (set &aux (new-size (next-prime (1+ (hash-set-size set)))))
   (let ((new-table (make-array new-size :initial-element nil)))
-    (loop for initial-bin across (hash-set-table set)
-       do (loop
-             for bin = initial-bin then next
-             for next = (hash-set-bin-next bin)
-             with index = (mod (hash-set-bin-hash bin) new-size)
-             while bin do ; Note that these are sequential, not parallel:
-               (setf (hash-set-bin-next bin) (aref new-table index)
-                     (aref new-table index) bin))
-       finally
-         (setf (hash-set-table set) new-table)))
-  set)
+    (with-accessors ((table hash-set-table)) set
+     (loop for chain across table
+        do (loop for bin in chain for index = (mod (car bin) new-size)
+              do (push bin (aref new-table index))))
+     (setf table new-table)
+     set)))
 
 (defun hash-set-insert (set hash data &aux (index (mod hash (hash-set-size set))))
   "Insert DATA into `hash-set' SET, using hash value HASH. Returns DATA if an
