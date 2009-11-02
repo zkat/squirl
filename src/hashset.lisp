@@ -61,6 +61,8 @@ insertion was made, or NIL if DATA was already present in the table."
       data)))
 
 (defun hash-set-find (set hash data)
+  "Searches for DATA in `hash-set' SET, using hash value HASH. Returns the datum
+found within SET, or the `hash-set-default-value' if no matching datum was found."
   (let ((chain (aref (hash-set-table set)
                      (mod hash (hash-set-size set)))))
     (dolist (bin chain (hash-set-default-value set))
@@ -68,6 +70,8 @@ insertion was made, or NIL if DATA was already present in the table."
         (return (cdr bin))))))
 
 (defun hash-set-remove (set hash data)
+  "Removes DATA from `hash-set' SET, using hash value HASH. Returns the datum
+removed from SET, or NIL if no such datum was found."
   (let ((found (hash-set-find set hash data)))
     (when found
       (let ((index (mod hash (hash-set-size set))))
