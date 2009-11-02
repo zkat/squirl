@@ -100,7 +100,7 @@
   (declare (ignore layers group))
   (let ((center (circle-transformed-center circle))
         (radius (circle-radius circle)))
-    (circle-segment-query center radius a b)))
+    (circle-segment-query circle center radius a b)))
 
 (defun circle-segment-query (shape center radius a b)
   (let* ((a (vec- a center))
