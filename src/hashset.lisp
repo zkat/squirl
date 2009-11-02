@@ -28,11 +28,11 @@
 (defun hash-set-size (set)
   (length (hash-set-table set)))
 
-(defun set-full-p (set)
+(defun hash-set-full-p (set)
   (> (hash-set-entries set)
      (hash-set-size set)))
 
-(defun set-resize (set &aux (new-size (next-prime (1+ (hash-set-size set)))))
+(defun hash-set-resize (set &aux (new-size (next-prime (1+ (hash-set-size set)))))
   (let ((new-table (make-array new-size :element-type 'hash-set-bin)))
     (loop for initial-bin across (hash-set-table set)
        do (loop
