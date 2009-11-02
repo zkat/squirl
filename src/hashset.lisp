@@ -13,16 +13,23 @@
   (loop for prime in *primes* when (>= prime n) return prime
      finally (error "Time to switch to native hashtables!")))
 
-(defstruct hash-set-bin
-  elt hash next)
+(defun make-hash-set-bin (&key hash elt next)
+  (acons hash elt next))
+
+(macrolet ((define-accessor (name internal)
+             `(progn (defun ,name (bin) (,internal bin))
+                     (defun (setf ,name) (new-value bin)
+                       (setf (,internal bin) new-value)))))
+  (define-accessor hash-set-bin-elt caar)
+  (define-accessor hash-set-bin-hash cdar)
+  (define-accessor hash-set-bin-next cdr))
 
 (defstruct (hash-set
              (:constructor
-              make-hash-set (size test transformer &aux
-                                 (table (make-array (next-prime size)
-                                                    :element-type 'hash-set-bin)))))
-  (entries 0)
-  test transformer
+              make-hash-set (size test &aux
+                                  (table (make-array (next-prime size)
+                                                     :element-type 'hash-set-bin)))))
+  (entries 0) test
   (default-value nil) table)
 
 (defun hash-set-size (set)
@@ -46,15 +53,14 @@
          (setf (hash-set-table set) new-table)))
   set)
 
-(defun hash-set-insert (set hash ptr data
-                        &aux (index (mod hash (hash-set-size set))))
+(defun hash-set-insert (set hash data &aux (index (mod hash (hash-set-size set))))
   (let ((bin (aref (hash-set-table set) index)))
-    (loop while (and bin (not (funcall (hash-set-test set) ptr
+    (loop while (and bin (not (funcall (hash-set-test set) data
                                        (hash-set-bin-elt bin))))
        do (setf bin (hash-set-bin-next bin)))
     (unless bin
       (setf bin (make-hash-set-bin
-                 :hash hash :elt (funcall (hash-set-transformer set) ptr data)
+                 :hash hash :elt data
                  :next (aref (hash-set-table set) index))
             (aref (hash-set-table set) index) bin)
       (incf (hash-set-entries set))
@@ -62,11 +68,11 @@
         (hash-set-resize set))
       (hash-set-bin-elt bin))))
 
-(defun hash-set-remove (set hash pointer)
+(defun hash-set-remove (set hash data)
   (let ((bin (aref (hash-set-table set)
                    (mod hash (hash-set-size set))))
         prev-bin)
-    (loop while (and bin (not (funcall (hash-set-test set) pointer
+    (loop while (and bin (not (funcall (hash-set-test set) data
                                        (hash-set-bin-elt bin))))
        do (setf prev-bin bin
                 bin (hash-set-bin-next bin))
@@ -76,10 +82,10 @@
            (decf (hash-set-entries set))
            (return (hash-set-bin-elt bin))))))
 
-(defun hash-set-find (set hash pointer)
+(defun hash-set-find (set hash data)
   (let ((bin (aref (hash-set-table set)
                    (mod hash (hash-set-size set)))))
-    (loop while (and bin (not (funcall (hash-set-test set) pointer
+    (loop while (and bin (not (funcall (hash-set-test set) data
                                        (hash-set-bin-elt bin))))
        do (setf bin (hash-set-bin-next bin)))
     (if bin (hash-set-bin-elt bin)
