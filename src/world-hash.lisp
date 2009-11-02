@@ -27,3 +27,7 @@
 
 (defun world-hash-size (hash)
   (length (world-hash-table hash)))
+
+(defun world-hash-reset-table (hash size)
+  (setf (world-hash-table hash)
+        (make-array size :initial-element nil)))
