@@ -6,12 +6,6 @@
 (defun reset-shape-id-counter ()
   (setf *shape-id-counter* 0))
 
-(defstruct segment-query-info
-  shape ; shape that was hit. NIL if no collision.
-  t ; distance along query segment, will always be (or 0 1)
-  n ; Normal vec of hit surface.
-  )
-
 ;;;
 ;;; Shape
 ;;;
@@ -60,22 +54,15 @@
                (logand layers (shape-layers shape)))
       (call-next-method))))
 
-(defgeneric shape-segment-query (shape a b layers group info)
-  (:method :around ((shape shape) a b layers group info)
+(defgeneric shape-segment-query (shape a b layers group)
+  (:method :around ((shape shape) a b layers group)
     ;; if(!(group && shape->group && group == shape->group) && (layers&shape->layers)){
     ;;    shape->klass->segmentQuery(shape, a, b, info);
     ;; }
     ;; return (info->shape != NULL);
     (when (and (not (and group (shape-group shape) (eq group (shape-group shape))))
                (logand layers (shape-layers shape)))
-      (call-next-method))
-    (null (shape-info shape))))
-
-(defun segment-query-hit-point (start end info)
-  (vec-lerp start end (segment-query-info-t info)))
-
-(defun segment-query-hit-dist (start end info)
-  (* (vec-dist start end) (segment-query-info-t info)))
+      (call-next-method))))
 
 ;;;
 ;;; Circles
@@ -107,23 +94,24 @@
   (declare (ignore layers group))
   (vec-near (circle-transformed-center circle) point (circle-radius circle)))
 
-(defmethod shape-segment-query ((circle circle) a b layers group info)
+(defmethod shape-segment-query ((circle circle) a b layers group)
   (declare (ignore layers group))
-  (let* ((center (circle-transformed-center circle))
-         (radius (circle-radius circle))
-         (a (vec- a center))
+  (let ((center (circle-transformed-center circle))
+        (radius (circle-radius circle)))
+    (circle-segment-query center radius a b)))
+
+(defun circle-segment-query (shape center radius a b)
+  (let* ((a (vec- a center))
          (b (vec- b center))
          (qa (+ (- (vec. a a) (* 2 (vec. a b))) (vec. b b)))
          (qb (- (* 2 (vec. a b)) (* 2 (vec. a a))))
          (qc (- (vec. a a) (expt radius 2)))
          (det (- (expt qb 2) (* 4 qa qc))))
-    (unless (not (minusp det))
-      (let ((t (/ (- (- qb) (sqrt det))
-                  (* 2 qa))))
-        (when (and (not (minusp t)) (<= t 1))
-          (setf (segment-query-info-shape info) circle
-                (segment-query-info-t info) t
-                (segment-query-info-n info) (vec-normalize (vec-lerp a b t))))))))
+    (unless (minusp det)
+      (let ((ratio (/ (- (- qb) (sqrt det))
+                      (* 2 qa))))
+        (when (<= 0 t 1)
+          (values circle ratio normal))))))
 
 ;;;
 ;;; Segments
@@ -187,7 +175,7 @@
                           (return nil))))
               (return t)))))))
 
-(defmethod shape-segment-query ((seg segment) a b info)
+(defmethod shape-segment-query ((seg segment) a b)
   (let ((n (segment-trans-normal seg)))
     (when (< (vec. a n) (vec. (seg-trans-a seg) n))
       (setf n (vec-neg n)))
@@ -201,11 +189,10 @@
                (dt-min (- (vecx (segment-trans-normal seg) (segment-trans-a seg))))
                (dt-max (- (vecx (segment-trans-normal seg) (segment-trans-b seg)))))
           (when (< dt-min dt dt-max)
-            (setf (segment-query-info-shape info) seg
-                  (segment-query-info-t info) ratio
-                  (segment-query-info-n info) n)
-            (return))))
+            (values seg ratio n)
+            (return (values seg ratio n)))))
       (unless (zerop (segment-radius seg))
+
         )
       ))
   )
