@@ -28,19 +28,19 @@
                  (vec* (contact-normal contact)
                        (contact-jn-acc contact)))))
 
+(defun contact-impulse-with-friction (contact)
+  (vec-rotate (contact-normal contact)
+              (vec (contact-jn-acc contact)
+                   (contact-jt-acc contact))))
+
 (defun contacts-sum-impulses-with-friction (&rest contacts)
   (reduce #'vec+ contacts :initial-value +zero-vector+
-          :key (lambda (contact)
-                 (vec-rotate (contact-normal contact)
-                             (vec (contact-jn-acc contact)
-                                  (contact-jt-acc contact))))))
+          :key #'contact-impulse-with-friction))
 
 (defun contacts-estimate-crushing-impulse (&rest contacts)
   (let ((fsum 0) (vsum +zero-vector+))
     (dolist (contact contacts)
-      (let ((j (vec-rotate (contact-normal contact)
-                           (vec (contact-jn-acc contact)
-                                  (contact-jt-acc contact)))))
+      (let ((j (contact-impulse-with-friction contact)))
         (incf fsum (vec-length j))
         (setf vsum (vec+ vsum j))))
     (- 1 (/ (vec-length vsum) fsum))))
