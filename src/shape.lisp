@@ -1,5 +1,10 @@
 (in-package :squirl)
 
+(defparameter *shape-id-counter* 0)
+
+(defun reset-shape-id-counter ()
+  (setf *shape-id-counter* 0))
+
 (defstruct segment-query-info
   shape ; shape that was hit. NIL if no collision.
   t ; distance along query segment, will always be (or 0 1)
@@ -65,9 +70,7 @@
   trans-normal ;transformed normal (world space coords)
   )
 
-(defun reset-shape-id-counter ()
-  ;; TODO
-  )
+
 
 (defun segment-query-info-print (info)
   ;; TODO
