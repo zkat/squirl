@@ -18,10 +18,12 @@
 
 (defstruct world-hash
   "The spatial hash is SquirL's default (and currently only) spatial index"
-  size                                  ; Number of cells in the table
-  cell-size                             ; Size of the cells
+  cell-size                             ; Size of the hash's cells
   bbox-function                         ; Bounding box callback
   handle-set                            ; `hash-set' of all handles
   table                                 ; Bins in use
   junk-bins                             ; The "recycle bin"
   )
+
+(defun world-hash-size (hash)
+  (length (world-hash-table hash)))
