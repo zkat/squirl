@@ -38,12 +38,11 @@
           :key #'contact-impulse-with-friction))
 
 (defun contacts-estimate-crushing-impulse (&rest contacts)
-  (let ((fsum 0) (vsum +zero-vector+))
-    (dolist (contact contacts)
-      (let ((j (contact-impulse-with-friction contact)))
-        (incf fsum (vec-length j))
-        (setf vsum (vec+ vsum j))))
-    (- 1 (/ (vec-length vsum) fsum))))
+  (loop for contact in contacts
+     for impulse = (contact-impulse-with-friction contact)
+     for vec-sum = +zero-vector+ then (vec+ vec-sum impulse)
+     sum (vec-length impulse) into scalar-sum
+     finally (return (- 1 (/ (vec-length vec-sum) scalar-sum)))))
 
 (defstruct (arbiter (:constructor make-arbiter (contacts shape-a shape-b stamp)))
   ;; Information on the contact points between the objects
