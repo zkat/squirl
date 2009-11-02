@@ -16,3 +16,9 @@
   "Check that a set of vertices has a correct winding, and that they form a convex polygon."
   ;; todo
   )
+
+(defun num-vertices (poly)
+  (length (poly-vertices poly)))
+
+(defun nth-vertex (index poly)
+  (elt (poly-vertices poly) index))
