@@ -24,3 +24,10 @@ the result of calling DELETE with PREDICATE, place, and the REMOVE-KEYWORDS.")
     `(let ((,cons-sym ,cons))
        (setf (cdr ,cons-sym) ,place
              ,place ,cons-sym))))
+
+(defun expt-mod (b e m &aux (result 1))
+  (do ((expt e (ash expt -1))
+       (base b (mod (* base base) m)))
+      ((zerop expt) result)
+    (when (oddp expt)
+      (setf result (mod (* result base) m)))))
