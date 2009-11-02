@@ -13,15 +13,15 @@
   (loop for prime in *primes* when (>= prime n) return prime
      finally (error "Time to switch to native hashtables!")))
 
-(defun make-hash-set-bin (&key hash elt next)
+(defun make-hash-set-bin (hash elt next)
   (acons hash elt next))
 
 (macrolet ((define-accessor (name internal)
              `(progn (defun ,name (bin) (,internal bin))
                      (defun (setf ,name) (new-value bin)
                        (setf (,internal bin) new-value)))))
-  (define-accessor hash-set-bin-elt caar)
-  (define-accessor hash-set-bin-hash cdar)
+  (define-accessor hash-set-bin-elt cdar)
+  (define-accessor hash-set-bin-hash caar)
   (define-accessor hash-set-bin-next cdr))
 
 (defstruct (hash-set
@@ -54,14 +54,10 @@
   set)
 
 (defun hash-set-insert (set hash data &aux (index (mod hash (hash-set-size set))))
-  (let ((bin (aref (hash-set-table set) index)))
-    (loop while (and bin (not (funcall (hash-set-test set) data
-                                       (hash-set-bin-elt bin))))
-       do (setf bin (hash-set-bin-next bin)))
+  (let ((bin (member data (aref (hash-set-table set) index)
+                     :test (hash-set-test set) :key #'cdr)))
     (unless bin
-      (setf bin (make-hash-set-bin
-                 :hash hash :elt data
-                 :next (aref (hash-set-table set) index))
+      (setf bin (make-hash-set-bin hash data (aref (hash-set-table set) index))
             (aref (hash-set-table set) index) bin)
       (incf (hash-set-count set))
       (when (hash-set-full-p set)
