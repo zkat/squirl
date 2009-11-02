@@ -42,7 +42,11 @@
   trans-normal ;transformed normal (world space coords)
   )
 
-(defgeneric shape-cache-bbox (shape)
+(defun shape-cache-bbox (shape)
+  (setf (shape-bbox shape)
+        (shape-cache-data shape)))
+
+(defgeneric shape-cache-data (shape)
   (:documentation "Cache the BBox of the shape."))
 
 (defgeneric shape-point-query (shape point)
