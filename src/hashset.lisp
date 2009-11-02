@@ -13,24 +13,12 @@
   (loop for prime in *primes* when (>= prime n) return prime
      finally (error "Time to switch to native hashtables!")))
 
-(defun make-hash-set-bin (hash elt next)
-  (acons hash elt next))
-
-(macrolet ((define-accessor (name internal)
-             `(progn (defun ,name (bin) (,internal bin))
-                     (defun (setf ,name) (new-value bin)
-                       (setf (,internal bin) new-value)))))
-  (define-accessor hash-set-bin-elt cdar)
-  (define-accessor hash-set-bin-hash caar)
-  (define-accessor hash-set-bin-next cdr))
-
 (defstruct (hash-set
              (:constructor
               make-hash-set (size test &aux
                                   (table (make-array (next-prime size)
                                                      :initial-element nil)))))
-  (count 0) test
-  (default-value nil) table)
+  (count 0) test (default-value nil) table)
 
 (defun hash-set-size (set)
   (length (hash-set-table set)))
