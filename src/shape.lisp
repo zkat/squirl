@@ -47,8 +47,10 @@
 
 (defun shape-cache-bbox (shape)
   "Cache the BBox of the shape."
-  ;; TODO
-  )
+  (let* ((body (shape-body shape))
+         (fun (shape-klass-cache-data (shape-klass shape))))
+    (setf (shape-bbox shape)
+          (funcall fun shape (body-position body) (body-rotation body)))))
 
 (defun shape-point-query (shape p layers group)
   "Test if a point lies within a shape."
