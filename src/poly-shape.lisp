@@ -78,3 +78,26 @@
 (defmethod shape-point-query ((poly poly) position)
   (and (bbox-containts-vec-p (poly-bbox poly) position)
        (poly-shape-contains-vertex-p poly position)))
+
+(defmethod shape-segment-query ((poly poly) a b layers group)
+  (declare (ignore layers group))
+  (let ((axes (poly-axes poly))
+        (vertices (poly-vertices poly)))
+    (loop for vert in vertices
+         for axis in axes
+         for i from 0
+         do
+         (let ((normal (poly-axis-normal axis))
+               (a-normal (vec. a normal)))
+           (unless (> (poly-axis-distance axis) a-normal)
+             (let* ((b-normal (vec. b normal))
+                    (ratio (/ (- (poly-axis-distance axis) an)
+                              (- bn an))))
+               (unless (or (< t 0) (< 1 t))
+                 (let* ((point (vec-lerp a b ratio))
+                        (dt (- (vecx normal point)))
+                        (dt-min (- (vecx normal vert)))
+                        (dt-max (- (vecx normal (mod (elt vertices (1+ i))
+                                                     (length vertices))))))
+                   (when (<= dt-min dt dt-max)
+                     (values poly ratio normal))))))))))
