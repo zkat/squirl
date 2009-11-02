@@ -32,8 +32,8 @@
   (loop with length = (length vertices)
      for i from 0
      for vert-a in vertices
-     for vert-b = (mod (elt vertices (1+ i)) length)
-     for vert-c = (mod (elt vertices (+ i 2)) length)
+     for vert-b = (elt vertices (mod (1+ i) length))
+     for vert-c = (elt vertices (mod (+ i 2) length))
      unless (minusp (vecx (vec- vert-b vert-a) (vec- vert-c vert-b)))
      return nil
      finally (return t)))
@@ -120,8 +120,7 @@
                  (let* ((point (vec-lerp a b ratio))
                         (dt (- (vecx normal point)))
                         (dt-min (- (vecx normal vert)))
-                        (dt-max (- (vecx normal (mod (elt vertices (1+ i))
-                                                     (length vertices))))))
+                        (dt-max (- (vecx normal (elt vertices (mod (1+ i) (length vertices)))))))
                    (when (<= dt-min dt dt-max)
                      (values poly ratio normal))))))))))
 
