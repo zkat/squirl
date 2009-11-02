@@ -28,19 +28,19 @@
              (:constructor
               make-hash-set (size test &aux
                                   (table (make-array (next-prime size)
-                                                     :element-type 'hash-set-bin)))))
-  (entries 0) test
+                                                     :initial-element nil)))))
+  (count 0) test
   (default-value nil) table)
 
 (defun hash-set-size (set)
   (length (hash-set-table set)))
 
 (defun hash-set-full-p (set)
-  (> (hash-set-entries set)
+  (> (hash-set-count set)
      (hash-set-size set)))
 
 (defun hash-set-resize (set &aux (new-size (next-prime (1+ (hash-set-size set)))))
-  (let ((new-table (make-array new-size :element-type 'hash-set-bin)))
+  (let ((new-table (make-array new-size :initial-element nil)))
     (loop for initial-bin across (hash-set-table set)
        do (loop
              for bin = initial-bin then next
@@ -63,7 +63,7 @@
                  :hash hash :elt data
                  :next (aref (hash-set-table set) index))
             (aref (hash-set-table set) index) bin)
-      (incf (hash-set-entries set))
+      (incf (hash-set-count set))
       (when (hash-set-full-p set)
         (hash-set-resize set))
       (hash-set-bin-elt bin))))
@@ -79,7 +79,7 @@
        finally
          (when bin
            (setf (hash-set-bin-next prev-bin) (hash-set-bin-next bin))
-           (decf (hash-set-entries set))
+           (decf (hash-set-count set))
            (return (hash-set-bin-elt bin))))))
 
 (defun hash-set-find (set hash data)
@@ -107,5 +107,5 @@
                     (if prev-bin
                         (setf (hash-set-bin-next prev-bin) next)
                         (setf (aref (hash-set-table set) index) next))
-                    (decf (hash-set-entries set))))
+                    (decf (hash-set-count set))))
              (setf bin next))))
