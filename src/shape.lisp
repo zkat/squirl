@@ -116,13 +116,21 @@
 ;;;
 ;;; Segments
 ;;;
-(defstruct (segment (:include shape))
+(defstruct (segment (:constructor %make-segment (body a b radius &aux
+                                                      (normal (vec-perp
+                                                               (vec-normalize (vec- b a))))))
+                    (:include shape))
   a b ; endpoints (body space coords)
   normal ; normal (body space coords)
   radius ; Thickness
   trans-a trans-b ;transformed endpoints (world space coords)
   trans-normal ;transformed normal (world space coords)
   )
+
+(defun make-segment (body a b radius)
+  (let ((segment (%make-segment body a b radius)))
+    (shared-shape-init segment)
+    segment))
 
 (defmethod shape-cache-data ((seg segment) position rotation)
   (with-accessors ((seg-ta segment-trans-a) (seg-tb segment-trans-b)
