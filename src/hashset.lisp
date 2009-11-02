@@ -77,9 +77,8 @@ are the `hash-set-default-value' for SET, and NIL. See `cl:remhash'."
   (multiple-value-bind (datum found) (hash-set-find set hash data)
     (when found
       (let ((index (mod hash (hash-set-size set))))
-        (setf (aref (hash-set-table set) index)
-              (delete datum (aref (hash-set-table set) index)
-                      :test #'eq :key #'cdr))))
+        (deletef (aref (hash-set-table set) index)
+                 datum :test #'eq :key #'cdr)))
     (values datum found)))
 
 (defun hash-set-map (function set)
