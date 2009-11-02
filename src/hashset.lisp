@@ -62,9 +62,10 @@
         (hash-set-resize set))
       (hash-set-bin-elt bin))))
 
-(defun hash-set-remove (set hash pointer
-                        &aux (index (mod hash (hash-set-size set))))
-  (let ((bin (aref (hash-set-table set) index)) prev-bin)
+(defun hash-set-remove (set hash pointer)
+  (let ((bin (aref (hash-set-table set)
+                   (mod hash (hash-set-size set))))
+        prev-bin)
     (loop while (and bin (not (funcall (hash-set-test set) pointer
                                        (hash-set-bin-elt bin))))
        do (setf prev-bin bin
@@ -75,9 +76,9 @@
            (decf (hash-set-entries set))
            (return (hash-set-bin-elt bin))))))
 
-(defun hash-set-find (set hash pointer
-                      &aux (index (mod hash (hash-set-size set))))
-  (let ((bin (aref (hash-set-table set) index)))
+(defun hash-set-find (set hash pointer)
+  (let ((bin (aref (hash-set-table set)
+                   (mod hash (hash-set-size set)))))
     (loop while (and bin (not (funcall (hash-set-test set) pointer
                                        (hash-set-bin-elt bin))))
        do (setf bin (hash-set-bin-next bin)))
