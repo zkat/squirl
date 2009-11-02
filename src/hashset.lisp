@@ -74,3 +74,12 @@
            (setf (hash-set-bin-next prev-bin) (hash-set-bin-next bin))
            (decf (hash-set-entries set))
            (return (hash-set-bin-elt bin))))))
+
+(defun hash-set-find (set hash pointer
+                      &aux (index (mod hash (hash-set-size set))))
+  (let ((bin (aref (hash-set-table set) index)))
+    (loop while (and bin (not (funcall (hash-set-test set) pointer
+                                       (hash-set-bin-elt bin))))
+       do (setf bin (hash-set-bin-next bin)))
+    (if bin (hash-set-bin-elt bin)
+        (hash-set-default-value set))))
