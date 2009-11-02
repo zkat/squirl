@@ -130,3 +130,11 @@ list structure into the `world-hash-junk'."
                 (null (handle-object handle))) do
        (funcall function object (handle-object handle))
        (setf (handle-stamp handle) (world-hash-stamp hash))))
+
+(defun world-hash-point-query (function hash point)
+  (let* ((dim (world-hash-cell-size hash))
+         (idx (with-vec (pt point)
+                (hash (floor (/ pt.x dim)) (floor (/ pt.y dim))
+                      (world-hash-size hash)))))
+    (query function hash (world-hash-chain hash idx) point))
+  (incf (world-hash-stamp hash)))
