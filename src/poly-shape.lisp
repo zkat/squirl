@@ -11,3 +11,8 @@
 (defun make-poly-shape (body vertices offset)
   (let ((poly-shape (%make-poly-shape body verticel offset)))
     poly-shape))
+
+(defun validate-vertices (vertices)
+  "Check that a set of vertices has a correct winding, and that they form a convex polygon."
+  ;; todo
+  )
