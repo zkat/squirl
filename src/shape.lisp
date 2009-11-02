@@ -12,6 +12,9 @@
   n ; Normal vec of hit surface.
   )
 
+;;;
+;;; Shape
+;;;
 (defstruct shape
   body ; body that the shape is attached to.
   bbox ; Cached Bounding Box for the shape.
@@ -31,6 +34,10 @@
   (id (prog1 *shape-id-counter* (incf *shape-id-counter*))) ; Unique id used as the hash value.
   )
 
+(defun shared-shape-init (shape)
+  (shape-cache-bbox shape)
+  shape)
+
 (defun shape-cache-bbox (shape)
   (let* ((body (shape-body shape))
          (position (body-position body))
@@ -41,7 +48,7 @@
 (defgeneric shape-cache-data (shape position rotation)
   (:documentation "Cache the BBox of the shape."))
 
-(defgeneric shape-point-query (shape point)
+(defgeneric shape-point-query (shape point layers group)
   (:documentation "Test if a point lies within a shape.")
   (:method :around ((shape shape) p layers group)
     ;; C version:
@@ -90,7 +97,8 @@
         (vec+ position (vec-rotate (circle-center circle) rotation)))
   (bbox-from-circle (circle-transformed-center circle) (circle-radius circle)))
 
-(defmethod shape-point-query ((circle circle) point)
+(defmethod shape-point-query ((circle circle) point layers group)
+  (declare (ignore layers group))
   (vec-near (circle-transformed-center circle) point (circle-radius circle)))
 
 (defmethod shape-segment-query ((circle circle) a b layers group info)
@@ -143,7 +151,8 @@
                 omfg-not-t (vec-y seg-ta)))
       (make-bbox (- l rad) (- s rad) (+ r rad) (+ omfg-not-t rad)))))
 
-(defmethod shape-point-query ((seg segment) point)
+(defmethod shape-point-query ((seg segment) point layers group)
+  (declare (ignore layers group))
   (when (bbox-containts-vec-p (shape-bbox seg) point)
     (with-accessors ((seg-ta segment-trans-a) (seg-tb segment-trans-b) (seg-r segment-radius)
                      (seg-a segment-a) (seg-b segment-b) (seg-tnormal segment-trans-normal)
