@@ -6,13 +6,6 @@
 (defun clamp (n min max)
   (min (max n min) max))
 
-(defun init-collision-funcs ()
-  ;; todo
-  )
-
-(defun init ()
-  (init-collision-funcs))
-
 (defun moment-for-circle (m inner-diameter outer-diameter offset)
   "Calculate the moment of inertia for a circle. r1 and r2 are the inner and outer diameters.
 A solid circle has an inner diameter of 0."
