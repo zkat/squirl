@@ -9,4 +9,6 @@
                          3 21 7 17 15 9 43 35 15 29 3 11 3)
      collect (+ (expt 2 x) offset)))
 
-
+(defun next-prime (n)
+  (loop for prime in *primes* when (> prime n) return prime
+     finally (error "Time to switch to native hashtables!")))
