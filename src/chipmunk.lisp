@@ -61,7 +61,7 @@ A solid circle has an inner diameter of 0."
        do (setf (svref t-verts i) (vec+ (elt verts i) offset)))
     (loop with sum1 = 0 with sum2 = 0
        for i below num-verts
-       for v1 in t-verts
+       for v1 across t-verts
        for v2 = (elt t-verts (mod (1+ i) num-verts))
        for a = (vecx v1 v2)
        for b = (+ (vec. v1 v1) (vec. v1 v2) (vec. v2 v2))
