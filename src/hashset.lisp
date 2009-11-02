@@ -35,6 +35,11 @@
 (defun hash-set-size (set)
   (length (hash-set-table set)))
 
+(defun hash-set-chain (set index)
+  (aref (hash-set-table set) index))
+(defun (setf hash-set-chain) (new-chain set index)
+  (setf (aref (hash-set-table set) index) new-chain))
+
 (defun hash-set-full-p (set)
   (> (hash-set-count set)
      (hash-set-size set)))
@@ -42,19 +47,18 @@
 (defun hash-set-resize (set &aux (new-size (next-prime (1+ (hash-set-size set)))))
   "Adjusts `hash-set' SET to accomodate more elements"
   (let ((new-table (make-array new-size :initial-element nil)))
-    (with-accessors ((table hash-set-table)) set
-     (loop for chain across table
-        do (loop for bin in chain for index = (mod (car bin) new-size)
-              do (push bin (aref new-table index))))
-     (setf table new-table)
-     set)))
+    (loop for chain across (hash-set-table set)
+       do (loop for bin in chain for index = (mod (car bin) new-size)
+             do (push bin (aref new-table index))))
+    (setf (hash-set-table set) new-table)
+    set))
 
 (defun hash-set-insert (set hash data &aux (index (mod hash (hash-set-size set))))
   "Insert DATA into `hash-set' SET, using hash value HASH. Returns DATA if an
 insertion was made, or NIL if DATA was already present in the table."
-  (with-accessors ((table hash-set-table) (test hash-set-test)) set
-    (unless (find data (aref table index) :test test :key #'cdr)
-      (push (cons hash data) (aref table index))
+  (with-accessors ((test hash-set-test)) set
+    (unless (find data (hash-set-chain set index) :test test :key #'cdr)
+      (push (cons hash data) (hash-set-chain set index))
       (incf (hash-set-count set))
       (when (hash-set-full-p set)
         (hash-set-resize set))
@@ -64,8 +68,7 @@ insertion was made, or NIL if DATA was already present in the table."
   "Searches for DATA in `hash-set' SET, using hash value HASH. On success, two
 values are returned: the datum found within SET, and T. On failure, the values
 are the `hash-set-default-value' for SET, and NIL. See `cl:gethash'."
-  (let ((chain (aref (hash-set-table set)
-                     (mod hash (hash-set-size set)))))
+  (let ((chain (hash-set-chain set (mod hash (hash-set-size set)))))
     (dolist (bin chain (values (hash-set-default-value set) nil))
       (when (funcall (hash-set-test set) data (cdr bin))
         (return (values (cdr bin) t))))))
@@ -77,7 +80,7 @@ are the `hash-set-default-value' for SET, and NIL. See `cl:remhash'."
   (multiple-value-bind (datum found) (hash-set-find set hash data)
     (when found
       (let ((index (mod hash (hash-set-size set))))
-        (deletef (aref (hash-set-table set) index)
+        (deletef (hash-set-chain set index)
                  datum :test #'eq :key #'cdr)))
     (values datum found)))
 
@@ -89,4 +92,4 @@ are the `hash-set-default-value' for SET, and NIL. See `cl:remhash'."
 (defun hash-set-delete-if (predicate set)
   "Deletes the items from `hash-set' SET on which PREDICATE is true. Returns NIL."
   (dotimes (index (hash-set-size set))
-    (delete-iff (aref (hash-set-table set) index) predicate :key #'cdr)))
+    (delete-iff (hash-set-chain set index) predicate :key #'cdr)))
