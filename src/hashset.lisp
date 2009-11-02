@@ -61,13 +61,14 @@ insertion was made, or NIL if DATA was already present in the table."
       data)))
 
 (defun hash-set-find (set hash data)
-  "Searches for DATA in `hash-set' SET, using hash value HASH. Returns the datum
-found within SET, or the `hash-set-default-value' if no matching datum was found."
+  "Searches for DATA in `hash-set' SET, using hash value HASH. On success, two
+values are returned: the datum found within SET, and T. On failure, returns
+the `hash-set-default-value' for SET, and NIL. See `cl:gethash'."
   (let ((chain (aref (hash-set-table set)
                      (mod hash (hash-set-size set)))))
-    (dolist (bin chain (hash-set-default-value set))
+    (dolist (bin chain (values (hash-set-default-value set) nil))
       (when (funcall (hash-set-test set) data (cdr bin))
-        (return (cdr bin))))))
+        (return (values (cdr bin) t))))))
 
 (defun hash-set-remove (set hash data)
   "Removes DATA from `hash-set' SET, using hash value HASH. Returns the datum
