@@ -82,11 +82,10 @@ are the `hash-set-default-value' for SET, and NIL. See `cl:remhash'."
                       :test #'eq :key #'cdr))))
     (values datum found)))
 
-(defun hash-set-map (set function)
-  (loop for bin across (hash-set-table set)
-     do (loop while bin do
-             (funcall function (hash-set-bin-elt bin))
-             (setf bin (hash-set-bin-next bin)))))
+(defun hash-set-map (function set)
+  "Calls FUNCTION once on each datum in the `hash-set' SET, and returns NIL."
+  (loop for chain across (hash-set-table set)
+     do (mapc function chain)))
 
 (defun hash-set-reject (set function)
   (loop for index below (length (hash-set-table set))
