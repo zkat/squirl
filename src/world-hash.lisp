@@ -49,12 +49,12 @@
 (defun clear-hash-cell (hash index)
   "Releases the handles under INDEX in `world-hash' HASH, and links the
 list structure into the `world-hash-junk'."
-  (do* ((node (world-hash-chain hash index) next)
+  (do* ((chain (world-hash-chain hash index) next)
         ;; We need to hang onto the CDR because we 'recycle' NODE
-        (next (cdr node) (cdr node)))
-       ((null node) (setf (world-hash-chain hash index) nil))
-    (release-handle (car node)) ; Is this just reference counting?
-    (push-cons node (world-hash-junk hash))))
+        (next (cdr chain) (cdr chain)))
+       ((null chain) (setf (world-hash-chain hash index) nil))
+    (release-handle (car chain)) ; Is this just reference counting?
+    (push-cons chain (world-hash-junk hash))))
 
 (defun clear-world-hash (hash)
   "Clear all cells in the `world-hash' HASH"
