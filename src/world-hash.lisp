@@ -34,9 +34,20 @@
   bbox-function                         ; Bounding box callback
   (handle-set (make-hash-set 0 #'handle-equal)) ; `hash-set' of all handles
   table                                         ; Bins in use
-  (junk-bins nil)                               ; The "recycle bin"
+  (junk nil)                                    ; The "recycle bin"
   (stamp 1)            ; Incremented on each query; see `handle-stamp'
   )
 
 (defun world-hash-size (hash)
   (length (world-hash-table hash)))
+
+(defun clear-hash-cell (hash index)
+  "Releases the handles under INDEX in `world-hash' HASH, and links the
+list structure into the `world-hash-junk'."
+  (do* ((node (aref (world-hash-table hash) index) next)
+        (next (cdr node) (cdr node)))
+       ((null node))
+    (release-handle (car node))
+    (setf (cdr node) (world-hash-junk hash)
+          (world-hash-junk hash) node))
+  (setf (aref (world-hash-table hash) index) nil))
