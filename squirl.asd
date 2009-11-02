@@ -25,5 +25,6 @@
              (:file "vec"
                     :depends-on ("utils"))
              (:file "world"
-                    :depends-on ("vec"))))))
-
+                    :depends-on ("vec"))
+             (:file "world-hash"
+                    :depends-on ("hash-set"))))))
