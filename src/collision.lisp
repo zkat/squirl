@@ -19,3 +19,10 @@
                       (vec* delta (maybe/ 1 dist))
                       (- dist mindist)
                       0))))))
+
+(defun circle-to-circle (shape-1 shape-2)
+  "Collide circles."
+  (circle-to-circle-query (circle-transformed-center shape-1)
+                          (circle-transformed-center shape-2)
+                          (circle-radius shape-1)
+                          (circle-radius shape-2)))
