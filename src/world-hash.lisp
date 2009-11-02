@@ -91,3 +91,9 @@ list structure into the `world-hash-junk'."
                (let ((node (get-new-node hash)))
                  (setf (car node) handle)
                  (push-cons node (world-hash-chain hash index)))))))
+
+(defun world-hash-insert (hash object id bbox)
+  (with-accessors ((handle-set world-hash-handle-set)) hash
+    (let ((handle (make-handle object)))
+      (hash-set-insert handle-set id handle)
+      (hash-handle hash handle bbox))))
