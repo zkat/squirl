@@ -41,33 +41,33 @@
     (setf (hash-set-table set) new-table)
     set))
 
-(defun hash-set-insert (set hash data &aux (index (mod hash (hash-set-size set))))
-  "Insert DATA into `hash-set' SET, using hash value HASH. Returns DATA if an
+(defun hash-set-insert (set code data &aux (index (mod code (hash-set-size set))))
+  "Insert DATA into `hash-set' SET, using hash value CODE. Returns DATA if an
 insertion was made, or NIL if DATA was already present in the table."
   (with-accessors ((test hash-set-test)) set
     (unless (find data (hash-set-chain set index) :test test :key #'cdr)
-      (push (cons hash data) (hash-set-chain set index))
+      (push (cons code data) (hash-set-chain set index))
       (incf (hash-set-count set))
       (when (hash-set-full-p set)
         (hash-set-resize set))
       data)))
 
-(defun hash-set-find (set hash data)
-  "Searches for DATA in `hash-set' SET, using hash value HASH. On success, two
+(defun hash-set-find (set code data)
+  "Searches for DATA in `hash-set' SET, using hash value CODE. On success, two
 values are returned: the datum found within SET, and T. On failure, the values
 are the `hash-set-default-value' for SET, and NIL. See `cl:gethash'."
-  (let ((chain (hash-set-chain set (mod hash (hash-set-size set)))))
+  (let ((chain (hash-set-chain set (mod code (hash-set-size set)))))
     (dolist (bin chain (values (hash-set-default-value set) nil))
       (when (funcall (hash-set-test set) data (cdr bin))
         (return (values (cdr bin) t))))))
 
-(defun hash-set-remove (set hash data)
-  "Removes DATA from `hash-set' SET, using hash value HASH. On success, two
+(defun hash-set-remove (set code data)
+  "Removes DATA from `hash-set' SET, using hash value CODE. On success, two
 values are returned: the datum removed from SET, and T. On failure, the values
 are the `hash-set-default-value' for SET, and NIL. See `cl:remhash'."
-  (multiple-value-bind (datum found) (hash-set-find set hash data)
+  (multiple-value-bind (datum found) (hash-set-find set code data)
     (when found
-      (let ((index (mod hash (hash-set-size set))))
+      (let ((index (mod code (hash-set-size set))))
         (deletef (hash-set-chain set index)
                  datum :test #'eq :key #'cdr)))
     (values datum found)))
