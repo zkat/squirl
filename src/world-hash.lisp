@@ -138,3 +138,16 @@ list structure into the `world-hash-junk'."
                       (world-hash-size hash)))))
     (query function hash (world-hash-chain hash idx) point))
   (incf (world-hash-stamp hash)))
+
+(defun world-hash-query (function hash object bbox)
+  (let* ((size (world-hash-size hash))
+         (dim (world-hash-cell-size hash))
+         (bb.t (floor (/ (bbox-top    bbox) dim)))
+         (bb.l (floor (/ (bbox-left   bbox) dim)))
+         (bb.r (floor (/ (bbox-right  bbox) dim)))
+         (bb.b (floor (/ (bbox-bottom bbox) dim))))
+    (loop for i from bb.l to bb.r
+       do (loop for j from bb.b to bb.t
+             for index = (hash i j size) do
+               (query function hash (world-hash-chain hash index) object))))
+  (incf (world-hash-stamp hash)))
