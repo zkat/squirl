@@ -3,12 +3,18 @@
 
 (declaim (optimize safety debug))
 
-(defstruct handle
+(defstruct (handle (:constructor make-handle (object)))
   "Used internally to track objects added to the hash"
   object                                ; Pointer to the object
-  retain                                ; Retain count
+  (retain 0)                            ; Retain count
   ;; Used to prevent duplicate identification of an object within one query
-  stamp)
+  (stamp 0))
+
+;;; These seem to just be used for C memory management
+(defun retain-handle (handle)
+  (incf (handle-retain handle)))
+(defun release-handle (handle)
+  (decf (handle-retain handle)))
 
 (defstruct world-hash
   "The spatial hash is SquirL's default (and currently only) spatial index"
