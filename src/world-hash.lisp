@@ -55,3 +55,8 @@ list structure into the `world-hash-junk'."
        ((null node) (setf (world-hash-chain hash index) nil))
     (release-handle (car node)) ; Is this just reference counting?
     (push-cons node (world-hash-junk hash))))
+
+(defun clear-world-hash (hash)
+  "Clear all cells in the `world-hash' HASH"
+  (dotimes (index (world-hash-size hash))
+    (clear-hash-cell hash index)))
