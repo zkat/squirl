@@ -13,35 +13,35 @@
   (loop for prime in *primes* when (>= prime n) return prime
      finally (error "Time to switch to native hashtables!")))
 
-(defstruct hashset-bin
+(defstruct hash-set-bin
   elt hash next)
 
-(defstruct (hashset
+(defstruct (hash-set
              (:constructor
-              make-hashset (size test transformer &aux
+              make-hash-set (size test transformer &aux
                                  (table (make-array (next-prime size)
-                                                    :element-type 'hashset-bin)))))
+                                                    :element-type 'hash-set-bin)))))
   (entries 0)
   test transformer
   (default-value nil) table)
 
-(defun hashset-size (set)
-  (length (hashset-table set)))
+(defun hash-set-size (set)
+  (length (hash-set-table set)))
 
 (defun set-full-p (set)
-  (> (hashset-entries set)
-     (hashset-size set)))
+  (> (hash-set-entries set)
+     (hash-set-size set)))
 
-(defun set-resize (set &aux (new-size (next-prime (1+ (hashset-size set)))))
-  (let ((new-table (make-array new-size :element-type 'hashset-bin)))
-    (loop for initial-bin across (hashset-table set)
+(defun set-resize (set &aux (new-size (next-prime (1+ (hash-set-size set)))))
+  (let ((new-table (make-array new-size :element-type 'hash-set-bin)))
+    (loop for initial-bin across (hash-set-table set)
        do (loop
              for bin = initial-bin then next
-             for next = (hashset-bin-next bin)
-             with index = (mod (hashset-bin-hash bin) new-size)
+             for next = (hash-set-bin-next bin)
+             with index = (mod (hash-set-bin-hash bin) new-size)
              while bin do ; Note that these are sequential, not parallel:
-               (setf (hashset-bin-next bin) (aref new-table index)
+               (setf (hash-set-bin-next bin) (aref new-table index)
                      (aref new-table index) bin))
        finally
-         (setf (hashset-table set) new-table)))
+         (setf (hash-set-table set) new-table)))
   set)
