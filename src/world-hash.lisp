@@ -31,3 +31,9 @@
 (defun world-hash-reset-table (hash size)
   (setf (world-hash-table hash)
         (make-array size :initial-element nil)))
+
+;;; Used for the `world-hash-handle-set'
+(defun handle-equal (object handle)
+  (eql object (handle-object handle)))
+(defun handle-transform (object)
+  (make-handle object))
