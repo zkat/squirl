@@ -188,5 +188,24 @@
               (return t)))))))
 
 (defmethod shape-segment-query ((seg segment) a b info)
-  ;; todo
+  (let ((n (segment-trans-normal seg)))
+    (when (< (vec. a n) (vec. (seg-trans-a seg) n))
+      (setf n (vec-neg n)))
+    (let* ((an (vec. a n))
+           (bn (vec. b n))
+           (d (+ (vec. (segment-trans-a seg) n) (segment-radius seg)))
+           (ratio (/ (- d an) (- bn an)))) ;adlai said t is 'ratio'
+      (when (< 0 ratio 1)
+        (let* ((point (vec-lerp a b ratio))
+               (dt (- (vecx (segment-trans-normal seg) point)))
+               (dt-min (- (vecx (segment-trans-normal seg) (segment-trans-a seg))))
+               (dt-max (- (vecx (segment-trans-normal seg) (segment-trans-b seg)))))
+          (when (< dt-min dt dt-max)
+            (setf (segment-query-info-shape info) seg
+                  (segment-query-info-t info) ratio
+                  (segment-query-info-n info) n)
+            (return))))
+      (unless (zerop (segment-radius seg))
+        )
+      ))
   )
