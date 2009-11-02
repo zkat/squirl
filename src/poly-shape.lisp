@@ -50,3 +50,12 @@
   (setf (poly-transformed-vertices poly)
         (map 'list (lambda (vert) (vec+ position (vec-rotate vert rotation)))
              (poly-vertices poly))))
+
+(defun poly-transform-axes (poly position rotation)
+  (flet ((transformed-axis (axis)
+           (let ((normal (vec-rotate (poly-axis-normal axis) rotation)))
+             (make-poly-axis
+              :normal normal
+              :distance (+ (vec. p n) (poly-axis-distance axis))))))
+    (setf (poly-transformed-axes poly)
+          (map 'list #'transformed-axis (poly-axes poly)))))
