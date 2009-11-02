@@ -32,8 +32,6 @@
   (id (prog1 *shape-id-counter* (incf *shape-id-counter*))) ; Unique id used as the hash value.
   )
 
-
-
 (defstruct (segment-shape (:include shape))
   a b ; endpoints (body space coords)
   normal ; normal (body space coords)
@@ -121,3 +119,4 @@
           (setf (segment-query-info-shape info) circle
                 (segment-query-info-t info) t
                 (segment-query-info-n info) (vec-normalize (vec-lerp a b t))))))))
+
