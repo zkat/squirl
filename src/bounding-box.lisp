@@ -3,7 +3,7 @@
 
 (declaim (optimize speed debug))
 
-(defstruct (bbox (:constructor %make-bbox (left bottom right top)))
+(defstruct (bbox (:constructor make-bbox (left bottom right top)))
   left bottom right top)
 
 (defun bbox-intersects-p (a b)
