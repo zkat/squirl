@@ -74,3 +74,7 @@
                 top (max top (vec-y vert))
                 bottom (min bottom (vec-y vert))))
     (make-bbox left bottom right top)))
+
+(defmethod shape-point-query ((poly poly) position)
+  (and (bbox-containts-vec-p (poly-bbox poly) position)
+       (poly-shape-contains-vertex-p poly position)))
