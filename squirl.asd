@@ -15,6 +15,8 @@
                     :depends-on ("vec"))
              (:file "chipmunk"
                     :depends-on ("vec"))
+             (:file "collision"
+                    :depends-on ("vec"))
              (:file "hashset"
                     :depends-on ("package"))
              (:file "package")
