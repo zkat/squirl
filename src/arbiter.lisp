@@ -140,3 +140,64 @@
                                         (contact-jt-acc contact)))))
           (body-apply-impulse body-a (vec- impulse) (contact-r1 contact))
           (body-apply-impulse body-b impulse (contact-r2 contact)))))))
+
+(defun arbiter-apply-impulse (arbiter e-coefficient)
+  (let ((body-a (shape-body (arbiter-shape-a arbiter)))
+        (body-b (shape-body (arbiter-shape-b arbiter))))
+    (dolist (contact (arbiter-contacts arbiter))
+      (let* ((n (contact-normal contact))
+             (r1 (contact-r1 contact))
+             (r2 (contact-r2 contact))
+             ;; Relative bias velocities
+             (vb1 (vec+ (body-velocity-bias body-a)
+                        (vec* (vec-perp r1)
+                              (body-angular-velocity-bias body-a))))
+             (vb2 (vec+ (body-velocity-bias body-b)
+                        (vec* (vec-perp r2)
+                              (body-angular-velocity-bias body-b))))
+             (vbn (vec. (vec- vb2 vb1) n)))
+        ;; Calculate and clamp bias impulse
+        (let ((jbn (* (- (contact-bias contact) vbn)
+                      (contact-normal-mass contact)))
+              (jbn-old (contact-j-bias contact)))
+          (setf (contact-j-bias contact) (max 0 (+ jbn-old jbn))
+                jbn (- (contact-j-bias contact) jbn-old))
+          ;; Apply bias impulse
+          ;; TODO: Use apply-bias-impulses from constraints/util
+          (let ((impulse (vec* n jbn)))
+            (body-apply-bias-impulse body-a (vec- impulse) r1)
+            (body-apply-bias-impulse body-b impulse r2)))
+        ;; Calculate relative velocity
+        ;; TODO: relative-velocity from constraints/util
+        (let* ((vr (vec- (vec+ (body-velocity body-b)
+                               (vec* (vec-perp r2)
+                                     (body-angular-velocity body-b)))
+                         (vec+ (body-velocity body-a)
+                               (vec* (vec-perp r1)
+                                     (body-angular-velocity body-a)))))
+               (vrn (vec. vr n)))
+          ;; Calculate and clamp the normal impulse
+          (let ((jn (* (- (+ (* (contact-bounce contact)
+                                e-coefficient)
+                             vrn))
+                       (contact-normal-mass contact)))
+                (jn-old (contact-jn-acc contact)))
+            (setf (contact-jn-acc contact) (max 0 (+ jn-old jn))
+                  jn (- (contact-jn-acc contact) jn-old))
+            (let*
+                ;; Calculate relative tangent velocity
+                ((vrt (vec. (vec+ vr (arbiter-target-v arbiter))
+                            (vec-perp n)))
+                 ;; Calculate and clamp friction impulse
+                 (jt-max (* (arbiter-u arbiter)
+                           (contact-jn-acc contact)))
+                 (jt (* (- vrt) (contact-tangent-mass contact)))
+                 (jt-old (contact-jt-acc contact)))
+              (setf (contact-jt-acc contact) (clamp (+ jt-old jt)
+                                                    (- jt-max)
+                                                    jt-max)
+                    jt (- (contact-jt-acc contact) jt-old))
+              (let ((impulse (vec-rotate n (vec jn jt))))
+                ;; TODO: apply-impulse from constraints/util
+                (body-apply-impulse body-a (vec- impulse) r1)
+                (body-apply-impulse body-b impulse r2)))))))))
