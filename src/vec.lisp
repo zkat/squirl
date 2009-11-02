@@ -99,7 +99,8 @@ WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
   (vec* v2 (/ (vec. v1 v2) (vec. v2 v2))))
 
 (defun vec-rotate (vec rot)
-  "Rotates VEC by (vec->angle ROT) radians. ROT should be a unit vec."
+  "Rotates VEC by (vec->angle ROT) radians. ROT should be a unit vec.
+This function is symmetric between VEC and ROT."
   (with-vecs (vec rot)
     (vec (- (* vec.x rot.x)
             (* vec.y rot.y))
@@ -107,7 +108,8 @@ WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
             (* vec.y rot.x)))))
 
 (defun vec-unrotate (vec rot)
-  "Rotates VEC by (- (vec->angle ROT)) radians. ROT should be a unit vec."
+  "Rotates VEC by (- (vec->angle ROT)) radians. ROT should be a unit vec.
+This function is symmetric between VEC and ROT."
   (with-vecs (vec rot)
     (vec (+ (* vec.x rot.x)
             (* vec.y rot.y))
