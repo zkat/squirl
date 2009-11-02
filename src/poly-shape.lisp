@@ -36,3 +36,12 @@
             (plusp (- (vec. (poly-axis-normal axis) vertex)
                       (poly-axis-distance axis))))
           (poly-trans-formed-axes poly)))
+
+(defun partial-poly-contains-vertex-p (poly vertex normal)
+  "Same as POLY-CONTAINS-VERTEX-P, but ignores faces pointing away from NORMAL."
+  ;; More hilarity. I'm honestly not sure that this translation is correct.
+  (notany (lambda (axis)
+            (unless (vec. (poly-axis-normal axis) normal)
+                (plusp (- (vec. (poly-axis-normal axis) vertex)
+                       (poly-axis-distance axis)))))
+          (poly-trans-formed-axes poly)))
