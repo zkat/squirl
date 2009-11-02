@@ -87,15 +87,8 @@ are the `hash-set-default-value' for SET, and NIL. See `cl:remhash'."
   (loop for chain across (hash-set-table set)
      do (mapc function chain)))
 
-(defun hash-set-reject (set function)
-  (loop for index below (length (hash-set-table set))
-     for bin = (aref (hash-set-table set) index) with prev-bin
-     do (loop while bin with next = (hash-set-bin-next bin)
-           do (if (funcall function (hash-set-bin-elt bin))
-                  (setf prev-bin bin)
-                  (progn
-                    (if prev-bin
-                        (setf (hash-set-bin-next prev-bin) next)
-                        (setf (aref (hash-set-table set) index) next))
-                    (decf (hash-set-count set))))
-             (setf bin next))))
+(defun hash-set-delete-if (predicate set)
+  "Deletes the items from `hash-set' SET on which PREDICATE is true. Returns NIL."
+  (dotimes (index (hash-set-size set))
+    (setf (aref (hash-set-table set) index)
+          (delete-if function (aref (hash-set-table set) index) :key #'cdr))))
