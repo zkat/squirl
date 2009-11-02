@@ -32,11 +32,7 @@
   (id (prog1 *shape-id-counter* (incf *shape-id-counter*))) ; Unique id used as the hash value.
   )
 
-(defstruct (circle-shape (:include shape))
-  center ; Center in body space coordinates.
-  radius
-  transformed-center; Transformed center. (world space coordinates)
-  )
+
 
 (defstruct (segment-shape (:include shape))
   a b ; endpoints (body space coords)
@@ -77,4 +73,19 @@
 
 (defun segment-query-hit-dist (start end info)
   (* (vec-dist start end) (segment-query-info-t info)))
+
+;;;
+;;; Circles
+;;;
+(defstruct (circle-shape (:include shape))
+  center ; Center in body space coordinates.
+  radius
+  transformed-center; Transformed center. (world space coordinates)
+  )
+
+(defun bbox-from-circle (vec r)
+  (make-bbox (- (vec-x vec) r)
+             (- (vec-y vec) r)
+             (+ (vec-x vec) r)
+             (+ (vec-y vec) r)))
 
