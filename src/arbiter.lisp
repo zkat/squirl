@@ -3,9 +3,9 @@
 
 (declaim (optimize safety debug))
 
-(defconstant +bias-coefficient+ 0.1
+(define-constant +bias-coefficient+ 0.1
   "Determines how fast penetrations resolve themselves.")
-(defconstant +collision-slop+ 0.1
+(define-constant +collision-slop+ 0.1
   "Amount of allowed penetration.  Used to reduce vibrating contacts.")
 
 (defstruct (contact (:constructor make-contact (point normal distance hash)))

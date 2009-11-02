@@ -17,7 +17,7 @@
   (defun vec-y (vec)
     (cdr vec)))
 
-(defconstant +zero-vector+ (vec 0 0))
+(define-constant +zero-vector+ (vec 0 0))
 
 (defmacro with-vec (form &body body)
   "FORM is either a symbol bound to a `vec', or a list of the form:

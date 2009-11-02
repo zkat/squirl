@@ -31,3 +31,8 @@ the result of calling DELETE with PREDICATE, place, and the REMOVE-KEYWORDS.")
       ((zerop expt) result)
     (when (oddp expt)
       (setf result (mod (* result base) m)))))
+
+(defmacro define-constant (name value &optional doc)
+  "ANSI-compliant replacement for `defconstant'. cf SBCL Manual 2.3.4."
+  `(defconstant ,name (if (boundp ',name) (symbol-value ',name) ,value)
+     ,@(when doc (list doc))))
