@@ -59,6 +59,13 @@ insertion was made, or NIL if DATA was already present in the table."
         (hash-set-resize set))
       data)))
 
+(defun hash-set-find (set hash data)
+  (let ((chain (aref (hash-set-table set)
+                     (mod hash (hash-set-size set)))))
+    (dolist (bin chain (hash-set-default-value set))
+      (when (funcall (hash-set-test set) data (cdr bin))
+        (return (cdr bin))))))
+
 (defun hash-set-remove (set hash data)
   (let ((bin (aref (hash-set-table set)
                    (mod hash (hash-set-size set))))
@@ -72,15 +79,6 @@ insertion was made, or NIL if DATA was already present in the table."
            (setf (hash-set-bin-next prev-bin) (hash-set-bin-next bin))
            (decf (hash-set-count set))
            (return (hash-set-bin-elt bin))))))
-
-(defun hash-set-find (set hash data)
-  (let ((bin (aref (hash-set-table set)
-                   (mod hash (hash-set-size set)))))
-    (loop while (and bin (not (funcall (hash-set-test set) data
-                                       (hash-set-bin-elt bin))))
-       do (setf bin (hash-set-bin-next bin)))
-    (if bin (hash-set-bin-elt bin)
-        (hash-set-default-value set))))
 
 (defun hash-set-map (set function)
   (loop for bin across (hash-set-table set)
