@@ -174,3 +174,10 @@ list structure into the `world-hash-junk'."
                                  (push-cons node (world-hash-chain hash index))))))
                   (incf (world-hash-stamp hash)))
                 (world-hash-handle-set hash)))
+
+(defun query-segment (function hash chain object)
+  (dolist (handle chain 1.0)
+    (unless (or (= (handle-stamp handle) (world-hash-stamp hash))
+                (null (handle-object handle)))
+      (setf (handle-stamp handle) (world-hash-stamp hash))
+      (return (funcall function object (handle-object handle))))))
