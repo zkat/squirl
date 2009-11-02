@@ -54,8 +54,17 @@
 
 (defun shape-point-query (shape p layers group)
   "Test if a point lies within a shape."
-  ;; TODO
-  )
+  ;; I'm not sure if this is supposed to return true/false/some value. Returning 0 for now.
+  ;; C version:
+  ;; if(!(group && shape->group && group == shape->group) && (layers&shape->layers)){
+  ;; 	return shape->klass->pointQuery(shape, p);
+  ;; }
+  ;; return 0;
+  (if (and (not (and group (shape-group shape) (eq group (shape-group shape))))
+           (logand layers (shape-layers shape)))
+      (funcall (shape-klass-pointer-query (shape-klass shape)) shape p)
+      0 ; is this really meant to be a "False"?
+      ))
 
 (defstruct circle-shape
   shape
