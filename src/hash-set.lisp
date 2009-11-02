@@ -10,7 +10,7 @@
      collect (+ (expt 2 x) offset)))
 
 (defun next-prime (n)
-  (loop for prime in *primes* when (>= prime n) return prime
+  (loop for prime in +primes+ when (>= prime n) return prime
      finally (error "Time to switch to native hashtables!")))
 
 (defstruct (hash-set
