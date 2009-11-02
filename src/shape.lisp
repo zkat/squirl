@@ -20,29 +20,30 @@
   )
 
 ;; Basic shape struct that the others inherit from.
-(defstruct (shape (:constructor %make-shape))
+(defstruct (shape (:constructor %make-shape (klass body)))
   klass ; The "class" of a shape as defined above.
   body ; body that the shape is attached to.
   bbox ; Cached Bounding Box for the shape.
   ;; Surface Properties
   ;; ------------------
-  elasticity ; Coefficient of restitution.
-  u ; Coefficient of friction. ; TODO - should this just be "friction"?
-  surface-velocity ; Surface velocity used when solving for friction
+  (elasticity 0)                   ; Coefficient of restitution.
+  (u 0)                            ; Coefficient of friction. ; TODO - should this just be "friction"?
+  (surface-velocity +zero-vector+)               ; Surface velocity used when solving for friction
   ;; User-definable slots
   ;; --------------------
   data ; User defined data pointer for the shape.
-  collision-type ; User defined collision type for the shape.
-  group ; User defined collision group for the shape.
-  layers ; User defined layer bitmask for the shape.
+  (collision-type 0) ; User defined collision type for the shape.
+  (group 0); User defined collision group for the shape.
+  (layers -1); User defined layer bitmask for the shape.
   ;; Internally used slots
   ;; ---------------------
-  id ; Unique id used as the hash value.
+  (id (prog1 *shape-id-counter* (incf *shape-id-counter*))) ; Unique id used as the hash value.
   )
 
-(defun make-shape (class body)
-  ;; TODO
-  )
+(defun make-shape (klass body)
+  (let ((shape (%make-shape klass body)))
+    (shape-cache-bbox shape)
+    shape))
 
 (defun shape-cache-bbox (shape)
   "Cache the BBox of the shape."
