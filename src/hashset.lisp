@@ -10,7 +10,7 @@
      collect (+ (expt 2 x) offset)))
 
 (defun next-prime (n)
-  (loop for prime in *primes* when (> prime n) return prime
+  (loop for prime in *primes* when (>= prime n) return prime
      finally (error "Time to switch to native hashtables!")))
 
 (defstruct hashset-bin
@@ -19,8 +19,11 @@
 (defstruct (hashset
              (:constructor
               make-hashset (size test transformer &aux
-                                 (size (next-prime size))
-                                 (bins (make-array size :element-type 'hashset-bin)))))
-  (entries 0) size
+                                 (table (make-array (next-prime size)
+                                                    :element-type 'hashset-bin)))))
+  (entries 0)
   test transformer
-  (default-value nil) bins)
+  (default-value nil) table)
+
+(defun hashset-size (set)
+  (length (hashset-table set)))
