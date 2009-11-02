@@ -45,3 +45,8 @@
                 (plusp (- (vec. (poly-axis-normal axis) vertex)
                        (poly-axis-distance axis)))))
           (poly-trans-formed-axes poly)))
+
+(defun poly-transform-vertices (poly position rotation)
+  (setf (poly-transformed-vertices poly)
+        (map 'list (lambda (vert) (vec+ position (vec-rotate vert rotation)))
+             (poly-vertices poly))))
