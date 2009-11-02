@@ -41,13 +41,18 @@
 (defun world-hash-size (hash)
   (length (world-hash-table hash)))
 
+(defun world-hash-chain (hash index)
+  (aref (world-hash-table hash) index))
+(defun (setf world-hash-chain) (new-chain hash index)
+  (setf (aref (world-hash-table hash) index) new-chain))
+
 (defun clear-hash-cell (hash index)
   "Releases the handles under INDEX in `world-hash' HASH, and links the
 list structure into the `world-hash-junk'."
-  (do* ((node (aref (world-hash-table hash) index) next)
+  (do* ((node (world-hash-chain hash index) next)
         (next (cdr node) (cdr node)))
        ((null node))
     (release-handle (car node))
     (setf (cdr node) (world-hash-junk hash)
           (world-hash-junk hash) node))
-  (setf (aref (world-hash-table hash) index) nil))
+  (setf (world-hash-chain hash index) nil))
