@@ -50,9 +50,8 @@
   "Releases the handles under INDEX in `world-hash' HASH, and links the
 list structure into the `world-hash-junk'."
   (do* ((node (world-hash-chain hash index) next)
+        ;; We need to hang onto the CDR because we 'recycle' NODE
         (next (cdr node) (cdr node)))
-       ((null node))
-    (release-handle (car node))
-    (setf (cdr node) (world-hash-junk hash)
-          (world-hash-junk hash) node))
-  (setf (world-hash-chain hash index) nil))
+       ((null node) (setf (world-hash-chain hash index) nil))
+    (release-handle (car node)) ; Is this just reference counting?
+    (push-cons node (world-hash-junk hash))))
