@@ -117,3 +117,8 @@ list structure into the `world-hash-junk'."
     (when foundp
       (setf (handle-object handle) nil)
       (release-handle handle))))
+
+(defun world-hash-map (function hash)
+  (hash-set-map (lambda (handle)
+                  (funcall function (handle-object handle)))
+                (world-hash-handle-set hash)))
