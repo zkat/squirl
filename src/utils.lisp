@@ -17,3 +17,10 @@ the result of calling DELETE with ITEM, place, and the REMOVE-KEYWORDS.")
   delete/swapped-arguments
   "Modify-macro for DELETE-IF. Sets place designated by the first argument to
 the result of calling DELETE with PREDICATE, place, and the REMOVE-KEYWORDS.")
+
+(defmacro push-cons (cons place)
+  "Like `cl:push', but reuses CONS"
+  (let ((cons-sym (gensym)))
+    `(let ((,cons-sym ,cons))
+       (setf (cdr ,cons-sym) ,place
+             ,place ,cons-sym))))
