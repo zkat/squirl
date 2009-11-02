@@ -83,3 +83,9 @@
        do (setf bin (hash-set-bin-next bin)))
     (if bin (hash-set-bin-elt bin)
         (hash-set-default-value set))))
+
+(defun hash-set-map (set function data)
+  (loop for bin across (hash-set-table set)
+     do (loop while bin do
+             (funcall function (hash-set-bin-elt bin) data)
+             (setf bin (hash-set-bin-next bin)))))
