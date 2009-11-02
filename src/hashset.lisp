@@ -40,6 +40,7 @@
      (hash-set-size set)))
 
 (defun hash-set-resize (set &aux (new-size (next-prime (1+ (hash-set-size set)))))
+  "Adjusts `hash-set' SET to accomodate more elements"
   (let ((new-table (make-array new-size :initial-element nil)))
     (with-accessors ((table hash-set-table)) set
      (loop for chain across table
