@@ -122,3 +122,11 @@ list structure into the `world-hash-junk'."
   (hash-set-map (lambda (handle)
                   (funcall function (handle-object handle)))
                 (world-hash-handle-set hash)))
+
+(defun query (function hash chain object)
+  (loop for handle in chain
+     unless (or (= (handle-stamp handle) (world-hash-stamp hash))
+                (eq object (handle-object handle))
+                (null (handle-object handle))) do
+       (funcall function object (handle-object handle))
+       (setf (handle-stamp handle) (world-hash-stamp hash))))
