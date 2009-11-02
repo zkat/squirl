@@ -90,5 +90,4 @@ are the `hash-set-default-value' for SET, and NIL. See `cl:remhash'."
 (defun hash-set-delete-if (predicate set)
   "Deletes the items from `hash-set' SET on which PREDICATE is true. Returns NIL."
   (dotimes (index (hash-set-size set))
-    (setf (aref (hash-set-table set) index)
-          (delete-if function (aref (hash-set-table set) index) :key #'cdr))))
+    (delete-iff (aref (hash-set-table set) index) predicate :key #'cdr)))
