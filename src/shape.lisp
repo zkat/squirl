@@ -50,6 +50,7 @@
     ;;    return shape->klass->pointQuery(shape, p);
     ;; }
     ;; return 0;
+    (declare (ignore p))
     (when (and (not (and group (shape-group shape) (eq group (shape-group shape))))
                (logand layers (shape-layers shape)))
       (call-next-method))))
@@ -60,6 +61,7 @@
     ;;    shape->klass->segmentQuery(shape, a, b, info);
     ;; }
     ;; return (info->shape != NULL);
+    (declare (ignore a b))
     (when (and (not (and group (shape-group shape) (eq group (shape-group shape))))
                (logand layers (shape-layers shape)))
       (call-next-method))))
@@ -75,7 +77,7 @@
   )
 
 (defun make-circle (body radius offset)
-  (let ((circle (%make-circle body radius center)))
+  (let ((circle (%make-circle body radius offset)))
     (shared-shape-init circle)
     circle))
 
@@ -110,8 +112,9 @@
     (unless (minusp det)
       (let ((ratio (/ (- (- qb) (sqrt det))
                       (* 2 qa))))
-        (when (<= 0 t 1)
-          (values circle ratio normal))))))
+        (when (<= 0 ratio 1)
+          (values shape ratio
+                  (vec-normalize (vec-lerp a b ratio))))))))
 
 ;;;
 ;;; Segments
@@ -161,10 +164,10 @@
                      (seg-normal segment-normal))
         seg
       ;; calculate normal distance from segment
-      (let* ((dn (- (vec. seg-tn point) (vec. seg-ta seg-tnormal)))
+      (let* ((dn (- (vec. seg-tnormal point) (vec. seg-ta seg-tnormal)))
              (dist (- (abs dn) seg-r)))
         (if (plusp dist)
-            (return t)
+            (return-from shape-point-query t)
             ;; calculate tangential distance along segment
             (let ((dt (- (vecx seg-tnormal point)))
                   (dt-min (- (vecx seg-tnormal seg-ta)))
@@ -172,21 +175,22 @@
               ;; decision tree to decide which feature of the segment to collide with
               (if (<= dt dt-min)
                   (if (< dt (- dt-min seg-r))
-                      (return nil)
-                      (return (< (vec-length-sq (vec- seg-ta point))
-                                 (expt seg-r 2))))
+                      (return-from shape-point-query nil)
+                      (return-from shape-point-query (< (vec-length-sq (vec- seg-ta point))
+                                                        (expt seg-r 2))))
                   (if (< dt dt-max)
-                      (return t)
+                      (return-from shape-point-query t)
                       (if (< dt (+ dt-max seg-r))
-                          (return (< (vec-length-sq (vec- seg-tb point))
-                                     (expt seg-r 2)))
-                          (return nil))))
-              (return t)))))))
+                          (return-from shape-point-query
+                            (< (vec-length-sq (vec- seg-tb point))
+                               (expt seg-r 2)))
+                          (return-from shape-point-query nil))))
+              (return-from shape-point-query t)))))))
 
 (defmethod shape-segment-query ((seg segment) a b layers group)
   (declare (ignore layers group))
   (let ((n (segment-trans-normal seg)))
-    (when (< (vec. a n) (vec. (seg-trans-a seg) n))
+    (when (< (vec. a n) (vec. (segment-trans-a seg) n))
       (setf n (vec-neg n)))
     (let* ((an (vec. a n))
            (bn (vec. b n))
@@ -199,7 +203,7 @@
                (dt-max (- (vecx (segment-trans-normal seg) (segment-trans-b seg)))))
           (when (< dt-min dt dt-max)
             (values seg ratio n)
-            (return (values seg ratio n)))))
+            (return-from shape-segment-query (values seg ratio n)))))
       (unless (zerop (segment-radius seg))
         (multiple-value-bind (shape1 t1 n1)
             (circle-segment-query seg (segment-trans-a seg) (segment-radius seg) a b)
