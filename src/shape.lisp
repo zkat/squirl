@@ -12,8 +12,7 @@
   n ; Normal vec of hit surface.
   )
 
-(defstruct (shape (:constructor %make-shape (klass body)))
-  klass ; The "class" of a shape as defined above.
+(defstruct shape
   body ; body that the shape is attached to.
   bbox ; Cached Bounding Box for the shape.
   ;; Surface Properties
