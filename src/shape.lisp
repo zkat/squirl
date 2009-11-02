@@ -12,7 +12,7 @@
   )
 
 ;; shape class. Holds function pointers and type data.
-(defstruct shape-class
+(defstruct shape-klass
   type
   cache-data ;function with ll (shape p rot), called by SHAPE-CACHE-BOX
   point-query ;function with ll (shape p), called by SHAPE-POINT-QUERY
