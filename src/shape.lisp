@@ -183,7 +183,8 @@
                           (return nil))))
               (return t)))))))
 
-(defmethod shape-segment-query ((seg segment) a b)
+(defmethod shape-segment-query ((seg segment) a b layers group)
+  (declare (ignore layers group))
   (let ((n (segment-trans-normal seg)))
     (when (< (vec. a n) (vec. (seg-trans-a seg) n))
       (setf n (vec-neg n)))
