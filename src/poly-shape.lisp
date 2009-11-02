@@ -22,3 +22,9 @@
 
 (defun nth-vertex (index poly)
   (elt (poly-vertices poly) index))
+
+(defun poly-value-on-axis (poly normal distance)
+  "Returns the minimum distance of the polygon to the axis."
+  (- (loop for vertex in (poly-vertices poly)
+        minimizing (vec. normal vertex))
+     distance))
