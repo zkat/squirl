@@ -28,3 +28,11 @@
   (- (loop for vertex in (poly-vertices poly)
         minimizing (vec. normal vertex))
      distance))
+
+(defun poly-contains-vertex-p (poly vertex)
+  "Returns true if the polygon contains the vertex."
+  ;; Lisp-hilarity
+  (notany (lambda (axis)
+            (plusp (- (vec. (poly-axis-normal axis) vertex)
+                      (poly-axis-distance axis))))
+          (poly-trans-formed-axes poly)))
