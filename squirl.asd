@@ -18,10 +18,12 @@
              (:file "collision"
                     :depends-on ("vec"))
              (:file "hashset"
-                    :depends-on ("package"))
+                    :depends-on ("utils"))
              (:file "package")
-             (:file "vec"
+             (:file "utils"
                     :depends-on ("package"))
+             (:file "vec"
+                    :depends-on ("utils"))
              (:file "world"
                     :depends-on ("vec"))))))
 
