@@ -23,7 +23,7 @@
   (make-handle object))
 
 (defun make-world-hash-table (size)
-  (make-array size :initial-element nil))
+  (make-array (next-prime size) :initial-element nil))
 
 (defstruct (world-hash
              (:constructor make-world-hash
@@ -60,3 +60,8 @@ list structure into the `world-hash-junk'."
   "Clear all cells in the `world-hash' HASH"
   (dotimes (index (world-hash-size hash))
     (clear-hash-cell hash index)))
+
+(defun resize-world-hash (hash new-cell-size new-size)
+  (clear-world-hash hash)
+  (setf (world-hash-cell-size hash) new-cell-size
+        (world-hash-table hash) (make-world-hash-table new-size)))
