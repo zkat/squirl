@@ -17,7 +17,7 @@
                     :depends-on ("vec"))
              (:file "collision"
                     :depends-on ("vec"))
-             (:file "hashset"
+             (:file "hash-set"
                     :depends-on ("utils"))
              (:file "package")
              (:file "utils"
