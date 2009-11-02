@@ -20,6 +20,9 @@
              (:file "hash-set"
                     :depends-on ("utils"))
              (:file "package")
+             (:file "shape")
+             (:file "poly-shape"
+                    :depends-on ("shape"))
              (:file "utils"
                     :depends-on ("package"))
              (:file "vec"
