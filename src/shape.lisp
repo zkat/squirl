@@ -123,14 +123,14 @@
   )
 
 (defmethod shape-cache-data ((seg segment) position rotation)
-  (with-accessors ((seg-ta segment-trans-a) (seg-tb (segment-trans-b))
+  (with-accessors ((seg-ta segment-trans-a) (seg-tb segment-trans-b)
                    (seg-a segment-a) (seg-b segment-b) (seg-tnormal segment-trans-normal)
                    (seg-normal segment-normal))
       seg
-    (setf seg-ta (vec+ position (vec-rotate (segment-a seg) rotation))
-          seg-tb (vec+ position (vec-rotate (segment-b seg) rotation))
-          (segment-trans-normal seg) (vec-rotate (segment-normal seg) rotation))
-    (let (l r s t (rad (segment-radius seg)))
+    (setf seg-ta (vec+ position (vec-rotate seg-a rotation))
+          seg-tb (vec+ position (vec-rotate seg-b rotation))
+          seg-tnormal (vec-rotate seg-normal rotation))
+    (let (l r s omfg-not-t (rad (segment-radius seg))) :P
       (if (< (vec-x seg-ta) (vec-x seg-tb))
           (setf l (vec-x seg-ta)
                 r (vec-x seg-tb))
@@ -138,10 +138,10 @@
                 r (vec-x seg-ta)))
       (if (< (vec-y seg-ta) (vec-y seg-tb))
           (setf s (vec-y seg-ta)
-                t (vec-y seg-tb))
+                omfg-not-t (vec-y seg-tb))
           (setf s (vec-y seg-tb)
-                t (vec-y seg-ta)))
-      (make-bbox (- l rad) (- s rad) (+ r rad) (+ t rad)))))
+                omfg-not-t (vec-y seg-ta)))
+      (make-bbox (- l rad) (- s rad) (+ r rad) (+ omfg-not-t rad))))) ;D
 
 (defmethod shape-point-query ((seg segment) point)
   (when (bbox-containts-vec-p (shape-bbox seg) point)
