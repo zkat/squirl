@@ -4,12 +4,27 @@
 (defstruct poly-axis
   normal distance)
 
-(defstruct (poly (:constructor %make-poly (body vertices))
+(defstruct (poly (:constructor %make-poly (body vertices &aux (length (length vertices))))
                  (:include shape))
-  vertices axes transformed-vertices transformed-axes)
+  (vertices (make-array length))
+  (axes (make-array length))
+  (transformed-vertices (make-array length))
+  (transformed-axes (make-array length)))
+
+(defun set-up-vertices (poly vertices offset)
+  (loop for vert in vertices for i from 0
+     for axis in (poly-axes poly)
+     for a = (vec+ offset vert)
+     for b = (vec+ offset (elt vertices (mod (1+ i) (length vertices))))
+     for normal = (vec-normalize (vec-perp (vec- b a)))
+     do (setf (elt (poly-vertices poly) i) a
+              (poly-axis-normal axis) normal
+              (poly-axis-distance axis) (vec. normal a))))
 
 (defun make-poly (body vertices offset)
   (let ((poly (%make-poly body vertices)))
+    (set-up-vertices poly vertices offset)
+    (shared-shape-init poly)
     poly))
 
 (defun validate-vertices (vertices)
