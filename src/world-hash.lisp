@@ -62,6 +62,12 @@ list structure into the `world-hash-junk'."
     (clear-hash-cell hash index)))
 
 (defun resize-world-hash (hash new-cell-size new-size)
+  "Resize `world-hash' HASH to the specified dimensions"
   (clear-world-hash hash)
   (setf (world-hash-cell-size hash) new-cell-size
         (world-hash-table hash) (make-world-hash-table new-size)))
+
+(defun get-new-node (hash)
+  "Get a recycled node or cons a new one"
+  (let ((node (pop (world-hash-junk hash))))
+    (if (null node) (cons nil nil) node)))
