@@ -59,3 +59,18 @@
               :distance (+ (vec. p n) (poly-axis-distance axis))))))
     (setf (poly-transformed-axes poly)
           (map 'list #'transformed-axis (poly-axes poly)))))
+
+(defmethod shape-cache-data ((poly poly) position rotation)
+  (poly-transform-vertices poly position rotation)
+  (poly-transform-axes poly position rotation)
+  (let ((verts (poly-transformed-vertices poly))
+        (left (vec-x (elt verts 0)))
+        (right (vec-x (elt verts 0)))
+        (top (vec-y (elt verts 0)))
+        (bottom (vec-y (elt verts 0))))
+    (loop for vert in verts
+       do (setf left (min left (vec-x vert))
+                right (max right (vec-x vert))
+                top (max top (vec-y vert))
+                bottom (min bottom (vec-y vert))))
+    (make-bbox left bottom right top)))
