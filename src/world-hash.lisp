@@ -74,4 +74,4 @@ list structure into the `world-hash-junk'."
 
 (defun hash (x y n)
   "Hash X, Y, and N to generate a hash code"
-  (mod (expt (* x 2185031351) (* y 4232417593)) n))
+  (expt-mod (* x 2185031351) (* y 4232417593) n))
