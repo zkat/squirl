@@ -172,3 +172,6 @@
                           (return nil))))
               (return t)))))))
 
+(defmethod shape-segment-query ((seg segment) a b info)
+  ;; todo
+  )
