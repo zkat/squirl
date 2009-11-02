@@ -43,6 +43,5 @@
                (setf (hashset-bin-next bin) (aref new-table index)
                      (aref new-table index) bin))
        finally
-         (setf (hashset-table set) new-table
-               (hashset-size set) new-size)))
+         (setf (hashset-table set) new-table)))
   set)
