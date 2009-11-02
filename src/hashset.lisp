@@ -54,15 +54,15 @@
   set)
 
 (defun hash-set-insert (set hash data &aux (index (mod hash (hash-set-size set))))
-  (let ((bin (member data (aref (hash-set-table set) index)
-                     :test (hash-set-test set) :key #'cdr)))
-    (unless bin
-      (setf bin (make-hash-set-bin hash data (aref (hash-set-table set) index))
-            (aref (hash-set-table set) index) bin)
+  "Insert DATA into `hash-set' SET, using hash value HASH. Returns DATA if an
+insertion was made, or NIL if DATA was already present in the table."
+  (with-accessors ((table hash-set-table) (test hash-set-test)) set
+    (unless (find data (aref table index) :test test :key #'cdr)
+      (push (cons hash data) (aref table index))
       (incf (hash-set-count set))
       (when (hash-set-full-p set)
         (hash-set-resize set))
-      (hash-set-bin-elt bin))))
+      data)))
 
 (defun hash-set-remove (set hash data)
   (let ((bin (aref (hash-set-table set)
