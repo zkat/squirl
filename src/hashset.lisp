@@ -67,18 +67,13 @@ insertion was made, or NIL if DATA was already present in the table."
         (return (cdr bin))))))
 
 (defun hash-set-remove (set hash data)
-  (let ((bin (aref (hash-set-table set)
-                   (mod hash (hash-set-size set))))
-        prev-bin)
-    (loop while (and bin (not (funcall (hash-set-test set) data
-                                       (hash-set-bin-elt bin))))
-       do (setf prev-bin bin
-                bin (hash-set-bin-next bin))
-       finally
-         (when bin
-           (setf (hash-set-bin-next prev-bin) (hash-set-bin-next bin))
-           (decf (hash-set-count set))
-           (return (hash-set-bin-elt bin))))))
+  (let ((found (hash-set-find set hash data)))
+    (when found
+      (let ((index (mod hash (hash-set-size set))))
+        (setf (aref (hash-set-table set) index)
+              (delete data (aref (hash-set-table set) index)
+                      :test (hash-set-test set) :key #'cdr))
+        found))))
 
 (defun hash-set-map (set function)
   (loop for bin across (hash-set-table set)
