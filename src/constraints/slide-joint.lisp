@@ -4,14 +4,7 @@
 (defstruct (slide-joint (:include constraint)
              (:constructor
               make-slide-joint
-              (body-a body-b anchor1 anchor2
-                      &aux (distance
-                            (let ((p1 (vec+ (body-position body-a)
-                                            (vec-rotate anchor1 (body-rotation body-b))))
-                                  (p2 (vec+ (body-position body-b)
-                                            (vec-rotate anchor2 (body-rotation body-a)))))
-                                       (vec-length (vec- p1 p2)))))))
-
+              (body-a body-b anchor1 anchor2)))
   (anchor1 +zero-vector+ :type vec)
   (anchor2 +zero-vector+ :type vec)
   (min-slide 0)
