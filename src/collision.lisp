@@ -3,6 +3,9 @@
 
 (declaim (optimize safety debug))
 
+(defgeneric collide-shapes (a b)
+  (:documentation "Collide shapes A and B together!"))
+
 (defun circle-to-circle-query (p1 p2 r1 r2)
   (let* ((delta (vec- p2 p1))
          (mindist (+ r1 r2))
@@ -17,14 +20,14 @@
                      (- dist mindist)
                      0)))))
 
-(defun circle-to-circle (shape-1 shape-2)
+(defmethod collide-shapes ((shape-1 circle) (shape-2 circle))
   "Collide circles."
   (circle-to-circle-query (circle-transformed-center shape-1)
                           (circle-transformed-center shape-2)
                           (circle-radius shape-1)
                           (circle-radius shape-2)))
 
-(defun circle-to-segment (circle segment)
+(defmethod collide-shapes ((circle circle) (segment segment))
   (let* ((radius-sum (+ (circle-radius circle)
                         (segment-radius segment)))
          (normal-distance (- (vec. (segment-trans-normal segment)
