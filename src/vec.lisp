@@ -26,9 +26,9 @@ where NAME is a symbol, and FORM evaluates to a `vec'.
 WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
   (let ((name (if (listp form) (first form) form))
         (place (if (listp form) (second form) form)))
-    `(with-accessors ((,(intern (format nil "~A.X" name)) vec-x)
-                      (,(intern (format nil "~A.Y" name)) vec-y))
-         ,place ,@body)))
+    `(with-place (,(format nil "~A." name) vec-)
+         (x y) ,place
+       ,@body)))
 
 (defmacro with-vecs ((form &rest forms) &body body)
   "Convenience macro for nesting WITH-VEC forms"
