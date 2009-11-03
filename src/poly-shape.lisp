@@ -1,15 +1,27 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
-(defstruct poly-axis
-  normal distance)
-
 (defstruct (poly (:constructor %make-poly (body vertices &aux (length (length vertices))))
                  (:include shape))
   (vertices (make-array length))
   (axes (make-array length))
   (transformed-vertices (make-array length))
   (transformed-axes (make-array length)))
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (deftype poly-axis ()
+    '(cons vec real))
+
+  (declaim (ftype (function (vec real) poly-axis) make-poly-axis))
+  (defun make-poly-axis (normal distance)
+    (cons normal distance))
+
+  ;; Note that axes are read-only data structures.
+  (declaim (ftype (function (poly-axis) vec) poly-axis-normal)
+           (ftype (function (poly-axis) real) poly-axis-distance))
+  (defun poly-axis-normal (axis)
+    (car axis))
+  (defun poly-axis-distance (axis)
+    (cdr axis)))
 
 (defun set-up-vertices (poly vertices offset)
   (loop for vert in vertices for i from 0
