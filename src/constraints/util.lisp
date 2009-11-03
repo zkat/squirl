@@ -36,13 +36,12 @@
 (defun k-tensor (body1 body2 r1 r2)
   ;; calculate mass matrix
   ;; C sources say: "If I wasn't lazy and wrote a proper matrix class, this wouldn't be so gross...
-  (let* ((b1-inverse-mass (body-inverse-mass body1))
-         (b2-inverse-mass (body-inverse-mass body2))
-         (mass-sum (+ b1-inverse-mass b2-inverse-mass))
+  (let* ((mass-sum (+ (body-inverse-mass body1)
+                      (body-inverse-mass body2)))
 
          ;; Start with I*mass-sum
          (k11 mass-sum) (k12 0)
-         (k21 0)(k22 mass-sum)
+         (k21 0)        (k22 mass-sum)
 
          ;; influence from r1
          (b1-inverse-inertia (body-inverse-inertia body1))
@@ -56,23 +55,19 @@
          (r2ysq (* (vec-y r2) (vec-y r2) b2-inverse-inertia))
          (r2nxy (- (* (vec-x r2) (vec-y r2) b2-inverse-inertia))))
     ;; apply influence from r1
-    (incf k11 r1ysq)
-    (incf k12 r1nxy)
-    (incf k21 r1nxy)
-    (incf k22 r1xsq)
+    (incf k11 r1ysq) (incf k12 r1nxy)
+    (incf k21 r1nxy) (incf k22 r1xsq)
 
     ;; apply influence from r2
-    (incf k11 r2ysq)
-    (incf k12 r2nxy)
-    (incf k21 r2nxy)
-    (incf k22 r2xsq)
+    (incf k11 r2ysq) (incf k12 r2nxy)
+    (incf k21 r2nxy) (incf k22 r2xsq)
 
     ;; invert
     (let ((det-inv (/ (- (* k11 k22) (* k12 k21)))))
 
       ;; and we're done.
-      (values (vec (* k22 det-inv) (- (* k12 det-inv)))
-              (vec (- (* k21 det-inv)) (* k11 det-inv))))))
+      (values (vec    (* k22 det-inv) (- (* k12 det-inv)))
+              (vec (- (* k21 det-inv))   (* k11 det-inv))))))
 
 (defun mult-k (vr k1 k2)
   (vec (vec. vr k1) (vec. vr k2)))
