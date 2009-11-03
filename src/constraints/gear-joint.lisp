@@ -57,3 +57,6 @@
 	;;  apply impulse
 	(decf (body-angular-velocity body-a) (* j (body-inverse-inertia body-a) ratio-inverse))
 	(incf (body-angular-velocity body-b) (* j (body-inverse-inertia body-b))))))
+
+(defmethod get-impulse ((gear gear-joint))
+  (abs (gear-joint-j-acc gear)))

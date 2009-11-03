@@ -61,3 +61,6 @@
 	;;  apply impulse
 	(decf (body-angular-velocity body-a) (* j (body-inverse-inertia body-a)))
 	(incf (body-angular-velocity body-b) (* j (body-inverse-inertia body-b))))))
+
+(defmethod get-impulse ((joint ratchet-joint))
+  (abs (ratchet-joint-j-acc joint)))

@@ -44,4 +44,5 @@
 	(decf (body-angular-velocity body-a) (* j (body-inverse-inertia body-a)))
 	(incf (body-angular-velocity body-b) (* j (body-inverse-inertia body-b))))))
 
-		   
+(defmethod get-impulse ((motor simple-motor))
+  (abs (simple-motor-j-acc motor)))

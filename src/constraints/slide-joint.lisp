@@ -82,7 +82,5 @@
       ;; apply impulse
       (apply-impulses body-a body-b  r1 r2 (vec* n jn)))))
 
-(defmethod get-impulse (joint)
-   (if (< (slide-joint-jn-acc joint) 0)
-       (- (slide-joint-jn-acc joint))
-       (slide-joint-jn-acc joint)))
+(defmethod get-impulse ((joint slide-joint))
+  (abs (slide-joint-jn-acc joint)))

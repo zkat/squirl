@@ -61,3 +61,6 @@
 	(setf j (vec- j-acc j-old))
 	;;  apply impulse
 	(apply-impulses body-a body-b r1 r2 j))))
+
+(defmethod get-impulse ((pivot pivot-joint))
+  (vec-length (pivot-joint-j-acc pivot)))
