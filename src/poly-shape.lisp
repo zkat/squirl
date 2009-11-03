@@ -1,12 +1,6 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
-(defstruct (poly (:constructor %make-poly (body vertices &aux (length (length vertices))))
-                 (:include shape))
-  (vertices (make-array length))
-  (axes (make-array length))
-  (transformed-vertices (make-array length))
-  (transformed-axes (make-array length)))
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (deftype poly-axis ()
     '(cons vec real))
@@ -23,6 +17,15 @@
   (defun poly-axis-distance (axis)
     (cdr axis)))
 
+(defstruct (poly (:include shape)
+                 (:constructor
+                  %make-poly (body length &aux
+                                   (vertices (make-array length))
+                                   (axes (make-array length))
+                                   (transformed-vertices (make-array length))
+                                   (transformed-axes (make-array length)))))
+  vertices axes transformed-vertices transformed-axes)
+
 (defun set-up-vertices (poly vertices offset)
   (loop for vert in vertices for i from 0
      for axis in (poly-axes poly)
@@ -34,7 +37,7 @@
               (poly-axis-distance axis) (vec. normal a))))
 
 (defun make-poly (body vertices offset)
-  (let ((poly (%make-poly body vertices)))
+  (let ((poly (%make-poly body (length vertices))))
     (set-up-vertices poly vertices offset)
     (shared-shape-init poly)
     poly))
