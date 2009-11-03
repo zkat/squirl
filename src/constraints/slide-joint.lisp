@@ -60,7 +60,7 @@
       ;; compute max impulse
       (setf jn-max (impulse-max joint dt))
       ;;apply accumulated impulse
-      (when (= bias 0.0)
+      (when (zerop bias)
         ;; if bias is 0, then the joint is not at a limit
         (setf jn-acc 0.0))
       (apply-impulses body-a body-b r1 r2 (vec* n jn-acc)))))
@@ -76,7 +76,7 @@
                    (bias slide-joint-bias)
                    (jn-max slide-joint-jn-max)
                    (jn-acc slide-joint-jn-acc)) joint
-    (when (= bias 0.0);; this could be moved up for a minor performance boost
+    (when (zerop bias);; this could be moved up for a minor performance boost
       (return-from apply-impulse))
     ;; compute relative velocity
     (let* ((vr (relative-velocity body-a body-b r1 r2))
