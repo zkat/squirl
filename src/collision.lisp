@@ -79,14 +79,14 @@
   "Add contacts for penetrating vertices"
   (loop
      for i from 0
-     for vertex in (poly-vertices poly1)
-     do (when (partial-poly-contains-vertex-p poly2 vertex (vec-neg normal))
-          (push (make-contact vertex normal distance (hash-pair poly1 i)) contacts)))
+     for vertex across (poly-vertices poly1)
+     when (partial-poly-contains-vertex-p poly2 vertex (vec-neg normal))
+     do (push (make-contact vertex normal distance (hash-pair poly1 i)) contacts))
   (loop
      for i from 0
-     for vertex in (poly-vertices poly2)
-     do (when (partial-poly-contains-vertex-p poly1 vertex (vec-neg normal))
-          (push (make-contact vertex normal distance (hash-pair poly2 i)) contacts)))
+     for vertex across (poly-vertices poly2)
+     when (partial-poly-contains-vertex-p poly1 vertex (vec-neg normal))
+     do (push (make-contact vertex normal distance (hash-pair poly2 i)) contacts))
   contacts)
 
 (defun segment-value-on-axis (segment normal distance)
