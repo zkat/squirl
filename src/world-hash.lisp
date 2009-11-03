@@ -35,6 +35,9 @@
   (stamp 1)            ; Incremented on each query; see `handle-stamp'
   )
 
+(defun stamp-handle (handle hash)
+  (setf (cdr handle) (world-hash-stamp hash)))
+
 (defun world-hash-size (hash)
   (length (world-hash-table hash)))
 
@@ -134,7 +137,7 @@ list structure into the `world-hash-junk'."
                 (eq object (handle-object handle))
                 (null (handle-object handle))) do
        (funcall function object (handle-object handle))
-       (setf (handle-stamp handle) (world-hash-stamp hash))))
+       (stamp-handle handle hash)))
 
 (defun world-hash-point-query (function hash point)
   (let* ((dim (world-hash-cell-size hash))
@@ -165,7 +168,7 @@ list structure into the `world-hash-junk'."
   (dolist (handle chain 1.0)
     (unless (or (= (handle-stamp handle) (world-hash-stamp hash))
                 (null (handle-object handle)))
-      (setf (handle-stamp handle) (world-hash-stamp hash))
+      (stamp-handle handle hash)
       (return (funcall function object (handle-object handle))))))
 
 (defun world-hash-query-segment (function hash object vec-a vec-b)
