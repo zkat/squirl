@@ -53,24 +53,22 @@
 (defun poly-contains-vertex-p (poly vertex)
   "Returns true if the polygon contains the vertex."
   ;; Lisp-hilarity
-  (notany (lambda (axis)
-            (plusp (- (vec. (poly-axis-normal axis) vertex)
-                      (poly-axis-distance axis))))
+  (notany (fun (plusp (- (vec. (poly-axis-normal _) vertex)
+                         (poly-axis-distance _))))
           (poly-transformed-axes poly)))
 
 (defun partial-poly-contains-vertex-p (poly vertex normal)
   "Same as POLY-CONTAINS-VERTEX-P, but ignores faces pointing away from NORMAL."
   ;; More hilarity. I'm honestly not sure that this translation is correct.
-  (notany (lambda (axis)
-            (unless (vec. (poly-axis-normal axis) normal)
-                (plusp (- (vec. (poly-axis-normal axis) vertex)
-                       (poly-axis-distance axis)))))
+  (notany (fun (unless (vec. (poly-axis-normal _) normal)
+                 (plusp (- (vec. (poly-axis-normal _) vertex)
+                           (poly-axis-distance _)))))
           (poly-transformed-axes poly)))
 
 (defun poly-transform-vertices (poly position rotation)
   (setf (poly-transformed-vertices poly)
         ;; this'll have to become a MAP-INTO, I think.
-        (map 'list (lambda (vert) (vec+ position (vec-rotate vert rotation)))
+        (map 'list (fun (vec+ position (vec-rotate _ rotation)))
              (poly-vertices poly))))
 
 (defun poly-transform-axes (poly position rotation)

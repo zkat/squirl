@@ -24,9 +24,8 @@
 
 (defun contacts-sum-impulses (&rest contacts)
   (reduce #'vec+ contacts :initial-value +zero-vector+
-          :key (lambda (contact)
-                 (vec* (contact-normal contact)
-                       (contact-jn-acc contact)))))
+          :key (fun (vec* (contact-normal _)
+                          (contact-jn-acc _)))))
 
 (defun contact-impulse-with-friction (contact)
   (vec-rotate (contact-normal contact)
