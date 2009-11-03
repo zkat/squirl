@@ -29,7 +29,8 @@
       ;; apply spring force.
       (apply-impulses body-a body-b (damped-spring-r1 spring) (damped-spring-r2 spring)
                       (vec* (damped-spring-normal spring)
-                            (* dt (spring-force spring)))))))
+                            (* dt (spring-force spring))))
+      (values))))
 
 (defmethod apply-impulse ((spring damped-spring))
   (let ((body-a (spring-body-a spring))
