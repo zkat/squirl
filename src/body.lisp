@@ -3,20 +3,11 @@
 
 (declaim (optimize safety debug))
 
-(defvar *body-update-velocity-default*)
-(defvar *body-update-position-default*)
-
 (defstruct (body
              (:constructor
               make-body (%mass %inertia &aux
                                (inverse-mass (/ %mass))
                                (inverse-inertia (/ %inertia)))))
-  ;; Function that is called to integrate the body's velocity.
-  (velocity-fun *body-update-velocity-default* :type function)
-
-  ;; Function that is called to integrate the body's position.
-  (position-fun *body-update-position-default* :type function)
-
   ;; Mass properties, and cached inverses
   %mass inverse-mass %inertia inverse-inertia
 
@@ -30,10 +21,7 @@
   (angular-velocity 0) (torque 0)
 
   ;; Velocity bias values used when solving penetrations and correcting constraints.
-  (velocity-bias +zero-vector+) (angular-velocity-bias 0)
-
-  ;; User Definable Slots
-  data)
+  (velocity-bias +zero-vector+) (angular-velocity-bias 0))
 
 ;;; Wraps the mass, inertia, and angle slots so that setting them updates
 ;;; the inverse-mass, inverse-inertia, and rotation slots.
@@ -46,33 +34,32 @@
   (wrap body-inertia body-%inertia body-inverse-inertia /)
   (wrap body-angle body-%angle body-rotation angle->vec))
 
-(defun body-update-velocity (body gravity damping dt)
-  (with-accessors ((angular-velocity body-angular-velocity)
-                   (inv-inertia body-inverse-inertia)
-                   (velocity body-velocity)
-                   (torque body-torque)
-                   (force body-force)) body
-    (setf velocity
-          (vec+ (vec* velocity damping)
-                (vec* (vec+ gravity (vec* force inv-inertia)) dt)))
-    (setf angular-velocity
-          (+ (* angular-velocity damping)
-             (* torque inv-inertia dt)))))
+(defgeneric body-update-velocity (body gravity damping dt)
+  (:method ((body body) gravity damping dt)
+    (with-accessors ((angular-velocity body-angular-velocity)
+                     (inv-inertia body-inverse-inertia)
+                     (velocity body-velocity)
+                     (torque body-torque)
+                     (force body-force)) body
+      (setf velocity
+            (vec+ (vec* velocity damping)
+                  (vec* (vec+ gravity (vec* force inv-inertia)) dt)))
+      (setf angular-velocity
+            (+ (* angular-velocity damping)
+               (* torque inv-inertia dt))))))
 
-(defun body-update-position (body dt)
-  (with-accessors ((angular-velocity-bias body-angular-velocity-bias)
-                   (angular-velocity body-angular-velocity)
-                   (velocity-bias body-velocity-bias)
-                   (position body-position)
-                   (velocity body-velocity)
-                   (angle body-angle)) body
-    (setf position (vec+ position (vec* (vec+ velocity velocity-bias) dt)))
-    (setf angle (+ angle (* angular-velocity angular-velocity-bias dt)))
-    (setf velocity-bias +zero-vector+)
-    (setf angular-velocity-bias 0)))
-
-(defparameter *body-update-velocity-default* #'body-update-velocity)
-(defparameter *body-update-position-default* #'body-update-position)
+(defgeneric body-update-position (body dt)
+  (:method ((body body) dt)
+    (with-accessors ((angular-velocity-bias body-angular-velocity-bias)
+                     (angular-velocity body-angular-velocity)
+                     (velocity-bias body-velocity-bias)
+                     (position body-position)
+                     (velocity body-velocity)
+                     (angle body-angle)) body
+      (setf position (vec+ position (vec* (vec+ velocity velocity-bias) dt)))
+      (setf angle (+ angle (* angular-velocity angular-velocity-bias dt)))
+      (setf velocity-bias +zero-vector+)
+      (setf angular-velocity-bias 0))))
 
 (defun body-slew (body pos dt)
   "Modify the velocity of the body so that it will move to the specified absolute coordinates in
