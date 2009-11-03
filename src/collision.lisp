@@ -75,7 +75,7 @@
                         min-index i))))
       (values min-index min))))
 
-(defun find-vertices (poly2 poly2 normal distance)
+(defun find-vertices (poly1 poly2 normal distance)
   "Add contacts for penetrating vertices"
   ;; todo
   )
@@ -120,6 +120,6 @@
     (circle-to-poly circle poly))
   (:method ((poly poly) (circle circle))
     (circle-to-poly circle poly))
-  (:method ((poly poly) (poly poly))
-    (poly-to-poly poly poly)))
+  (:method ((poly1 poly) (poly2 poly))
+    (poly-to-poly poly1 poly2)))
 

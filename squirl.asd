@@ -16,7 +16,7 @@
              (:file "chipmunk"
                     :depends-on ("vec"))
              (:file "collision"
-                    :depends-on ("vec"))
+                    :depends-on ("shape" "poly-shape"))
              (:file "hash-set"
                     :depends-on ("utils"))
              (:file "package")
