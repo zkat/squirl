@@ -4,16 +4,11 @@
 (defstruct (gear-joint (:include constraint)
              (:constructor
               make-gear-joint
-              (body-a body-b anchor1 anchor2
-                      &aux (distance
-                            (let ((p1 (vec+ (body-position body-a)
-                                            (vec-rotate anchor1 (body-rotation body-b))))
-                                  (p2 (vec+ (body-position body-b)
-                                            (vec-rotate anchor2 (body-rotation body-a)))))
-                                       (vec-length (vec- p1 p2)))))))
-  (phase 0.0)
-  (ratio 0.0)
-  (ratio-inverse 0.0)
+              (body-a body-b phase ratio
+                      &aux (ratio-inverse (/ ratio)))))
+  phase
+  ratio
+  ratio-inverse
   (i-sum 0.0)
   (bias 0.0)
   (j-acc 0.0)
