@@ -27,9 +27,9 @@
   vertices axes transformed-vertices transformed-axes)
 
 (defun set-up-vertices (poly vertices offset)
-  (loop for vert in vertices for i from 0
+  (loop for vert across vertices for i from 0
      for a = (vec+ offset vert)
-     for b = (vec+ offset (elt vertices (mod (1+ i) (length vertices))))
+     for b = (vec+ offset (aref vertices (mod (1+ i) (length vertices))))
      for normal = (vec-normalize (vec-perp (vec- b a)))
      do (setf (svref (poly-vertices poly) i) a
               (svref (poly-axes poly) i) (make-poly-axis normal (vec. normal a)))))
