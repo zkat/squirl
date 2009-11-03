@@ -4,13 +4,12 @@
 (defstruct (pin-joint (:include constraint)
                       (:constructor
                        make-pin-joint
-                       (body-a body-b anchor1 anchor2
-                               &aux (distance
-                                     (let ((p1 (vec+ (body-position body-a)
-                                                     (vec-rotate anchor1 (body-rotation body-a))))
-                                           (p2 (vec+ (body-position body-b)
-                                                     (vec-rotate anchor2 (body-rotation body-b)))))
-                                       (vec-length (vec- p1 p2)))))))
+                       (body-a body-b anchor1 anchor2 &aux
+                               (point-1 (vec+ (body-position body-a)
+                                              (vec-rotate anchor1 (body-rotation body1))))
+                               (point-2 (vec+ (body-position body-b)
+                                              (vec-rotate anchor2 (body-rotation body2))))
+                               (distance (vec-length (vec- point-1 point-2))))))
   anchor1 anchor2
   distance
   r1 r2
