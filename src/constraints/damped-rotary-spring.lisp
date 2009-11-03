@@ -1,7 +1,10 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
-(defstruct (damped-rotary-spring (:include constraint))
+(defstruct (damped-rotary-spring
+             (:include constraint)
+             (:constructor make-damped-rotary-spring
+                           (body-a body-b rest-angle stiffness damping)))
   rest-angle stiffness damping dt target-wrn i-sum)
 
 (defgeneric spring-torque (spring relative-angle)
