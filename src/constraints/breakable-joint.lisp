@@ -1,7 +1,7 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
-(defstruct breakable-joint
+(defstruct (breakable-joint (:include constraint))
   delegate space last-dt-inverse)
 
 (defmethod pre-step ((joint breakable-joint) dt dt-inverse)
