@@ -69,3 +69,6 @@
     (apply-impulses body-a body-b (pin-joint-r1 joint) (pin-joint-r2 joint) (vec* normal jn)))
   (values))
 
+(defmethod get-impulse ((joint pin-joint))
+  (abs (pin-joint-jn-acc joint)))
+
