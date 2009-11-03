@@ -49,7 +49,7 @@
   ;; The two shapes involved in the collision
   shape-a shape-b
   ;; Calculated by arbiter-prestep
-  u target-v
+  u target-v ; todo - give these better names. -- zkat
   ;; Timestamp of the arbiter (from world)
   stamp)
 
