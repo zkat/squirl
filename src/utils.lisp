@@ -18,9 +18,13 @@ the result of calling DELETE with ITEM, place, and the REMOVE-KEYWORDS.")
   "Modify-macro for DELETE-IF. Sets place designated by the first argument to
 the result of calling DELETE with PREDICATE, place, and the REMOVE-KEYWORDS.")
 
+(defmacro with-gensyms ((&rest vars) &body body)
+  `(let ,(loop for var in vars collect `(,var (gensym ,(symbol-name var))))
+     ,@body))
+
 (defmacro push-cons (cons place)
   "Like `cl:push', but reuses CONS"
-  (let ((cons-sym (gensym)))
+  (with-gensyms (cons-sym)
     `(let ((,cons-sym ,cons))
        (setf (cdr ,cons-sym) ,place
              ,place ,cons-sym))))
