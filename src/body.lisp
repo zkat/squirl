@@ -17,7 +17,7 @@
   (force    +zero-vector+ :type vec)
 
   ;; Angular components of motion, and cached rotation vector
-  (%angle 0) (rotation (load-time-value (angle->vec 0)))
+  (%angle 0) (rotation (load-time-value (vec 1.0 0.0)))
   (angular-velocity 0) (torque 0)
 
   ;; Velocity bias values used when solving penetrations and correcting constraints.
