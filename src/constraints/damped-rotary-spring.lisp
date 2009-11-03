@@ -4,7 +4,10 @@
 (defstruct (damped-rotary-spring (:include constraint))
   rest-angle stiffness damping dt target-wrn i-sum)
 
-(defgeneric spring-torque (spring relative-angle))
+(defgeneric spring-torque (spring relative-angle)
+  (:method ((spring damped-rotary-spring) relative-angle)
+    (* (- relative-angle (damped-rotary-spring-rest-angle spring))
+       (damped-rotary-spring-stiffness spring))))
 
 (defmethod pre-step ((spring damped-rotary-spring) dt dt-inverse)
   (let ((body-a (constraint-body-a spring))
