@@ -31,4 +31,4 @@
              (:file "world"
                     :depends-on ("vec"))
              (:file "world-hash"
-                    :depends-on ("hash-set"))))))
+                    :depends-on ("hash-set" "vec"))))))
