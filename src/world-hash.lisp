@@ -68,21 +68,27 @@ list structure into the `world-hash-junk'."
   "Hash X, Y, and N to generate a hash code"
   (expt-mod (* x 2185031351) (* y 4232417593) n))
 
+(defmacro do-bbox ((chain-macro hash-form bbox-form) &body body)
+  (with-gensyms (hash bbox size dim bb.l bb.r bb.b bb.t i j index)
+    `(let* ((,hash ,hash-form)
+            (,bbox ,bbox-form)
+            (,size (world-hash-size ,hash))
+            (,dim (world-hash-cell-size ,hash))
+            (,bb.t (floor (/ (bbox-top    ,bbox) ,dim)))
+            (,bb.l (floor (/ (bbox-left   ,bbox) ,dim)))
+            (,bb.r (floor (/ (bbox-right  ,bbox) ,dim)))
+            (,bb.b (floor (/ (bbox-bottom ,bbox) ,dim))))
+       (symbol-macrolet ((,chain-macro (world-hash-chain ,hash ,index)))
+         (loop for ,i from ,bb.l to ,bb.r
+            do (loop for ,j from ,bb.b to ,bb.t
+                  for ,index = (hash ,i ,j ,size) ,@body))))))
+
 (defun hash-handle (hash handle bbox)
-  (let* ((size (world-hash-size hash))
-         (dim (world-hash-cell-size hash))
-         (bb.t (floor (/ (bbox-top    bbox) dim)))
-         (bb.l (floor (/ (bbox-left   bbox) dim)))
-         (bb.r (floor (/ (bbox-right  bbox) dim)))
-         (bb.b (floor (/ (bbox-bottom bbox) dim))))
-    (loop for i from bb.l to bb.r
-       do (loop for j from bb.b to bb.t
-             for index = (hash i j size)
-             for chain list = (world-hash-chain hash index)
-             unless (find handle chain :key #'eq) do
-               (let ((node (get-new-node hash)))
-                 (setf (car node) handle)
-                 (push-cons node (world-hash-chain hash index)))))))
+  (do-bbox (chain hash bbox)
+    unless (find handle chain :key #'eq) do
+      (let ((node (get-new-node hash)))
+        (setf (car node) handle)
+        (push-cons node chain))))
 
 (defun world-hash-insert (hash object id bbox)
   (with-accessors ((handle-set world-hash-handle-set)) hash
@@ -131,37 +137,21 @@ list structure into the `world-hash-junk'."
   (incf (world-hash-stamp hash)))
 
 (defun world-hash-query (function hash object bbox)
-  (let* ((size (world-hash-size hash))
-         (dim (world-hash-cell-size hash))
-         (bb.t (floor (/ (bbox-top    bbox) dim)))
-         (bb.l (floor (/ (bbox-left   bbox) dim)))
-         (bb.r (floor (/ (bbox-right  bbox) dim)))
-         (bb.b (floor (/ (bbox-bottom bbox) dim))))
-    (loop for i from bb.l to bb.r
-       do (loop for j from bb.b to bb.t
-             for index = (hash i j size) do
-               (query function hash (world-hash-chain hash index) object))))
+  (do-bbox (chain hash bbox)
+    do (query function hash chain object))
   (incf (world-hash-stamp hash)))
 
 (defun world-hash-query-rehash (function hash)
   (clear-world-hash hash)
-  (hash-set-map (lambda (handle &aux (object (handle-object handle)))
-                  (let* ((size (world-hash-size hash))
-                         (dim (world-hash-cell-size hash))
-                         (bbox (funcall (world-hash-bbox-function hash) object))
-                         (bb.t (floor (/ (bbox-top    bbox) dim)))
-                         (bb.l (floor (/ (bbox-left   bbox) dim)))
-                         (bb.r (floor (/ (bbox-right  bbox) dim)))
-                         (bb.b (floor (/ (bbox-bottom bbox) dim))))
-                    (loop for i from bb.l to bb.r
-                       do (loop for j from bb.b to bb.t
-                             for index = (hash i j size)
-                             for chain = (world-hash-chain hash index)
-                             unless (find handle chain) do
-                               (query function hash chain object)
-                               (let ((node (get-new-node hash)))
-                                 (setf (car node) handle)
-                                 (push-cons node (world-hash-chain hash index))))))
+  (hash-set-map (lambda (handle &aux (object (handle-object handle))
+                         (bbox (funcall (world-hash-bbox-function hash) object)))
+                  (do-bbox (chain-form hash bbox)
+                    for chain = chain-form
+                    unless (find handle chain) do
+                      (query function hash chain object)
+                      (let ((node (get-new-node hash)))
+                        (setf (car node) handle)
+                        (push-cons node chain-form)))
                   (incf (world-hash-stamp hash)))
                 (world-hash-handle-set hash)))
 
