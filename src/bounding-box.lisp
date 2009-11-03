@@ -56,11 +56,9 @@
   ;; cpFloat y = (mody > 0.0f) ? mody : mody + iy;
 
   ;; return cpv(x + bb.l, y + bb.b);
-  (let* ((ix (abs (- (bbox-right bb) (bbox-left bb))))
-         (modx (mod (- (vec-x vec) (bbox-left bb)) ix))
-         (x (if (plusp modx) modx (+ modx ix)))
-         (iy (abs (- (bbox-top bb) (bbox-bottom bb))))
-         (mody (mod (- (vec-y vec) (bbox-bottom bb)) iy))
-         (y (if (plusp mody) mody (+ mody iy))))
-    (vec (+ x (bbox-left bb))
-         (+ y (bbox-bottom bb)))))
+  (vec (+ (bbox-left bb)
+          (mod (- (vec-x vec) (bbox-left bb))
+               (abs (- (bbox-right bb) (bbox-left bb)))))
+       (+ (bbox-bottom bb)
+          (mod (- (vec-y vec) (bbox-bottom bb))
+               (abs (- (bbox-top bb) (bbox-bottom bb)))))))
