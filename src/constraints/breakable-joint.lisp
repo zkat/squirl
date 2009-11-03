@@ -13,3 +13,6 @@
         ;; otherwise, call pre-step on its delegate.
         (prog1 (pre-step delegate dt dt-inverse)
           (setf (breakable-joint-last-dt-inverse joint) dt-inverse)))))
+
+(defmethod apply-impulse ((joint breakable-joint))
+  (apply-impule (breakable-joint-delegate joint)))
