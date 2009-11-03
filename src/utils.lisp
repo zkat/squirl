@@ -46,3 +46,14 @@ the result of calling DELETE with PREDICATE, place, and the REMOVE-KEYWORDS.")
 
 (defun maybe/ (a b)
   (if (zerop b) 0 (/ a b)))
+
+(defmacro with-place (conc-name (&rest slots) form &body body)
+  (flet ((conc (a b) (intern (format nil "~A~A" a b))))
+    (let ((sm-prefix (if (atom conc-name) conc-name (first conc-name)))
+          (acc-prefix (if (atom conc-name) conc-name (second conc-name))))
+      `(with-accessors
+             ,(mapcar (fun `(,(conc sm-prefix (if (atom _) _ (car _)))
+                              ,(conc acc-prefix (if (atom _) _ (cadr _)))))
+                      slots)
+           ,form
+         ,@body))))
