@@ -97,8 +97,28 @@
 
 (defun find-points-behind-segment (segment poly p-dist coefficient)
   "Identify vertices that have penetrated the segment."
-  ;; todo
-  )
+  (let ((dta (vecx (segment-trans-normal segment)
+                   (segment-trans-a segment)))
+        (dtb (vecx (segment-trans-normal segment)
+                   (segment-trans-b segment)))
+        (normal (vec* (segment-trans-normal segment)
+                      coefficient)))
+    (loop
+       with contacts
+       for i from 0
+       for vertex across (poly-vertices poly)
+       when (< (vec. vertex normal)
+               (+ (* (vec. (segment-trans-normal segment)
+                           (segment-trans-a segment))
+                     coefficient)
+                  (segment-radius segment)))
+       do (let ((dt (vecx (segment-trans-normal segment)
+                          vertex)))
+            (when (and (>= dta dt)
+                       (>= dt dtb))
+              (push (make-contact vertex normal p-dist (hash-pair poly i))
+                    contacts)))
+       finally (return contacts))))
 
 (defun segment-to-poly (segment poly)
   ;; todo
