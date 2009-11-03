@@ -22,7 +22,7 @@
           (setf (breakable-joint-last-dt-inverse joint) dt-inverse)))))
 
 (defmethod apply-impulse ((joint breakable-joint))
-  (apply-impule (breakable-joint-delegate joint)))
+  (apply-impulse (breakable-joint-delegate joint)))
 
 (defmethod get-impulse ((joint breakable-joint))
   (get-impulse (breakable-joint-delegate joint)))
