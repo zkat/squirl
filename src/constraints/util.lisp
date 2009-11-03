@@ -71,3 +71,7 @@
       ;; and we're done.
       (values (vec (* k22 det-inv) (- (* k12 det-inv)))
               (vec (- (* k21 det-inv)) (* k11 det-inv))))))
+
+(defun mult-k (vr k1 k2)
+  (vec (vec. vr k1) (vec. vr k2)))
+
