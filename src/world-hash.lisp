@@ -123,8 +123,7 @@ list structure into the `world-hash-junk'."
 (defun world-hash-remove (hash object id)
   (multiple-value-bind (handle foundp)
       (hash-set-remove (world-hash-handle-set hash) id object)
-    (when foundp
-      (setf (handle-object handle) nil))))
+    (when foundp (handle-object handle))))
 
 (defun world-hash-map (function hash)
   (hash-set-map (lambda (handle)
