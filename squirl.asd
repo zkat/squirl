@@ -44,6 +44,8 @@
                               :depends-on ("spring"))
                        (:file "gear-joint"
                               :depends-on ("constraints"))
+                       (:file "groove-joint"
+                              :depends-on ("constraints"))
                        (:file "pin-joint"
                               :depends-on ("constraints"))
                        (:file "pivot-joint"
