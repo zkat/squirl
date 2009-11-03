@@ -19,3 +19,14 @@
   (body-apply-bias-impulse body1 (vec-neg j) r1)
   (body-apply-bias-impulse body2 j r2)
   (values))
+
+(defun k-scalar (body1 body2 r1 r2 normal)
+  (let ((mass-sum (+ (body-inverse-mass body1)
+                     (body-inverse-mass body2)))
+        (r1-cross-normal (vecx r1 normal))
+        (r2-cross-normal (vecx r2 normal)))
+    (+ mass-sum
+       (* r1-cross-normal r1-cross-normal
+          (body-inverse-inertia body1))
+       (* r2-cross-normal r2-cross-normal
+          (body-inverse-inertia body2)))))
