@@ -116,7 +116,7 @@
              (let* ((b-normal (vec. b normal))
                     (ratio (/ (- (poly-axis-distance axis) a-normal)
                               (- b-normal a-normal))))
-               (unless (or (< t 0) (< 1 t))
+               (unless (or (< ratio 0) (< 1 ratio))
                  (let* ((point (vec-lerp a b ratio))
                         (dt (- (vecx normal point)))
                         (dt-min (- (vecx normal vert)))
