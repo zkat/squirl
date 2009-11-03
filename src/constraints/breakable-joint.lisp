@@ -1,6 +1,12 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
+;; What we have here is a textbook case of a proxy pattern.
+;; Instead of creating an is-a relationship (which in this case
+;; would involve multiple inheritance), we instead wrap any given
+;; joint with this breakable one, which adds the breaking behavior.
+;; As such, we forward most of the behavior over to the delegate, but
+;; we pass -this- object around.
 (defstruct (breakable-joint (:include constraint))
   delegate space last-dt-inverse)
 
@@ -19,3 +25,4 @@
 
 (defmethod get-impulse ((joint breakable-joint))
   (get-impulse (breakable-joint-delegate joint)))
+
