@@ -22,3 +22,18 @@
       (decf (body-angular-velocity body-a) (* j-spring (body-inverse-inertia body-a)))
       (incf (body-angular-velocity body-b) (* j-spring (body-inverse-inertia body-b)))))
   (values))
+
+(defmethod apply-impulse ((spring damped-rotary-spring))
+  (let* ((body-a (constraint-body-a spring))
+         (body-b (constraint-body-b spring))
+         (wrn (- (body-angular-velocity body-a)
+                 (body-angular-velocity body-b)))
+         (angular-velocity-damp
+          (* wrn (- 1.0 (exp (- (/ (* (damped-rotary-spring-damping spring)
+                                      (damped-rotary-spring-dt spring))
+                                   (damped-rotary-spring-i-sum spring))))))))
+    (setf (damped-rotary-spring-target-wrn spring) (- wrn angular-velocity-damp))
+    (let ((j-damp (* angular-velocity-damp (damped-rotary-spring-i-sum spring))))
+      (decf (body-angular-velocity body-a) (* j-damp (body-inverse-inertia body-a)))
+      (incf (body-angular-velocity body-b) (* j-damp (body-inverse-inertia body-b)))))
+  (values))
