@@ -57,17 +57,16 @@
                                    (segment-radius segment)))
           (t nil))))))
 
-(defun find-min-separating-axis (poly axes)
-  (loop with min-index = 0 with min
-     for i from 0
-     for axis across axes
-     for distance = (poly-value-on-axis poly (poly-axis-normal axis) (poly-axis-distance axis))
+(defun find-min-separating-axis (poly1 poly2)
+  (loop with msa with min-distance
+     for axis across (poly-transformed-axes poly2)
+     for distance = (poly-value-on-axis poly1 (poly-axis-normal axis) (poly-axis-distance axis))
      if (plusp distance)
      return nil
-     else if (or (null min) (> distance min))
-     do (setf min distance
-              min-index i)
-     finally (return (values min-index min))))
+     else if (or (null min-distance) (> distance min-distance))
+     do (setf min-distance distance
+              msa axis)
+     finally (return (values msa min-distance))))
 
 (defun find-vertices (poly1 poly2 normal distance &aux contacts)
   "Add contacts for penetrating vertices"
