@@ -4,13 +4,7 @@
 (defstruct (simple-motor (:include constraint)
              (:constructor
               make-simple-motor
-              (body-a body-b anchor1 anchor2
-                      &aux (distance
-                            (let ((p1 (vec+ (body-position body-a)
-                                            (vec-rotate anchor1 (body-rotation body-b))))
-                                  (p2 (vec+ (body-position body-b)
-                                            (vec-rotate anchor2 (body-rotation body-a)))))
-                                       (vec-length (vec- p1 p2)))))))
+              (body-a body-b rate)))
   (rate 0.0)
   (i-sum 0.0)
   (j-acc 0.0)
