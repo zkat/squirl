@@ -81,3 +81,6 @@
     (apply-impulses body-a body-b (groove-joint-r1 joint) (groove-joint-r2 joint)
                     (vec- (groove-joint-j-acc joint) j-old))))
 
+(defmethod get-impulse ((joint groove-joint))
+  (vec-length (groove-joint-j-acc joint)))
+
