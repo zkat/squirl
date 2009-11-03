@@ -56,7 +56,7 @@
       ;; calculate mass normal
       (setf n-mass (/ 1.0 (k-scalar body-a body-b r1 r2  n )))
       ;; calculate bias velocity
-      (setf bias (clamp (- (* bias-coef dt-inv pdist)) (- max-bias) max-bias)) ;;;check up bracket thing from C code
+      (setf bias (clamp (- (* bias-coef dt-inv pdist)) (- max-bias) max-bias))
       ;; compute max impulse
       (setf jn-max (impulse-max joint dt))
       ;;apply accumulated impulse
@@ -76,7 +76,7 @@
                    (bias slide-joint-bias)
                    (jn-max slide-joint-jn-max)
                    (jn-acc slide-joint-jn-acc)) joint
-    (when (zerop bias);; this could be moved up for a minor performance boost
+    (when (zerop bias)
       (return-from apply-impulse))
     ;; compute relative velocity
     (let* ((vr (relative-velocity body-a body-b r1 r2))
