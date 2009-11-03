@@ -34,12 +34,20 @@
                     :depends-on ("hash-set" "vec"))
              (:module "constraints"
                       :components
-                      ((:file "util")
+                      ((:file "breakable-joint"
+                              :depends-on ("constraints"))
                        (:file "constraints"
                               :depends-on ("util"))
+                       (:file "damped-rotary-spring"
+                              :depends-on ("constraints"))
+                       (:file "gear-joint"
+                              :depends-on ("constraints"))
                        (:file "pin-joint"
                               :depends-on ("constraints"))
+                       (:file "simple-motor"
+                              :depends-on ("constraints"))
                        (:file "slide-joint"
-                              :depends-on ("constraints")))
+                              :depends-on ("constraints"))
+                       (:file "util"))                      
                       :depends-on ("shape" "poly-shape" "world" "collision"))))))
 
