@@ -6,15 +6,8 @@
 (defstruct (handle (:constructor make-handle (object)))
   "Used internally to track objects added to the hash"
   object                                ; Pointer to the object
-  (retain 0)                            ; Retain count
   ;; Used to prevent duplicate identification of an object within one query
   (stamp 0))
-
-;;; These seem to just be used for C memory management
-(defun retain-handle (handle)
-  (incf (handle-retain handle)))
-(defun release-handle (handle)
-  (decf (handle-retain handle)))
 
 ;;; Used for the `world-hash-handle-set'
 (defun handle-equal (object handle)
@@ -53,7 +46,6 @@ list structure into the `world-hash-junk'."
         ;; We need to hang onto the CDR because we 'recycle' NODE
         (next (cdr chain) (cdr chain)))
        ((null chain) (setf (world-hash-chain hash index) nil))
-    (release-handle (car chain)) ; Is this just reference counting?
     (push-cons chain (world-hash-junk hash))))
 
 (defun clear-world-hash (hash)
@@ -115,8 +107,7 @@ list structure into the `world-hash-junk'."
   (multiple-value-bind (handle foundp)
       (hash-set-remove (world-hash-handle-set hash) id object)
     (when foundp
-      (setf (handle-object handle) nil)
-      (release-handle handle))))
+      (setf (handle-object handle) nil))))
 
 (defun world-hash-map (function hash)
   (hash-set-map (lambda (handle)
@@ -167,7 +158,6 @@ list structure into the `world-hash-junk'."
                              for index = (hash i j size)
                              for chain = (world-hash-chain hash index)
                              unless (find handle chain) do
-                               (retain-handle handle)
                                (query function hash chain object)
                                (let ((node (get-new-node hash)))
                                  (setf (car node) handle)
