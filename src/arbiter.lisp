@@ -116,12 +116,12 @@
     (let ((body-a (shape-body shape-a))
           (body-b (shape-body shape-b)))
       (dolist (contact (arbiter-contacts arbiter))
-        ;; TODO: Use apply-impulses from constraints/util
-        (let ((impulse (vec-rotate (contact-normal contact)
-                                   (vec (contact-jn-acc contact)
-                                        (contact-jt-acc contact)))))
-          (body-apply-impulse body-a (vec- impulse) (contact-r1 contact))
-          (body-apply-impulse body-b impulse (contact-r2 contact)))))))
+        (apply-impulses body-a body-b
+                        (contact-r1 contact)
+                        (contact-r2 contact)
+                        (vec-rotate (contact-normal contact)
+                                    (vec (contact-jn-acc contact)
+                                         (contact-jt-acc contact))))))))
 
 (defun arbiter-apply-impulse (arbiter e-coefficient)
   (let ((body-a (shape-body (arbiter-shape-a arbiter)))
