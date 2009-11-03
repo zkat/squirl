@@ -21,11 +21,11 @@
          (normal (vec-rotate (groove-joint-groove-normal joint)
                              (body-rotation body-a)))
          (d (vec. trans-a normal))) ; distance? dot product? What?
-    (setf (groove-joint-transformed-normal joint) normal
+    (setf (groove-joint-groove-transformed-normal joint) normal
           (groove-joint-r2 joint) (vec-rotate (groove-joint-anchor2 joint)
                                               (body-rotation body-b)))
     ;; calculate tangential distance along the axis of r2
-    (let ((td (vecx (vec+ (body-position bodyb) (groove-joint-r2 joint)) normal)))
+    (let ((td (vecx (vec+ (body-position body-b) (groove-joint-r2 joint)) normal)))
       ;; Calculate the clamping factor and r2
       (cond ((<= td (vecx trans-a normal))
              (setf (groove-joint-clamp joint) 1.0
@@ -45,7 +45,7 @@
             (groove-joint-k2 joint) k2-val))
 
     ;; compute max impulse
-    (setf (joint-max-length joint) (impulse-max joint dt))
+    (setf (groove-joint-j-max-length joint) (impulse-max joint dt))
 
     ;; Calculate bias velocity
     (let ((delta (vec- (vec+ (body-position body-b) (groove-joint-r2 joint))
