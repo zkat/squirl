@@ -75,3 +75,6 @@
 (defun mult-k (vr k1 k2)
   (vec (vec. vr k1) (vec. vr k2)))
 
+(defun impulse-max (constraint dt)
+  (* (constraint-max-force constraint) dt))
+
