@@ -3,6 +3,9 @@
 
 (declaim (optimize safety debug))
 
+(defmacro fun (&body body)
+  `(lambda (&optional _) (declare (ignorable _)) ,@body))
+
 ;; from alexandria:
 (declaim (inline delete/swapped-arguments))
 (defun delete/swapped-arguments (sequence delete-form &rest keyword-arguments)
