@@ -2,10 +2,12 @@
 (in-package :squirl)
 
 (defun relative-velocity (body1 body2 r1 r2)
-  (vec+ (body-velocity body1)
-        (vec* (vec-perp r1) (body-angular-velocity body1))
-        (body-velocity body2)
-        (vec* (vec-perp r2) (body-angular-velocity body2))))
+  (vec- (vec+ (body-velocity body2)
+              (vec* (vec-perp r2)
+                    (body-angular-velocity body2)))
+        (vec+ (body-velocity body1)
+              (vec* (vec-perp r1)
+                    (body-angular-velocity body1)))))
 
 (defun normal-relative-velocity (body1 body2 r1 r2 normal)
   (vec. (relative-velocity body1 body2 r1 r2) normal))
