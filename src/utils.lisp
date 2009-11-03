@@ -40,3 +40,6 @@ the result of calling DELETE with PREDICATE, place, and the REMOVE-KEYWORDS.")
   "ANSI-compliant replacement for `defconstant'. cf SBCL Manual 2.3.4."
   `(defconstant ,name (if (boundp ',name) (symbol-value ',name) ,value)
      ,@(when doc (list doc))))
+
+(defun maybe/ (a b)
+  (if (zerop b) 0 (/ a b)))

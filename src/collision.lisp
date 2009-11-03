@@ -10,15 +10,12 @@
    (when (< distsq
             (expt mindist 2))
      (let* ((dist (sqrt distsq)))
-       (flet ((maybe/ (a b)
-                (if (= b 0) 0
-                    (/ a b))))
-        (make-contact (vec+ p1 (vec* delta
-                                     (+ 0.5 (maybe/ (- r1 (/ mindist 2))
-                                                    dist))))
-                      (vec* delta (maybe/ 1 dist))
-                      (- dist mindist)
-                      0))))))
+       (make-contact (vec+ p1 (vec* delta
+                                    (+ 0.5 (maybe/ (- r1 (/ mindist 2))
+                                                   dist))))
+                     (vec* delta (maybe/ 1 dist))
+                     (- dist mindist)
+                     0)))))
 
 (defun circle-to-circle (shape-1 shape-2)
   "Collide circles."
