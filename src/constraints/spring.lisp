@@ -4,7 +4,7 @@
 (defstruct (spring (:include constraint))
   stiffness dt)
 
-(defmethod get-impulse ((spring damped-rotary-spring))
+(defmethod get-impulse ((spring spring))
   0.0)
 
 (defgeneric spring-torque (spring relative-angle))
