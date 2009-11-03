@@ -2,15 +2,14 @@
 (in-package :squirl)
 
 (defstruct (damped-rotary-spring
-             (:include constraint)
+             (:include spring)
              (:constructor make-damped-rotary-spring
                            (body-a body-b rest-angle stiffness damping)))
-  rest-angle stiffness damping dt target-wrn i-sum)
+  rest-angle damping target-wrn i-sum)
 
-(defgeneric spring-torque (spring relative-angle)
-  (:method ((spring damped-rotary-spring) relative-angle)
-    (* (- relative-angle (damped-rotary-spring-rest-angle spring))
-       (damped-rotary-spring-stiffness spring))))
+(defmethod spring-torque ((spring damped-rotary-spring) relative-angle)
+  (* (- relative-angle (damped-rotary-spring-rest-angle spring))
+     (damped-rotary-spring-stiffness spring)))
 
 (defmethod pre-step ((spring damped-rotary-spring) dt dt-inverse)
   (declare (ignore dt-inverse))
@@ -41,7 +40,4 @@
       (decf (body-angular-velocity body-a) (* j-damp (body-inverse-inertia body-a)))
       (incf (body-angular-velocity body-b) (* j-damp (body-inverse-inertia body-b)))))
   (values))
-
-(defmethod get-impulse ((spring damped-rotary-spring))
-  0.0)
 
