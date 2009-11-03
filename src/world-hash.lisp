@@ -3,11 +3,15 @@
 
 (declaim (optimize safety debug))
 
-(defstruct (handle (:constructor make-handle (object)))
+;; Eventually, this should be (cons t fixnum)
+(deftype handle ()
   "Used internally to track objects added to the hash"
-  object                                ; Pointer to the object
-  ;; Used to prevent duplicate identification of an object within one query
-  (stamp 0))
+  '(cons t integer))
+(defun make-handle (object)
+  (cons object 0))
+
+(defun handle-object (handle) (car handle))
+(defun handle-stamp  (handle) (cdr handle))
 
 ;;; Used for the `world-hash-handle-set'
 (defun handle-equal (object handle)
