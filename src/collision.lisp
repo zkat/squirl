@@ -66,11 +66,6 @@
   ;; todo
   )
 
-(defmethod collide-shapes ((poly1 poly) (poly2 poly))
-  "Collide two poly shapes together"
-  ;; todo
-  )
-
 (defun segment-value-on-axis (segment normal distance)
   (- (min (- (vec. normal (segment-trans-a segment)) (segment-radius segment))
           (- (vec. normal (segment-trans-b segment)) (segment-radius segment)))
@@ -93,6 +88,7 @@
 ;;;
 (defgeneric collide-shapes (a b)
   (:documentation "Collide shapes A and B together!")
+  ;; Note that we don't handle segment-to-segment (yet?)
   (:method ((shape-1 circle) (shape-2 circle))
     (circle-to-circle-query (circle-transformed-center shape-1)
                             (circle-transformed-center shape-2)
@@ -109,4 +105,7 @@
   (:method ((circle circle) (poly poly))
     (circle-to-poly circle poly))
   (:method ((poly poly) (circle circle))
-    (circle-to-poly circle poly)))
+    (circle-to-poly circle poly))
+  (:method ((poly poly) (poly poly))
+    (poly-to-poly poly poly)))
+
