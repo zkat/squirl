@@ -59,3 +59,10 @@
     (apply-impulses body-a body-b
                     (groove-joint-r1 joint) (groove-joint-r2 joint)
                     (groove-joint-j-acc joint))))
+
+(defun constraint-groove (joint j)
+  (let* ((normal (groove-joint-groove-transformed-normal joint))
+         (j-clamp (if (plusp (* (groove-joint-clamp joint) (vecx j normal)))
+                      j (vec-project j normal))))
+    (vec-clamp j-clamp (groove-joint-j-max-length joint))))
+
