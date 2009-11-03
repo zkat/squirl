@@ -30,3 +30,23 @@
       (apply-impulses body-a body-b (damped-spring-r1 spring) (damped-spring-r2 spring)
                       (vec* (damped-spring-normal spring)
                             (* dt (spring-force spring)))))))
+
+(defmethod apply-impulse ((spring damped-spring))
+  (let ((body-a (spring-body-a spring))
+        (body-b (spring-body-b spring))
+        (normal (damped-spring-normal spring))
+        (r1 (damped-spring-r1 spring))
+        (r2 (damped-spring-r2 spring))
+        (n-mass (damped-spring-n-mass spring))
+        ;; compute relative velocity
+        (vrn (- (normal-relative-velocity body-a body-b r1 r2 normal)
+                (damped-spring-target-vrn spring)))
+        ;; compute velocity loss from drag.
+        ;; C source sez: "not 100% certain this is derived correctly, though it makes sense"
+        (v-damp (- (* vrn (- 1.0 (exp (- (/ (* (damped-spring-damping spring)
+                                               (damped-spring-dt spring))
+                                            n-mass))))))))
+    (setf (damped-spring-target-vrn spring) (+ vrn v-damp))
+    (apply-impulses body-a body-b r1 r2 (vec* normal (* v-damp n-mass)))
+    (values)))
+
