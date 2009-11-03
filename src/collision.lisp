@@ -67,3 +67,38 @@
                                    (circle-radius circle)
                                    (segment-radius segment)))
           (t nil))))))
+
+(defun find-minimum-separating-axis (poly axes)
+  ;; todo
+  )
+
+(defun find-vertices (poly2 poly2 normal distance)
+  "Add contacts for penetrating vertices"
+  ;; todo
+  )
+
+(defmethod collide-shapes ((poly1 poly) (poly2 poly))
+  "Collide two poly shapes together"
+  ;; todo
+  )
+
+(defun find-points-behind-segment (segment poly p-dist coefficient)
+  "Identify vertices that have penetrated the segment."
+  ;; todo
+  )
+
+(defun segment-to-poly (segment poly)
+  ;; todo
+  )
+(defmethod collide-shapes ((segment segment) (poly poly))
+  (segment-to-poly segment poly))
+(defmethod collide-shapes ((poly poly) (segment segment))
+  (segment-to-poly segment poly))
+
+(defun circle-to-poly (circle poly)
+  ;; todo
+  )
+(defmethod collide-shapes ((circle circle) (poly poly))
+  (circle-to-poly circle poly))
+(defmethod collide-shapes ((poly poly) (circle circle))
+  (circle-to-poly circle poly))
