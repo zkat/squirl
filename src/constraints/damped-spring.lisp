@@ -1,7 +1,10 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
-(defstruct (damped-spring (:include spring))
+(defstruct (damped-spring (:include spring)
+                          (:constructor
+                           make-damped-spring
+                           (body-a body-b anchor1 anchor2 rest-length stiffness damping)))
   anchor1 anchor2 rest-length damping target-vrn r1 r2 n-mass normal)
 
 (defmethod spring-force ((spring damped-spring) distance)
@@ -50,4 +53,3 @@
     (setf (damped-spring-target-vrn spring) (+ vrn v-damp))
     (apply-impulses body-a body-b r1 r2 (vec* normal (* v-damp n-mass)))
     (values)))
-
