@@ -37,3 +37,7 @@
       (decf (body-angular-velocity body-a) (* j-damp (body-inverse-inertia body-a)))
       (incf (body-angular-velocity body-b) (* j-damp (body-inverse-inertia body-b)))))
   (values))
+
+(defmethod get-impulse ((spring damped-rotary-spring))
+  0.0)
+
