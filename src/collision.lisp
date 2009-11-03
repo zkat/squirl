@@ -77,7 +77,7 @@
 
 (defun find-vertices (poly1 poly2 normal distance)
   "Add contacts for penetrating vertices"
-  (let ((contacts))
+  (let (contacts)
     (loop
       for i from 0
       for vertex in (poly-vertices poly1)
@@ -87,8 +87,8 @@
       for i from 0
       for vertex in (poly-vertices poly2)
       do (when (partial-poly-contains-vertex-p poly1 vertex (vec-neg normal))
-           (push (make-contact vertex normal distance (hash-pair poly2 i)) contacts))
-       finally (return contacts))))
+           (push (make-contact vertex normal distance (hash-pair poly2 i)) contacts)))
+    contacts))
 
 (defun segment-value-on-axis (segment normal distance)
   (- (min (- (vec. normal (segment-trans-a segment)) (segment-radius segment))
@@ -100,7 +100,7 @@
   ;; todo
   )
 
-t(defun segment-to-poly (segment poly)
+(defun segment-to-poly (segment poly)
   ;; todo
   )
 (defun circle-to-poly (circle poly)
