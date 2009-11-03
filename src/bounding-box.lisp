@@ -29,14 +29,11 @@
 (defun bbox-containts-vec-p (bb vec)
   ;; C version:
   ;; return (bb.l < v.x && bb.r > v.x && bb.b < v.y && bb.t > v.y);
-  (and (< (bbox-left bb)
-          (vec-x vec))
-       (> (bbox-right bb)
-          (vec-x vec))
-       (< (bbox-bottom bb)
-          (vec-y vec))
-       (> (bbox-top bb)
-          (vec-y vec))))
+  (with-vec vec
+    (and (< (bbox-left bb)   vec.x)
+         (> (bbox-right bb)  vec.x)
+         (< (bbox-bottom bb) vec.y)
+         (> (bbox-top bb)    vec.y))))
 
 (defun bbox-clamp-vec (bb vec)
   "Clamps the vector to lie within the bbox"
@@ -44,12 +41,8 @@
   ;; cpFloat x = cpfmin(cpfmax(bb.l, v.x), bb.r);
   ;; cpFloat y = cpfmin(cpfmax(bb.b, v.y), bb.t);
   ;; return cpv(x, y);
-  (let ((x (min (max (bbox-left bb)
-                     (vec-x vec))
-                (bbox-right bb)))
-        (y (min (max (bbox-bottom bb) (vec-y vec))
-                (bbox-top bb))))
-    (vec x y)))
+  (vec (min (max (bbox-left bb)   (vec-x vec)) (bbox-right bb))
+       (min (max (bbox-bottom bb) (vec-y vec)) (bbox-top bb))))
 
 (defun bbox-wrap-vec (bb vec)
   "Wrap a vector to a bbox."
@@ -64,13 +57,10 @@
 
   ;; return cpv(x + bb.l, y + bb.b);
   (let* ((ix (abs (- (bbox-right bb) (bbox-left bb))))
-         (modx (mod (- (vec-x vec) (bbox-left bb))
-                    ix))
+         (modx (mod (- (vec-x vec) (bbox-left bb)) ix))
          (x (if (plusp modx) modx (+ modx ix)))
-
          (iy (abs (- (bbox-top bb) (bbox-bottom bb))))
-         (mody (mod (- (vec-y vec) (bbox-bottom bb))
-                    iy))
+         (mody (mod (- (vec-y vec) (bbox-bottom bb)) iy))
          (y (if (plusp mody) mody (+ mody iy))))
     (vec (+ x (bbox-left bb))
-            (+ y (bbox-bottom bb)))))
+         (+ y (bbox-bottom bb)))))
