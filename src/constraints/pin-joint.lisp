@@ -49,3 +49,23 @@
                       (vec* (pin-joint-normal joint) (pin-joint-jn-acc joint)))))
   (values))
 
+(defmethod apply-impulse ((joint pin-joint))
+  (let* ((body-a (pin-joint-body-a joint))
+         (body-b (pin-joint-body-b joint))
+         (normal (pin-joint-normal joint))
+         ;; compute relative velocity
+         (relative-velocity (normal-relative-velocity body-a body-b
+                                                      (pin-joint-r1 joint)
+                                                      (pin-joint-r2 joint)
+                                                      normal))
+         ;; copmute normal impulse
+         (jn (* (- (pin-joint-bias joint) relative-velocity)
+                (pin-joint-n-mass joint)))
+         (jn-old (pin-joint-jn-acc joint)))
+    (setf (pin-joint-jn-acc joint) (clamp (+ jn jn-old)
+                                          (- (pin-joint-jn-max joint))
+                                          (pin-joint-jn-max joint))
+          jn (- (pin-joint-jn-acc joint) jn-old))
+    (apply-impulses body-a body-b (pin-joint-r1 joint) (pin-joint-r2 joint) (vec* normal jn)))
+  (values))
+
