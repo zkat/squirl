@@ -22,7 +22,7 @@
     (let* ((delta (vec- (vec+ (body-position body-b) (damped-spring-r2 spring))
                         (vec+ (body-position body-a) (damped-spring-r1 spring))))
            (distance (vec-length delta)))
-      (setf (damped-spring-normal spring) (vec* delt (maybe/ distance))
+      (setf (damped-spring-normal spring) (vec* delta (maybe/ 1 distance))
             ;; calculate mass normal
             (damped-spring-n-mass spring) (/ (k-scalar body-a body-b
                                                        (damped-spring-r1 spring)
