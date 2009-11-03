@@ -145,18 +145,9 @@
           (setf (contact-j-bias contact) (max 0 (+ jbn-old jbn))
                 jbn (- (contact-j-bias contact) jbn-old))
           ;; Apply bias impulse
-          ;; TODO: Use apply-bias-impulses from constraints/util
-          (let ((impulse (vec* n jbn)))
-            (body-apply-bias-impulse body-a (vec- impulse) r1)
-            (body-apply-bias-impulse body-b impulse r2)))
+          (apply-bias-impulses body-a body-b r1 r2 (vec* n jbn)))
         ;; Calculate relative velocity
-        ;; TODO: relative-velocity from constraints/util
-        (let* ((vr (vec- (vec+ (body-velocity body-b)
-                               (vec* (vec-perp r2)
-                                     (body-angular-velocity body-b)))
-                         (vec+ (body-velocity body-a)
-                               (vec* (vec-perp r1)
-                                     (body-angular-velocity body-a)))))
+        (let* ((vr (relative-velocity body-a body-b r1 r2))
                (vrn (vec. vr n)))
           ;; Calculate and clamp the normal impulse
           (let ((jn (* (- (+ (* (contact-bounce contact)
@@ -179,7 +170,5 @@
                                                     (- jt-max)
                                                     jt-max)
                     jt (- (contact-jt-acc contact) jt-old))
-              (let ((impulse (vec-rotate n (vec jn jt))))
-                ;; TODO: apply-impulse from constraints/util
-                (body-apply-impulse body-a (vec- impulse) r1)
-                (body-apply-impulse body-b impulse r2)))))))))
+              (apply-impulses body-a body-b r1 r2
+                              (vec-rotate n (vec jn jt))))))))))
