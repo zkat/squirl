@@ -52,7 +52,7 @@
 
 (defun poly-contains-vertex-p (poly vertex)
   "Returns true if the polygon contains the vertex."
-  (loop for axis in (poly-transformed-axes poly)
+  (loop for axis across (poly-transformed-axes poly)
      never (> (vec. (poly-axis-normal axis) vertex)
               (poly-axis-distance axis))))
 
