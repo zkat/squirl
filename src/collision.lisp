@@ -27,7 +27,11 @@
                           (circle-radius shape-1)
                           (circle-radius shape-2)))
 
+(defmethod collide-shapes ((segment segment) (circle circle))
+  (circle-to-segment circle segment))
 (defmethod collide-shapes ((circle circle) (segment segment))
+  (circle-to-segment circle segment))
+(defun circle-to-segment (circle segment)
   (let* ((radius-sum (+ (circle-radius circle)
                         (segment-radius segment)))
          (normal-distance (- (vec. (segment-trans-normal segment)
