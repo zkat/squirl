@@ -66,3 +66,18 @@
                       j (vec-project j normal))))
     (vec-clamp j-clamp (groove-joint-j-max-length joint))))
 
+(defmethod apply-impulse ((joint groove-joint))
+  (let* ((body-a (groove-joint-body-a joint))
+         (body-b (groove-joint-body-b joint))
+         (r1 (groove-joint-r1 joint))
+         (r2 (groove-joint-r2 joint))
+         ;; Compute impulse...
+         (relative-velocity (relative-velocity body-a body-b r1 r2))
+         (j (mult-k (vec- (groove-joint-bias joint) relative-velocity)
+                    (groove-joint-k1 joint) (groove-joint-k2 joint)))
+         (j-old (groove-joint-j-acc joint)))
+    (setf (groove-joint-j-acc joint) (constrain-groove joint (vec+ j-old j)))
+    ;; Apply impulses
+    (apply-impulses body-a body-b (groove-joint-r1 joint) (groove-joint-r2 joint)
+                    (vec- (groove-joint-j-acc joint) j-old))))
+
