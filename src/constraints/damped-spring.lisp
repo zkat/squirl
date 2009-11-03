@@ -12,6 +12,7 @@
      (spring-stiffness spring)))
 
 (defmethod pre-step ((spring damped-spring) dt dt-inverse)
+  (declare (ignore dt-inverse))
   (let ((body-a (spring-body-a spring))
         (body-b (spring-body-b spring)))
     (setf (damped-spring-r1 spring) (vec-rotate (damped-spring-anchor1 spring)

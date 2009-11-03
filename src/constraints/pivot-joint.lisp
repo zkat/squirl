@@ -18,8 +18,8 @@
   (j-acc +zero-vector+ :type vec))
 
 (defmethod pre-step ((pivot pivot-joint) dt dt-inv)
-  (with-accessors (
-		   (body-a pivot-joint-body-a)
+  (declare (ignore dt))
+  (with-accessors ((body-a pivot-joint-body-a)
 		   (body-b pivot-joint-body-b)
 		   (j-max-length pivot-joint-j-max-length)
 		   (bias pivot-joint-bias)
@@ -29,8 +29,8 @@
 		   (r2 pivot-joint-r2)
 		   (max-bias pivot-joint-max-bias)
 		   (anchor1 pivot-joint-anchor1)
-		   (anchor2 pivot-joint-anchor2)) pivot
-
+		   (anchor2 pivot-joint-anchor2)) 
+      pivot
     (setf r1 (vec-rotate anchor1 (body-rotation body-a)))
     (setf r2 (vec-rotate anchor2 (body-rotation body-b)))
     ;; calculate mass tensor
