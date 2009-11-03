@@ -82,6 +82,11 @@
   ;; todo
   )
 
+(defun segment-value-on-axis (segment normal distance)
+  (- (min (- (vec. normal (segment-trans-a segment)) (segment-radius segment))
+          (- (vec. normal (segment-trans-b segment)) (segment-radius segment)))
+     distance))
+
 (defun find-points-behind-segment (segment poly p-dist coefficient)
   "Identify vertices that have penetrated the segment."
   ;; todo
