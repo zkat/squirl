@@ -29,7 +29,7 @@
 (defun set-up-vertices (poly vertices offset)
   (loop for vert in vertices for i from 0
      for a = (vec+ offset vert)
-     for b = (vec+ offset (svref vertices (mod (1+ i) (length vertices))))
+     for b = (vec+ offset (elt vertices (mod (1+ i) (length vertices))))
      for normal = (vec-normalize (vec-perp (vec- b a)))
      do (setf (svref (poly-vertices poly) i) a
               (svref (poly-axes poly) i) (make-poly-axis normal (vec. normal a)))))
@@ -95,7 +95,7 @@
          (right (vec-x (svref verts 0)))
          (top (vec-y (svref verts 0)))
          (bottom (vec-y (svref verts 0))))
-    (loop for vert in verts
+    (loop for vert across verts
        do (setf left (min left (vec-x vert))
                 right (max right (vec-x vert))
                 top (max top (vec-y vert))
