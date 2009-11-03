@@ -52,10 +52,9 @@
 
 (defun poly-contains-vertex-p (poly vertex)
   "Returns true if the polygon contains the vertex."
-  ;; Lisp-hilarity
-  (notany (fun (plusp (- (vec. (poly-axis-normal _) vertex)
-                         (poly-axis-distance _))))
-          (poly-transformed-axes poly)))
+  (loop for axis in (poly-transformed-axes poly)
+     never (> (vec. (poly-axis-normal axis) vertex)
+              (poly-axis-distance axis))))
 
 (defun partial-poly-contains-vertex-p (poly vertex normal)
   "Same as POLY-CONTAINS-VERTEX-P, but ignores faces pointing away from NORMAL."
