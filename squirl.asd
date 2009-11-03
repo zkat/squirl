@@ -39,14 +39,24 @@
                        (:file "constraints"
                               :depends-on ("util"))
                        (:file "damped-rotary-spring"
-                              :depends-on ("constraints"))
+                              :depends-on ("spring"))
+                       (:file "damped-spring"
+                              :depends-on ("spring"))
                        (:file "gear-joint"
                               :depends-on ("constraints"))
                        (:file "pin-joint"
                               :depends-on ("constraints"))
+                       (:file "pivot-joint"
+                              :depends-on ("constraints"))
+                       (:file "ratchet-joint"
+                              :depends-on ("constraints"))
+                       (:file "rotary-limit-joint"
+                              :depends-on ("constraints"))
                        (:file "simple-motor"
                               :depends-on ("constraints"))
                        (:file "slide-joint"
+                              :depends-on ("constraints"))
+                       (:file "spring"
                               :depends-on ("constraints"))
                        (:file "util"))                      
                       :depends-on ("shape" "poly-shape" "world" "collision"))))))
