@@ -7,8 +7,9 @@
 ;; joint with this breakable one, which adds the breaking behavior.
 ;; As such, we forward most of the behavior over to the delegate, but
 ;; we pass -this- object around.
-(defstruct (breakable-joint (:include constraint))
-  delegate space last-dt-inverse)
+(defstruct (breakable-joint (:include constraint)
+                            (:constructor make-breakable-joint (delegate space)))
+  delegate space (last-dt-inverse 0))
 
 (defmethod pre-step ((joint breakable-joint) dt dt-inverse)
   (let ((delegate (breakable-joint-delegate joint)))
