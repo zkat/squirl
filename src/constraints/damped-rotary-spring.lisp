@@ -13,6 +13,7 @@
        (damped-rotary-spring-stiffness spring))))
 
 (defmethod pre-step ((spring damped-rotary-spring) dt dt-inverse)
+  (declare (ignore dt-inverse))
   (let ((body-a (constraint-body-a spring))
         (body-b (constraint-body-b spring)))
     (setf (damped-rotary-spring-i-sum spring) (/ (+ (body-inverse-inertia body-a)

@@ -17,8 +17,8 @@
   (j-max 0.0))
 
 (defmethod pre-step ((motor simple-motor) dt dt-inv)
-  (with-accessors (
-		   (body-a simple-motor-body-a)
+  (declare (ignore dt-inv))
+  (with-accessors ((body-a simple-motor-body-a)
 		   (body-b simple-motor-body-b)
 		   (i-sum simple-motor-i-sum)
 		   (j-max simple-motor-j-max)
