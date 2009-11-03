@@ -16,7 +16,7 @@
     (if (>= (* (get-impulse delegate) (breakable-joint-last-dt-inverse joint))
             (breakable-joint-max-force joint))
         ;; remove the breakable joint from the space...
-        (space-remove-constraint (breakable-joint-space joint) joint)
+        (world-remove-constraint (breakable-joint-space joint) joint)
         ;; otherwise, call pre-step on its delegate.
         (prog1 (pre-step delegate dt dt-inverse)
           (setf (breakable-joint-last-dt-inverse joint) dt-inverse)))))
