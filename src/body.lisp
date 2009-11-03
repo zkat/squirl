@@ -129,9 +129,8 @@ Warning: Large damping values can be unstable. Use a DAMPED-SPRING constraint fo
         anchor2 (vec-rotate anchor2 (body-rotation body2)))
   (let* ((delta (vec- (vec+ (body-position body2) anchor2)
                       (vec+ (body-position body1) anchor1)))
-         (distance (vec-length delta))
-         (normal (vec-normalize-safe distance))
-         (f-spring (* k (- distance rlen)))
+         (normal (vec-normalize-safe delta))
+         (f-spring (* k (- (vec-length delta) rlen)))
          ;; Calculate the world relative velocities of the anchor points.
          (v1 (vec+ (body-velocity body1)
                    (vec* (vec-perp anchor1) (body-angular-velocity body1))))
@@ -140,9 +139,9 @@ Warning: Large damping values can be unstable. Use a DAMPED-SPRING constraint fo
          ;; Calculate the damping force.
          ;; This really should be in the impulse solve and can produce problems when
          ;; using large damping values.
-         (vrn (vec. (vec- v2 v1) normal))
-         (f-damp (* vrn (min dmp (/ (* dt (+ (body-inverse-mass body1)
-                                             (body-inverse-mass body2)))))))
+         (f-damp (* (vec. (vec- v2 v1) normal)
+                    (min dmp (/ (* dt (+ (body-inverse-mass body1)
+                                         (body-inverse-mass body2)))))))
          (f (vec* normal (+ f-spring f-damp))))
     ;; Apply!
     (body-apply-force body1 f anchor1)
