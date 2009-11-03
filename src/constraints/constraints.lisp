@@ -7,7 +7,7 @@
 (defgeneric apply-impulse (constraint))
 (defgeneric get-impulse (constraint))
 
-(defstruct (constraint (:constructor (make-constraint (body-a body-b))))
+(defstruct constraint
   body-a body-b
   (max-force most-positive-double-float)
   (bias-coefficient *constraint-bias-coefficient*)
