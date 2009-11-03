@@ -121,7 +121,7 @@
 (defun poly-to-poly (poly1 poly2)
   (multiple-value-bind (msa1 min1) (find-min-separating-axis poly2 poly1)
     (multiple-value-bind (msa2 min2) (find-min-separating-axis poly1 poly2)
-      (cond ((or (null msa1) (null msa2))
+      (cond ((not (and msa1 msa2))
              nil)
             ((> min1 min2)
              (find-vertices poly1 poly2 (poly-axis-normal msa1) min1))
