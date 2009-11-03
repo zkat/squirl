@@ -64,6 +64,12 @@ list structure into the `world-hash-junk'."
   (let ((node (pop (world-hash-junk hash))))
     (if (null node) (cons nil nil) node)))
 
+(defmacro push-handle (handle hash chain)
+  (with-gensyms (node)
+    `(let ((,node (get-new-node ,hash)))
+       (setf (car ,node) ,handle)
+       (push-cons ,node ,chain))))
+
 (defun hash (x y n)
   "Hash X, Y, and N to generate a hash code"
   (expt-mod (* x 2185031351) (* y 4232417593) n))
@@ -86,9 +92,7 @@ list structure into the `world-hash-junk'."
 (defun hash-handle (hash handle bbox)
   (do-bbox (chain hash bbox)
     unless (find handle chain :key #'eq) do
-      (let ((node (get-new-node hash)))
-        (setf (car node) handle)
-        (push-cons node chain))))
+      (push-handle handle hash chain)))
 
 (defun world-hash-insert (hash object id bbox)
   (with-accessors ((handle-set world-hash-handle-set)) hash
@@ -149,9 +153,7 @@ list structure into the `world-hash-junk'."
                     for chain = chain-form
                     unless (find handle chain) do
                       (query function hash chain object)
-                      (let ((node (get-new-node hash)))
-                        (setf (car node) handle)
-                        (push-cons node chain-form)))
+                      (push-handle handle hash chain-form))
                   (incf (world-hash-stamp hash)))
                 (world-hash-handle-set hash)))
 
