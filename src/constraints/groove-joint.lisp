@@ -60,7 +60,7 @@
                     (groove-joint-r1 joint) (groove-joint-r2 joint)
                     (groove-joint-j-acc joint))))
 
-(defun constraint-groove (joint j)
+(defun constrain-groove (joint j)
   (let* ((normal (groove-joint-groove-transformed-normal joint))
          (j-clamp (if (plusp (* (groove-joint-clamp joint) (vecx j normal)))
                       j (vec-project j normal))))
