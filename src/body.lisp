@@ -125,30 +125,25 @@ of gravity (also in world coordinates)."
 (defun apply-damped-spring (body1 body2 anchor1 anchor2 rlen k dmp dt)
   "Apply a damped spring force between two bodies.
 Warning: Large damping values can be unstable. Use a DAMPED-SPRING constraint for this instead."
-  (let* (;; Calculate the world space anchor coordinates.
-         (r1 (vec-rotate anchor1 (body-rotation body1)))
-         (r2 (vec-rotate anchor2 (body-rotation body2)))
-
-         (delta (vec- (vec+ (body-position body2) r2)
-                      (vec+ (body-position body1) r1)))
+  (setf anchor1 (vec-rotate anchor1 (body-rotation body1))
+        anchor2 (vec-rotate anchor2 (body-rotation body2)))
+  (let* ((delta (vec- (vec+ (body-position body2) anchor2)
+                      (vec+ (body-position body1) anchor1)))
          (distance (vec-length delta))
-         (n (if (zerop distance) +zero-vector+ (vec* delta (/ 1 distance))))
-
+         (normal (vec-normalize-safe distance))
          (f-spring (* k (- distance rlen)))
-
          ;; Calculate the world relative velocities of the anchor points.
          (v1 (vec+ (body-velocity body1)
-                   (vec* (vec-perp r1) (body-angular-velocity body1))))
+                   (vec* (vec-perp anchor1) (body-angular-velocity body1))))
          (v2 (vec+ (body-velocity body2)
-                   (vec* (vec-perp r2) (body-angular-velocity body2))))
-
+                   (vec* (vec-perp anchor2) (body-angular-velocity body2))))
          ;; Calculate the damping force.
-         ;; This really sholud be in the impulse solvel and can produce problems when
+         ;; This really should be in the impulse solve and can produce problems when
          ;; using large damping values.
-         (vrn (vec. (vec- v2 v1) n))
-         (f-damp (* vrn (min dmp (/ 1 (* dt (+ (body-inverse-mass body1)
-                                               (body-inverse-mass body2)))))))
-         (f (vec* n (+ f-spring f-damp))))
+         (vrn (vec. (vec- v2 v1) normal))
+         (f-damp (* vrn (min dmp (/ (* dt (+ (body-inverse-mass body1)
+                                             (body-inverse-mass body2)))))))
+         (f (vec* normal (+ f-spring f-damp))))
     ;; Apply!
-    (body-apply-force body1 f r1)
-    (body-apply-force body2 (vec-neg f) r2)))
+    (body-apply-force body1 f anchor1)
+    (body-apply-force body2 (vec-neg f) anchor2)))
