@@ -150,3 +150,10 @@
 (defun resize-world-static-hash (world dimension count)
   (resize-world-hash (world-static-shapes world) dimension count)
   (rehash-world-hash (world-static-shapes world)))
+
+(defun resize-world-active-hash (world dimension count)
+  (resize-world-hash (world-active-shapes world) dimension count))
+
+(defun rehash-world-static-data (world)
+  (map-world-hash #'shape-cache-bbox (world-static-shapes world))
+  (rehash-world-hash (world-static-shapes world)))
