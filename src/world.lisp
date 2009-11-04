@@ -101,3 +101,11 @@
                             (when (point-inside-shape-p shape point layers groups)
                               (funcall function shape)))
                           (world-static-shapes world) point))
+
+;;; Unlike the C version, this actually returns the -first- shape
+;;; encountered which matches the layers, groups, and point. It
+;;; uses a functional RETURN-FROM rather than the pointer juggling
+;;; from the C version, for speed and clarity.
+(defun world-point-query-first (world point layers groups)
+  (world-point-query (fun (return-from world-point-query-first _))
+                     world point layers groups))
