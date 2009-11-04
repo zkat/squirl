@@ -157,3 +157,15 @@
 (defun rehash-world-static-data (world)
   (map-world-hash #'shape-cache-bbox (world-static-shapes world))
   (rehash-world-hash (world-static-shapes world)))
+
+;;;
+;;; Collision Detection Functions
+;;;
+
+(defun collision-possible-p (shape1 shape2)
+  (with-place (a. shape-) ((bb bbox) body group layers) shape1
+    (with-place (b. shape-) ((bb bbox) body group layers) shape2
+      (or (not (bbox-intersects-p a.bb b.bb))
+          (eq a.body b.body)
+          (and a.group b.group (eq a.group b.group))
+          (zerop (logand a.layers b.layers))))))
