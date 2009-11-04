@@ -41,18 +41,13 @@
 (defgeneric shape-cache-data (shape position rotation)
   (:documentation "Cache the BBox of the shape."))
 
-(defgeneric shape-point-query (shape point layers group)
-  (:documentation "Test if a point lies within a shape.")
-  (:method :around ((shape shape) p layers group)
-    ;; C version:
-    ;; if(!(group && shape->group && group == shape->group) && (layers&shape->layers)){
-    ;;    return shape->klass->pointQuery(shape, p);
-    ;; }
-    ;; return 0;
-    (declare (ignore p))
-    (when (and (not (and group (shape-group shape) (eq group (shape-group shape))))
-               (logand layers (shape-layers shape)))
-      (call-next-method))))
+(defun point-inside-shape-p (shape point layers group)
+  (when (and (not (and group (shape-group shape) (eq group (shape-group shape))))
+             (logand layers (shape-layers shape)))
+    (shape-point-query shape point)))
+
+(defgeneric shape-point-query (shape point)
+  (:documentation "Test if a point lies within a shape."))
 
 (defgeneric shape-segment-query (shape a b layers group)
   (:method :around ((shape shape) a b layers group)
@@ -90,8 +85,7 @@
         (vec+ position (vec-rotate (circle-center circle) rotation)))
   (bbox-from-circle (circle-transformed-center circle) (circle-radius circle)))
 
-(defmethod shape-point-query ((circle circle) point layers group)
-  (declare (ignore layers group))
+(defmethod shape-point-query ((circle circle) point)
   (vec-near (circle-transformed-center circle) point (circle-radius circle)))
 
 (defmethod shape-segment-query ((circle circle) a b layers group)
@@ -153,8 +147,7 @@
                 top (vec-y seg-ta)))
       (make-bbox (- left rad) (- bottom rad) (+ right rad) (+ top rad)))))
 
-(defmethod shape-point-query ((seg segment) point layers group)
-  (declare (ignore layers group))
+(defmethod shape-point-query ((seg segment) point)
   (when (bbox-containts-vec-p (shape-bbox seg) point)
     (with-accessors ((seg-ta segment-trans-a) (seg-tb segment-trans-b) (seg-r segment-radius)
                      (seg-a segment-a) (seg-b segment-b) (seg-tnormal segment-trans-normal)

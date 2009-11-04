@@ -102,8 +102,7 @@
                 bottom (min bottom (vec-y vert))))
     (make-bbox left bottom right top)))
 
-(defmethod shape-point-query ((poly poly) point layers group)
-  (declare (ignore layers group))
+(defmethod shape-point-query ((poly poly) point)
   (and (bbox-containts-vec-p (poly-bbox poly) point)
        (poly-contains-vertex-p poly point)))
 
