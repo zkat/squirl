@@ -29,8 +29,8 @@
   ;; Internal slots
   (stamp 0)      ; Time stamp, incremented on every call to WORLD-STEP
   ;; Static and active shape spatial hashes
-  (static-shapes (make-world-hash *default-cell-size* *default-count* #'shape-bbox))
-  (active-shapes (make-world-hash *default-cell-size* *default-count* #'shape-bbox))
+  (static-shapes (make-world-hash *initial-cell-size* *initial-count* #'shape-bbox))
+  (active-shapes (make-world-hash *initial-cell-size* *initial-count* #'shape-bbox))
   ;; Bodies in the system.
   (bodies (make-array *initial-array-length* :fill-pointer t :adjustable t))
   ;; Active arbiters for the impulse solver.
