@@ -78,7 +78,7 @@ WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
     (+ (* v1.x v2.x)
        (* v1.y v2.y))))
 
-(defun vecx (v1 v2)
+(defun vec-cross (v1 v2)
   "Cross product of two vectors"
   (with-vecs (v1 v2)
     (- (* v1.x v2.y)
