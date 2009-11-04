@@ -19,7 +19,6 @@
   (surface-velocity +zero-vector+) ; Surface velocity used when solving for friction
   ;; User-definable slots
   ;; --------------------
-  data ; User defined data pointer for the shape.
   (collision-type 0) ; User defined collision type for the shape.
   (group 0); User defined collision group for the shape.
   (layers -1); User defined layer bitmask for the shape.
