@@ -6,14 +6,14 @@
 (defun clamp (n min max)
   (min (max n min) max))
 
-(defun moment-for-circle (m inner-diameter outer-diameter offset)
+(defun moment-for-circle (mass inner-diameter outer-diameter offset)
   "Calculate the moment of inertia for a circle.
 A solid circle has an inner diameter of 0."
   ;; c version: return (1.0f/2.0f)*m*(inner*inner + outer*outer) + m*cpvdot(offset, offset);
   (+
-   (* m 1/2 (+ (expt inner-diameter 2)
+   (* mass 1/2 (+ (expt inner-diameter 2)
                (expt outer-diameter 2)))
-   (* m (vec. offset offset))))
+   (* mass (vec. offset offset))))
 
 (defun moment-for-segment (m a b)
   "Calculate the moment of inertia for a line segment. Beveling radius not supported."
