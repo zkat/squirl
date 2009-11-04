@@ -3,6 +3,9 @@
 
 (declaim (optimize safety debug))
 
+(define-constant +collision-slop+ 0.1
+  "Amount of allowed penetration.  Used to reduce vibrating contacts.")
+
 ;;;
 ;;; Collision resolution functions
 ;;;
@@ -133,7 +136,6 @@
         (unless (or (plusp poly-min)
                     (not (loop
                             for i from 0
-                            for vertex across (poly-vertices poly)
                             for axis across axes
                             for distance = (segment-value-on-axis segment
                                                                   (poly-axis-normal axis)
@@ -200,7 +202,6 @@
                  (circle-radius circle))))
     (when (loop
              for i from 0
-             for vertex across (poly-vertices poly)
              for axis across axes
              for distance = (- (vec. (poly-axis-normal axis)
                                      (circle-transformed-center circle))
