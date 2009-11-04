@@ -62,3 +62,7 @@
 (defun world-add-body (world body)
   (vector-push-extend body (world-bodies world))
   body)
+
+(defun world-add-constraint (world constraint)
+  (vector-push-extend constraint (world-constraints world))
+  constraint)
