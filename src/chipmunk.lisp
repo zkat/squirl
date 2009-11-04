@@ -28,7 +28,7 @@ A solid circle has an inner diameter of 0."
      (* mass (vec. offset offset)))))
 
 (defun moment-for-poly (m num-verts verts offset)
-  "Calculate the moment of inertia for a solid palygon shape."
+  "Calculate the moment of inertia for a solid convex polygon."
   ;; C version:
   ;; cpVect *tVerts = (cpVect *)calloc(numVerts, sizeof(cpVect));
   ;; for(int i=0; i<numVerts; i++)
