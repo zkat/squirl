@@ -57,3 +57,12 @@ the result of calling DELETE with PREDICATE, place, and the REMOVE-KEYWORDS.")
                       slots)
            ,form
          ,@body))))
+
+;;;
+;;; Hashing
+;;;
+
+(locally (declare (optimize speed (safety 1)))
+  (defun hash-pair (x y &aux (pair (cons x y)))
+    (declare (dynamic-extent pair))
+    (sxhash pair)))
