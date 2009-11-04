@@ -37,8 +37,4 @@
   (arbiters (make-array *initial-array-length* :fill-pointer t :adjustable t))
   (contact-set (make-hash-set 0 #'contact-set-equal)) ; Persistent contact set.
   ;; Constraints in the system.
-  (constraints (make-array *initial-array-length* :fill-pointer t :adjustable t))
-  ;; I'll get to these in a bit - Adlai
-  collision-function-set            ; Set of collision-pair functions.
-  default-collision-pair-function   ; Default collision pair function.
-  )
+  (constraints (make-array *initial-array-length* :fill-pointer t :adjustable t)))
