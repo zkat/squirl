@@ -85,3 +85,10 @@
 (defun world-remove-static-shape (world shape)
   (world-hash-remove (world-static-shapes world) shape (shape-id shape))
   (shape-removal-arbiter-reject world shape))
+
+(defun world-remove-body (world body)
+  (deletef (world-bodies world) body))
+
+(defun world-remove-constraint (world constraint)
+  (deletef (world-constraints world) constraint))
+
