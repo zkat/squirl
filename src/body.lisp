@@ -5,9 +5,12 @@
 
 (defstruct (body
              (:constructor
-              make-body (%mass %inertia &aux
+              make-body (%mass %inertia &optional actor &aux
                                (inverse-mass (/ %mass))
                                (inverse-inertia (/ %inertia)))))
+  ;; Actor used for the COLLIDE "callback"
+  actor
+
   ;; Mass properties, and cached inverses
   %mass inverse-mass %inertia inverse-inertia
 
