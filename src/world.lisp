@@ -43,3 +43,12 @@
   (:method (actor1 actor2 contacts)
     (declare (ignore actor1 actor2 contacts))
     t))
+
+;;;
+;;; Body, Shape, and Joint Management
+;;;
+
+(defun world-add-shape (world shape)
+  (with-place (shape. shape-) (id bbox body) shape
+    (assert shape.body)
+    (world-hash-insert (world-active-shapes world) shape shape.id shape.bbox)))
