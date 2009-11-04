@@ -81,3 +81,7 @@
 (defun world-remove-shape (world shape)
   (world-hash-remove (world-active-shapes world) shape (shape-id shape))
   (shape-removal-arbiter-reject world shape))
+
+(defun world-remove-static-shape (world shape)
+  (world-hash-remove (world-static-shapes world) shape (shape-id shape))
+  (shape-removal-arbiter-reject world shape))
