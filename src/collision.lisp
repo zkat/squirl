@@ -118,9 +118,9 @@
 (defun circle-to-poly (circle poly)
   (let* ((axes (poly-transformed-axes poly))
          (min-i 0)
-         (min (- (vec. (poly-axis-normal (first axes))
+         (min (- (vec. (poly-axis-normal (svref axes 0))
                        (circle-transformed-center circle))
-                 (poly-axis-distance (first axes))
+                 (poly-axis-distance (svref axes 0))
                  (circle-radius circle))))
     (when (loop
              for i from 0
