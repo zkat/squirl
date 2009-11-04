@@ -52,3 +52,9 @@
   (with-place (shape. shape-) (id bbox body) shape
     (assert shape.body)
     (world-hash-insert (world-active-shapes world) shape shape.id shape.bbox)))
+
+(defun world-add-static-shape (world shape)
+  (with-place (shape. shape-) (id bbox body) shape
+    (assert shape.body)
+    (shape-cache-bbox shape)
+    (world-hash-insert (world-static-shapes world) shape shape.id shape.bbox)))
