@@ -142,3 +142,11 @@
      (world-hash-query-segment #'query-shape (world-static-shapes world) start end)
      (world-hash-query-segment #'query-shape (world-active-shapes world) start end)
      (values first-shape min-ratio first-normal))))
+
+;;;
+;;; World Hash Management
+;;;
+
+(defun resize-world-static-hash (world dimension count)
+  (resize-world-hash (world-static-shapes world) dimension count)
+  (rehash-world-hash (world-static-shapes world)))
