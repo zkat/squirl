@@ -92,3 +92,12 @@
 (defun world-remove-constraint (world constraint)
   (deletef (world-constraints world) constraint))
 
+(defun world-point-query (function world point layers groups)
+  (world-hash-point-query (lambda (point shape)
+                            (when (point-inside-shape-p shape point layers groups)
+                              (funcall function shape)))
+                          (world-active-shapes world) point)
+  (world-hash-point-query (lambda (point shape)
+                            (when (point-inside-shape-p shape point layers groups)
+                              (funcall function shape)))
+                          (world-static-shapes world) point))
