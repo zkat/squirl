@@ -187,7 +187,7 @@
                                                  (length poly-t-v))))
                  for collision = (circle-to-circle-query point vertex
                                                          (segment-radius segment) 0)
-                 when collision return collision))))))))
+                 when collision return (push collision contacts)))))))))
 
 (defun circle-to-poly (circle poly)
   (let* ((axes (poly-transformed-axes poly))
