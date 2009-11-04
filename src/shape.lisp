@@ -154,9 +154,9 @@
         (if (plusp dist)
             (return-from shape-point-query t)
             ;; calculate tangential distance along segment
-            (let ((dt (- (vecx seg-tnormal point)))
-                  (dt-min (- (vecx seg-tnormal seg-ta)))
-                  (dt-max (- (vecx seg-tnormal seg-tb))))
+            (let ((dt (- (vec-cross seg-tnormal point)))
+                  (dt-min (- (vec-cross seg-tnormal seg-ta)))
+                  (dt-max (- (vec-cross seg-tnormal seg-tb))))
               ;; decision tree to decide which feature of the segment to collide with
               (if (<= dt dt-min)
                   (if (< dt (- dt-min seg-r))
@@ -182,9 +182,9 @@
            (ratio (/ (- d an) (- bn an)))) ;adlai said t is 'ratio'
       (when (< 0 ratio 1)
         (let* ((point (vec-lerp a b ratio))
-               (dt (- (vecx (segment-trans-normal seg) point)))
-               (dt-min (- (vecx (segment-trans-normal seg) (segment-trans-a seg))))
-               (dt-max (- (vecx (segment-trans-normal seg) (segment-trans-b seg)))))
+               (dt (- (vec-cross (segment-trans-normal seg) point)))
+               (dt-min (- (vec-cross (segment-trans-normal seg) (segment-trans-a seg))))
+               (dt-max (- (vec-cross (segment-trans-normal seg) (segment-trans-b seg)))))
           (when (< dt-min dt dt-max)
             (values seg ratio n)
             (return-from shape-segment-query (values seg ratio n)))))
