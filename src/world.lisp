@@ -92,6 +92,10 @@
 (defun world-remove-constraint (world constraint)
   (deletef (world-constraints world) constraint))
 
+;;;
+;;; Point Query Functions
+;;;
+
 (defun world-point-query (function world point layers groups)
   (world-hash-point-query (lambda (point shape)
                             (when (point-inside-shape-p shape point layers groups)
@@ -109,3 +113,7 @@
 (defun world-point-query-first (world point layers groups)
   (world-point-query (fun (return-from world-point-query-first _))
                      world point layers groups))
+
+;;; Why is this here? Shouldn't it be in another section?
+(defun world-map (function world)
+  (map nil function (world-bodies world)))
