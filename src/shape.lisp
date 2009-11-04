@@ -49,16 +49,13 @@
 (defgeneric shape-point-query (shape point)
   (:documentation "Test if a point lies within a shape."))
 
-(defgeneric shape-segment-query (shape a b layers group)
-  (:method :around ((shape shape) a b layers group)
-    ;; if(!(group && shape->group && group == shape->group) && (layers&shape->layers)){
-    ;;    shape->klass->segmentQuery(shape, a, b, info);
-    ;; }
-    ;; return (info->shape != NULL);
-    (declare (ignore a b))
-    (when (and (not (and group (shape-group shape) (eq group (shape-group shape))))
-               (logand layers (shape-layers shape)))
-      (call-next-method))))
+(defun segment-intersects-shape-p (shape segment-point-a segment-point-b layers group)
+  "Tests if the line segment that runs between point A and point B intersects SHAPE."
+  (when (and (not (and group (shape-group shape) (eq group (shape-group shape))))
+             (logand layers (shape-layers shape)))
+    (shape-segment-query shape segment-point-a segment-point-b)))
+
+(defgeneric shape-segment-query (shape a b))
 
 ;;;
 ;;; Circles
@@ -88,8 +85,7 @@
 (defmethod shape-point-query ((circle circle) point)
   (vec-near (circle-transformed-center circle) point (circle-radius circle)))
 
-(defmethod shape-segment-query ((circle circle) a b layers group)
-  (declare (ignore layers group))
+(defmethod shape-segment-query ((circle circle) a b)
   (let ((center (circle-transformed-center circle))
         (radius (circle-radius circle)))
     (circle-segment-query circle center radius a b)))
@@ -177,8 +173,7 @@
                           (return-from shape-point-query nil))))
               (return-from shape-point-query t)))))))
 
-(defmethod shape-segment-query ((seg segment) a b layers group)
-  (declare (ignore layers group))
+(defmethod shape-segment-query ((seg segment) a b)
   (let ((n (segment-trans-normal seg)))
     (when (< (vec. a n) (vec. (segment-trans-a seg) n))
       (setf n (vec-neg n)))

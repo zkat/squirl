@@ -106,8 +106,7 @@
   (and (bbox-containts-vec-p (poly-bbox poly) point)
        (poly-contains-vertex-p poly point)))
 
-(defmethod shape-segment-query ((poly poly) a b layers group)
-  (declare (ignore layers group))
+(defmethod shape-segment-query ((poly poly) a b)
   (let ((axes (poly-axes poly))
         (vertices (poly-vertices poly)))
     (loop for vert across vertices
