@@ -129,3 +129,16 @@
       (world-hash-query-segment #'query-shape (world-static-shapes world) start end)
       (world-hash-query-segment #'query-shape (world-active-shapes world) start end)
       collision-p)))
+
+(defun world-shape-segment-query-first (world start end layers group)
+  (let (first-shape min-ratio first-normal)
+   (flet ((query-shape (shape)
+            (multiple-value-bind (hitp ratio normal)
+                (segment-intersects-shape-p shape start end layers group)
+              (when (and hitp (< ratio min-ratio))
+                (setf first-shape  shape
+                      min-ratio    ratio
+                      first-normal normal)))))
+     (world-hash-query-segment #'query-shape (world-static-shapes world) start end)
+     (world-hash-query-segment #'query-shape (world-active-shapes world) start end)
+     (values first-shape min-ratio first-normal))))
