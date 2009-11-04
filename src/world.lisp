@@ -97,14 +97,11 @@
 ;;;
 
 (defun world-point-query (function world point layers groups)
-  (world-hash-point-query (lambda (point shape)
-                            (when (point-inside-shape-p shape point layers groups)
-                              (funcall function shape)))
-                          (world-active-shapes world) point)
-  (world-hash-point-query (lambda (point shape)
-                            (when (point-inside-shape-p shape point layers groups)
-                              (funcall function shape)))
-                          (world-static-shapes world) point))
+  (flet ((query-point-and-shape (point shape)
+           (when (point-inside-shape-p shape point layers groups)
+             (funcall function shape))))
+    (world-hash-point-query #'query-point-and-shape (world-active-shapes world) point)
+    (world-hash-point-query #'query-point-and-shape (world-static-shapes world) point)))
 
 ;;; Unlike the C version, this actually returns the -first- shape
 ;;; encountered which matches the layers, groups, and point. It
@@ -124,16 +121,11 @@
 
 (defun world-shape-segment-query (function world start end layers group)
   (let (collision-p)
-    (world-hash-query-segment (fun (prog1 1.0
-                                     (when (segment-intersects-shape-p _ start end layers group)
-                                       (when function
-                                         (funcall function _ 0.0 +zero-vector+))
-                                       (setf collision-p t))))
-                              (world-static-shapes world) start end)
-    (world-hash-query-segment (fun (prog1 1.0
-                                     (when (segment-intersects-shape-p _ start end layers group)
-                                       (when function
-                                         (funcall function _ 0.0 +zero-vector+))
-                                       (setf collision-p t))))
-                              (world-active-shapes world) start end)
-    collision-p))
+    (flet ((query-shape (shape)
+             (prog1 1.0
+               (when (segment-intersects-shape-p shape start end layers group)
+                 (when function (funcall function shape 0.0 +zero-vector+))
+                 (setf collision-p t)))))
+      (world-hash-query-segment #'query-shape (world-static-shapes world) start end)
+      (world-hash-query-segment #'query-shape (world-active-shapes world) start end)
+      collision-p)))
