@@ -113,8 +113,82 @@
        finally (return contacts))))
 
 (defun segment-to-poly (segment poly)
-  ;; todo
-  )
+  (let* (contacts
+         (axes (poly-transformed-axes poly))
+         (segD (vec. (segment-trans-normal segment)
+                     (segment-trans-a segment)))
+         (min-norm (- (poly-value-on-axis poly
+                                          (segment-trans-normal segment)
+                                          segD)
+                     (segment-radius segment)))
+         (min-neg (- (poly-value-on-axis poly
+                                         (vec-neg (segment-trans-normal segment))
+                                         (- segD))
+                     (segment-radius segment))))
+    (unless (or (> min-neg 0) (> min-norm 0))
+      (let ((min-i 0)
+            (poly-min (segment-value-on-axis segment
+                                             (poly-axis-normal (svref axes 0))
+                                             (poly-axis-distance (svref axes 0)))))
+        (unless (or (plusp poly-min)
+                    (not (loop
+                            for i from 0
+                            for vertex across (poly-vertices poly)
+                            for axis across axes
+                            for distance = (segment-value-on-axis segment
+                                                                  (poly-axis-normal axis)
+                                                                  (poly-axis-distance axis))
+                            when (> distance 0) return nil
+                            when (> distance poly-min)
+                            do (setf poly-min distance
+                                     min-i i)
+                            finally (return t))))
+          (let* ((poly-normal (vec-neg (poly-axis-normal (svref axes min-i))))
+                 (vertex-a (vec+ (segment-trans-a segment)
+                                 (vec* poly-normal (segment-radius segment))))
+                 (vertex-b (vec+ (segment-trans-b segment)
+                                 (vec* poly-normal (segment-radius segment)))))
+            (loop
+               for i from 0
+               for vertex in (list vertex-a vertex-b)
+               when (poly-contains-vertex-p poly vertex)
+               do (push (make-contact vertex-a poly-normal poly-min
+                                      (hash-pair segment i))
+                        contacts))
+            ;; "Floating point precision problems here.
+            ;;  This will have to do for now."
+            (decf poly-min +collision-slop+)
+            (when (or (>= min-norm poly-min)
+                      (>= min-neg poly-min))
+              (if (> min-norm min-neg)
+                  (setf contacts
+                        (append contacts
+                                (find-points-behind-segment segment
+                                                            poly
+                                                            min-norm
+                                                            1)))
+                  (setf contacts
+                        (append contacts
+                                (find-points-behind-segment segment
+                                                            poly
+                                                            min-neg
+                                                            (- 1))))))
+            ;; If no other collision points were found, try colliding endpoints.
+            (unless contacts
+              (loop
+                 with seg-t-a = (segment-trans-a segment)
+                 with seg-t-b = (segment-trans-b segment)
+                 with poly-t-v = (poly-transformed-vertices poly)
+                 for point in (list seg-t-a seg-t-b
+                                    seg-t-a seg-t-b)
+                 for vertex in (list (svref poly-t-v min-i)
+                                     (svref poly-t-v
+                                            (mod (1+ min-i)
+                                                 (length poly-t-v))))
+                 for collision = (circle-to-circle-query point vertex
+                                                         (segment-radius segment) 0)
+                 when collision return collision))))))))
+
 (defun circle-to-poly (circle poly)
   (let* ((axes (poly-transformed-axes poly))
          (min-i 0)
