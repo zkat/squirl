@@ -116,8 +116,51 @@
   ;; todo
   )
 (defun circle-to-poly (circle poly)
-  ;; todo
-  )
+  (let* ((axes (poly-transformed-axes poly))
+         (min-i 0)
+         (min (- (vec. (poly-axis-normal (first axes))
+                       (circle-transformed-center circle))
+                 (poly-axis-distance (first axes))
+                 (circle-radius circle))))
+    (when (loop
+             for i from 0
+             for vertex across (poly-vertices poly)
+             for axis across axes
+             for distance = (- (vec. (poly-axis-normal axis)
+                                     (circle-transformed-center circle))
+                               (poly-axis-distance axis)
+                               (circle-radius circle))
+             when (> distance 0) return nil
+             when (> distance min)
+             do (setf min distance
+                      min-i i)
+             finally (return t))
+      (let* ((normal (poly-axis-normal (svref axes min-i)))
+             (a (svref (poly-transformed-vertices poly) min-i))
+             (b (svref (poly-transformed-vertices poly)
+                       (mod (1+ min-i) (length (poly-transformed-vertices poly)))))
+             (dta (vecx normal a))
+             (dtb (vecx normal b))
+             (dt (vecx normal (circle-transformed-center circle))))
+        (cond
+          ((< dt dtb)
+           (circle-to-circle-query (circle-transformed-center circle)
+                                   b
+                                   (circle-radius circle)
+                                   0))
+          ((< dt dta)
+           (make-contact (vec- (circle-transformed-center circle)
+                               (vec* normal
+                                     (+ (circle-radius circle)
+                                        (/ min 2))))
+                         (vec-neg normal)
+                         min
+                         0))
+          (t
+           (circle-to-circle-query (circle-transformed-center circle)
+                                   a
+                                   (circle-radius circle)
+                                   0)))))))
 (defun poly-to-poly (poly1 poly2)
   (multiple-value-bind (msa1 min1) (find-min-separating-axis poly2 poly1)
     (multiple-value-bind (msa2 min2) (find-min-separating-axis poly1 poly2)
