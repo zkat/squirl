@@ -117,3 +117,23 @@
 ;;; Why is this here? Shouldn't it be in another section?
 (defun world-map (function world)
   (map nil function (world-bodies world)))
+
+;;;
+;;; Segment Query Functions
+;;;
+
+(defun world-shape-segment-query (function world start end layers group)
+  (let (collision-p)
+    (world-hash-query-segment (fun (prog1 1.0
+                                     (when (segment-intersects-shape-p _ start end layers group)
+                                       (when function
+                                         (funcall function _ 0.0 +zero-vector+))
+                                       (setf collision-p t))))
+                              (world-static-shapes world) start end)
+    (world-hash-query-segment (fun (prog1 1.0
+                                     (when (segment-intersects-shape-p _ start end layers group)
+                                       (when function
+                                         (funcall function _ 0.0 +zero-vector+))
+                                       (setf collision-p t))))
+                              (world-active-shapes world) start end)
+    collision-p))
