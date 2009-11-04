@@ -72,7 +72,7 @@ are the `hash-set-default-value' for SET, and NIL. See `cl:remhash'."
                  datum :test #'eq :key #'cdr)))
     (values datum found)))
 
-(defun hash-set-map (function set)
+(defun map-hash-set (function set)
   "Calls FUNCTION once on each datum in the `hash-set' SET, and returns NIL."
   (loop for chain across (hash-set-table set)
      do (mapc function chain)))

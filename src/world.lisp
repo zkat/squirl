@@ -112,7 +112,7 @@
                      world point layers groups))
 
 ;;; Why is this here? Shouldn't it be in another section?
-(defun world-map (function world)
+(defun map-world (function world)
   (map nil function (world-bodies world)))
 
 ;;;
