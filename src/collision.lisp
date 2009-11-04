@@ -89,9 +89,9 @@
 
 (defun find-points-behind-segment (segment poly p-dist coefficient)
   "Identify vertices that have penetrated the segment."
-  (let ((dta (vecx (segment-trans-normal segment)
+  (let ((dta (vec-cross (segment-trans-normal segment)
                    (segment-trans-a segment)))
-        (dtb (vecx (segment-trans-normal segment)
+        (dtb (vec-cross (segment-trans-normal segment)
                    (segment-trans-b segment)))
         (normal (vec* (segment-trans-normal segment)
                       coefficient)))
@@ -104,7 +104,7 @@
                            (segment-trans-a segment))
                      coefficient)
                   (segment-radius segment)))
-       do (let ((dt (vecx (segment-trans-normal segment)
+       do (let ((dt (vec-cross (segment-trans-normal segment)
                           vertex)))
             (when (and (>= dta dt)
                        (>= dt dtb))
@@ -215,9 +215,9 @@
              (a (svref (poly-transformed-vertices poly) min-i))
              (b (svref (poly-transformed-vertices poly)
                        (rem (1+ min-i) (length (poly-transformed-vertices poly)))))
-             (dta (vecx normal a))
-             (dtb (vecx normal b))
-             (dt (vecx normal (circle-transformed-center circle))))
+             (dta (vec-cross normal a))
+             (dtb (vec-cross normal b))
+             (dt (vec-cross normal (circle-transformed-center circle))))
         (cond
           ((< dt dtb)
            (circle-to-circle-query (circle-transformed-center circle)
