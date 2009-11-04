@@ -25,8 +25,7 @@
   (layers -1); User defined layer bitmask for the shape.
   ;; Internally used slots
   ;; ---------------------
-  (id (prog1 *shape-id-counter* (incf *shape-id-counter*))) ; Unique id used as the hash value.
-  )
+  (id (prog1 *shape-id-counter* (incf *shape-id-counter*)))) ; Unique id used as the hash value.
 
 (defun shared-shape-init (shape)
   (shape-cache-bbox shape)
@@ -73,8 +72,7 @@
                    (:include shape))
   center ; Center in body space coordinates.
   radius
-  transformed-center; Transformed center. (world space coordinates)
-  )
+  transformed-center); Transformed center. (world space coordinates)
 
 (defun make-circle (body radius offset)
   (let ((circle (%make-circle body radius offset)))
@@ -127,8 +125,7 @@
   normal ; normal (body space coords)
   radius ; Thickness
   trans-a trans-b ;transformed endpoints (world space coords)
-  trans-normal ;transformed normal (world space coords)
-  )
+  trans-normal) ;transformed normal (world space coords)
 
 (defun make-segment (body a b radius)
   (let ((segment (%make-segment body a b radius)))
