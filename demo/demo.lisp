@@ -36,7 +36,7 @@
     (world-add-static-shape space shape)))
 
 (defun init-world ()
-  (reset-shape-id-counter)    
+  (reset-shape-id-counter)
   (let* ((static-body (make-body most-positive-double-float most-positive-double-float))
 	 (world (make-world :iterations 10))
 	 (body (make-body 100.0 10000.0))
@@ -46,7 +46,6 @@
 	       (vec -320 -240) (vec 320 -240)
 	       (vec -320 240) (vec 320 240)
 	       world static-body)
-    
     (world-add-body world body)
     (setf (shape-elasticity shape) 1.0)
     (setf (shape-friction shape) 1.0)
@@ -75,7 +74,7 @@
       (world-add-shape world shape))))
 
 (defun render (world) world)
-	
+
 (defun quick-and-dirty ()
   (sdl:with-init ()
     (sdl:window 800 600 :title-caption "SQIRL PYHSICS" :icon-caption "SQUIRL-DEMO")
@@ -89,5 +88,4 @@
 			   (sdl:push-quit-event))
 			 (when (sdl:key-down-p :sdl-key-a)
 			   (add-box world))))
-      (sdl:quit-sdl :force t))))
-   
+      (sdl:quit-sdl :force t)))
