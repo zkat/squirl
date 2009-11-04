@@ -47,7 +47,7 @@
      for vert-a across vertices
      for vert-b = (svref vertices (mod (1+ i) length))
      for vert-c = (svref vertices (mod (+ i 2) length))
-     unless (minusp (vecx (vec- vert-b vert-a) (vec- vert-c vert-b)))
+     unless (minusp (vec-cross (vec- vert-b vert-a) (vec- vert-c vert-b)))
      return nil
      finally (return t)))
 
@@ -120,8 +120,9 @@
                                (- b-normal a-normal))))
                 (when (<= 0 ratio 1)
                   (let* ((point (vec-lerp a b ratio))
-                         (dt (- (vecx normal point)))
-                         (dt-min (- (vecx normal vert)))
-                         (dt-max (- (vecx normal (svref vertices (mod (1+ i) (length vertices)))))))
+                         (dt (- (vec-cross normal point)))
+                         (dt-min (- (vec-cross normal vert)))
+                         (dt-max (- (vec-cross normal (svref vertices (mod (1+ i)
+                                                                           (length vertices)))))))
                     (when (<= dt-min dt dt-max)
                       (values poly ratio normal))))))))))
