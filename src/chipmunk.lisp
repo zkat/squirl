@@ -7,7 +7,7 @@
   (min (max n min) max))
 
 (defun moment-for-circle (m inner-diameter outer-diameter offset)
-  "Calculate the moment of inertia for a circle. r1 and r2 are the inner and outer diameters.
+  "Calculate the moment of inertia for a circle.
 A solid circle has an inner diameter of 0."
   ;; c version: return (1.0f/2.0f)*m*(inner*inner + outer*outer) + m*cpvdot(offset, offset);
   (+
