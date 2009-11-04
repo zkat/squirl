@@ -114,7 +114,7 @@ list structure into the `world-hash-junk'."
     (hash-handle hash (hash-set-find handle-set id object)
                  (funcall bbox-function object))))
 
-(defun world-hash-rehash (hash)
+(defun rehash-world-hash (hash)
   (clear-world-hash hash)
   (let ((bbox-fn (world-hash-bbox-function hash)))
     (map-hash-set (fun (hash-handle hash _ (funcall bbox-fn (handle-object _))))
