@@ -179,12 +179,14 @@
                  with seg-t-a = (segment-trans-a segment)
                  with seg-t-b = (segment-trans-b segment)
                  with poly-t-v = (poly-transformed-vertices poly)
+                 with vert-a = (svref poly-t-v min-i)
+                 with vert-b = (svref poly-t-v
+                                      (rem (1+ min-i)
+                                           (length poly-t-v)))
                  for point in (list seg-t-a seg-t-b
                                     seg-t-a seg-t-b)
-                 for vertex in (list (svref poly-t-v min-i)
-                                     (svref poly-t-v
-                                            (rem (1+ min-i)
-                                                 (length poly-t-v))))
+                 for vertex in (list vert-a vert-a
+                                     vert-b vert-b)
                  for collision = (circle-to-circle-query point vertex
                                                          (segment-radius segment) 0)
                  when collision return (push collision contacts)))))))))
