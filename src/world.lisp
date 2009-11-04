@@ -77,3 +77,7 @@
           (vector-push arbiter new-array)
         finally
           (setf arbiters new-array)))))
+
+(defun world-remove-shape (world shape)
+  (world-hash-remove (world-active-shapes world) shape (shape-id shape))
+  (shape-removal-arbiter-reject world shape))
