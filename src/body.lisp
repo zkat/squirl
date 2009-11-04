@@ -87,7 +87,7 @@ gravity (also in world coordinates)."
                    (inverse-mass body-inverse-mass)
                    (velocity body-velocity)) body
     (setf velocity (vec+ velocity (vec* impulse inverse-mass)))
-    (incf angular-velocity (* inverse-inertia (vecx relative impulse)))))
+    (incf angular-velocity (* inverse-inertia (vec-cross relative impulse)))))
 
 (defun body-apply-bias-impulse (body impulse relative)
   ;; From C: "Not intended for external use. Used by cpArbiter.c and cpConstraint.c."
@@ -96,7 +96,7 @@ gravity (also in world coordinates)."
                    (inverse-mass body-inverse-mass)
                    (velocity-bias body-velocity-bias)) body
     (setf velocity-bias (vec+ velocity-bias (vec* impulse inverse-mass)))
-    (incf angular-velocity-bias (* inverse-inertia (vecx relative impulse)))))
+    (incf angular-velocity-bias (* inverse-inertia (vec-cross relative impulse)))))
 
 (defun body-reset-forces (body)
   "Zero the forces on a body."
@@ -107,7 +107,7 @@ gravity (also in world coordinates)."
   "Apply a force (in world coordinates) to a body at a point relative to the center
 of gravity (also in world coordinates)."
   (setf (body-force body) (vec+ (body-force body) force))
-  (incf (body-torque body) (vecx r force)))
+  (incf (body-torque body) (vec-cross r force)))
 
 (defun apply-damped-spring (body1 body2 anchor1 anchor2 rlen k dmp dt)
   "Apply a damped spring force between two bodies.
