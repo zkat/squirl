@@ -16,7 +16,7 @@ A solid circle has an inner diameter of 0."
    (* mass (vec. offset offset))))
 
 (defun moment-for-segment (m a b)
-  "Calculate the moment of inertia for a line segment. Beveling radius not supported."
+  "Calculate the moment of inertia for a line segment connecting a to b."
   ;; C version:
   ;; cpFloat length = cpvlength(cpvsub(b, a));
   ;; cpVect offset = cpvmult(cpvadd(a, b), 1.0f/2.0f);
