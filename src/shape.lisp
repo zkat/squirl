@@ -42,7 +42,7 @@
   (:documentation "Cache the BBox of the shape."))
 
 (defun point-inside-shape-p (shape point layers group)
-  (when (and (not (and group (shape-group shape) (eq group (shape-group shape))))
+  (when (and (not (and (not (zerop group)) (shape-group shape) (= group (shape-group shape))))
              (logand layers (shape-layers shape)))
     (shape-point-query shape point)))
 
@@ -51,7 +51,7 @@
 
 (defun segment-intersects-shape-p (shape segment-point-a segment-point-b layers group)
   "Tests if the line segment that runs between point A and point B intersects SHAPE."
-  (when (and (not (and group (shape-group shape) (eq group (shape-group shape))))
+  (when (and (not (and (not (zerop group)) (shape-group shape) (= group (shape-group shape))))
              (logand layers (shape-layers shape)))
     (shape-segment-query shape segment-point-a segment-point-b)))
 
