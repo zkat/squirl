@@ -183,7 +183,7 @@
                                     seg-t-a seg-t-b)
                  for vertex in (list (svref poly-t-v min-i)
                                      (svref poly-t-v
-                                            (mod (1+ min-i)
+                                            (rem (1+ min-i)
                                                  (length poly-t-v))))
                  for collision = (circle-to-circle-query point vertex
                                                          (segment-radius segment) 0)
@@ -212,7 +212,7 @@
       (let* ((normal (poly-axis-normal (svref axes min-i)))
              (a (svref (poly-transformed-vertices poly) min-i))
              (b (svref (poly-transformed-vertices poly)
-                       (mod (1+ min-i) (length (poly-transformed-vertices poly)))))
+                       (rem (1+ min-i) (length (poly-transformed-vertices poly)))))
              (dta (vecx normal a))
              (dtb (vecx normal b))
              (dt (vecx normal (circle-transformed-center circle))))
