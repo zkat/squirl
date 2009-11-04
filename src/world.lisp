@@ -22,7 +22,7 @@
   ;; Number of iterations to use in the impulse solver to solve elastic collisions.
   (elastic-iterations *default-elastic-iterations* :type fixnum)
   ;; Default gravity to supply when integrating rigid body motions.
-  (gravity +zero-vector+ :type vector)
+  (gravity +zero-vector+ :type vec)
   ;; Default damping to supply when integrating rigid body motions.
   (damping 1.0)
 
