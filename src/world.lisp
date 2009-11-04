@@ -66,3 +66,14 @@
 (defun world-add-constraint (world constraint)
   (vector-push-extend constraint (world-constraints world))
   constraint)
+
+;;; FIXME: I'm ported literally from C!
+(defun shape-removal-arbiter-reject (world shape)
+  (with-accessors ((arbiters world-arbiters)) world
+   (let ((new-array (make-array (length arbiters) :adjustable t :fill-pointer t)))
+     (loop for arbiter across arbiters
+        when (with-place (arb. arbiter-) ((a shape-a) (b shape-b)) arbiter
+               (and (not (eq shape arb.a)) (not (eq shape arb.b)))) do
+          (vector-push arbiter new-array)
+        finally
+          (setf arbiters new-array)))))
