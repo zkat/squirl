@@ -38,3 +38,8 @@
   (contact-set (make-hash-set 0 #'contact-set-equal)) ; Persistent contact set.
   ;; Constraints in the system.
   (constraints (make-array *initial-array-length* :fill-pointer t :adjustable t)))
+
+(defgeneric collide (actor1 actor2 contacts)
+  (:method (actor1 actor2 contacts)
+    (declare (ignore actor1 actor2 contacts))
+    t))
