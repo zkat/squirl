@@ -58,3 +58,7 @@
     (assert shape.body)
     (shape-cache-bbox shape)
     (world-hash-insert (world-static-shapes world) shape shape.id shape.bbox)))
+
+(defun world-add-body (world body)
+  (vector-push-extend body (world-bodies world))
+  body)
