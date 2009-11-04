@@ -15,17 +15,17 @@ A solid circle has an inner diameter of 0."
                (expt outer-diameter 2)))
    (* mass (vec. offset offset))))
 
-(defun moment-for-segment (m a b)
-  "Calculate the moment of inertia for a line segment connecting a to b."
+(defun moment-for-segment (mass point-a point-b)
+  "Calculate the moment of inertia for a line segment connecting POINT-A to POINT-B."
   ;; C version:
   ;; cpFloat length = cpvlength(cpvsub(b, a));
   ;; cpVect offset = cpvmult(cpvadd(a, b), 1.0f/2.0f);
   ;; return m*length*length/12.0f + m*cpvdot(offset, offset);
-  (let ((length (length (vec- b a)))
-        (offset (vec* (vec+ a b) 1/2)))
+  (let ((length (length (vec- point-b point-a)))
+        (offset (vec* (vec+ point-a point-b) 1/2)))
     (+
-     (* m length (/ length 12))
-     (* m (vec. offset offset)))))
+     (* mass length (/ length 12))
+     (* mass (vec. offset offset)))))
 
 (defun moment-for-poly (m num-verts verts offset)
   "Calculate the moment of inertia for a solid palygon shape."
