@@ -163,14 +163,14 @@ list structure into the `world-hash-junk'."
                   (incf (world-hash-stamp hash)))
                 (world-hash-handle-set hash)))
 
-(defun query-segment (function hash chain object)
+(defun query-segment (function hash chain)
   (dolist (handle chain 1.0)
     (unless (or (= (handle-stamp handle) (world-hash-stamp hash))
                 (null (handle-object handle)))
       (stamp-handle handle hash)
-      (return (funcall function object (handle-object handle))))))
+      (return (funcall function (handle-object handle))))))
 
-(defun world-hash-query-segment (function hash object vec-a vec-b)
+(defun world-hash-query-segment (function hash vec-a vec-b)
   (with-accessors ((cell-size world-hash-cell-size)) hash
     (with-vecs ((a (vec* vec-a (/ cell-size)))
                 (b (vec* vec-b (/ cell-size))))
@@ -188,7 +188,7 @@ list structure into the `world-hash-junk'."
             (setf y-inc -1 next-v (* (- a.y      (floor a.y)) dt/dy)))
         (let ((cell-size (world-hash-cell-size hash)))
           (loop while (< ratio exit-ratio) for index = (hash cell-x cell-y cell-size)
-             for new-ratio = (query-segment function hash (world-hash-chain hash index) object)
+             for new-ratio = (query-segment function hash (world-hash-chain hash index))
              do (setf exit-ratio (min exit-ratio new-ratio))
                 (if (< next-v next-h) ; Note indentation
                     (progn
