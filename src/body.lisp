@@ -7,7 +7,8 @@
              (:constructor
               make-body (%mass %inertia x y 
                                &optional actor &aux
-                               (position (vec x y))
+                               (position (if (and (zerop x) (zerop y))
+                                             +zero-vector+ (vec x y)))
                                (inverse-mass (/ %mass))
                                (inverse-inertia (/ %inertia)))))
   ;; Actor used for the COLLIDE "callback"
