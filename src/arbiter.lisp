@@ -57,7 +57,13 @@
       (and (eq (arbiter-shape-b arbiter1) (arbiter-shape-b arbiter2))
            (eq (arbiter-shape-a arbiter1) (arbiter-shape-a arbiter2)))))
 
-(defun arbiter-inject (arbiter &rest contacts)
+(defun arbiter-has-shapes-p (arbiter shape1 shape2)
+  (or (and (eq shape1 (arbiter-shape-a arbiter))
+           (eq shape2 (arbiter-shape-b arbiter)))
+      (and (eq shape2 (arbiter-shape-a arbiter))
+           (eq shape1 (arbiter-shape-b arbiter)))))
+
+(defun arbiter-inject (arbiter contacts)
   "Replaces ARBITER's contacts with the supplied set, saving state for persistent contacts."
   (dolist (old-contact (arbiter-contacts arbiter))
     (dolist (new-contact contacts)
