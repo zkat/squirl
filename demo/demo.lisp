@@ -15,14 +15,15 @@
     (setf (shape-elasticity shape) 1.0)
     (setf (shape-friction shape) 1.0)
     (setf (shape-layers shape) 1)
-    (world-add-static-shape space shape)
-    
+
+    (step (world-add-static-shape space shape))
+
     (setf shape (make-segment static-body a2 b2 0.0))
     (setf (shape-elasticity shape) 1.0)
     (setf (shape-friction shape) 1.0)
     (setf (shape-layers shape) 1)
     (world-add-static-shape space shape)
-    
+
     (setf shape ( make-segment static-body a3 b3 0.0))
     (setf (shape-elasticity shape) 1.0)
     (setf (shape-friction shape) 1.0)
@@ -41,8 +42,7 @@
 	 (world (make-world :iterations 10))
 	 (body (make-body 100.0 10000.0))
 	 (shape (make-segment body (vec -75 0) (vec 75 0) 5)))
-    (world-box (vec -320 -240) (vec -320 240)
-	       (vec 320 -240) (vec 320 240)
+    (world-box (vec -320 -240) (vec -320 240) (vec 320 -240) (vec 320 240)
 	       (vec -320 -240) (vec 320 -240)
 	       (vec -320 240) (vec 320 240)
 	       world static-body)
@@ -83,16 +83,19 @@
   (sdl:draw-line-* (vec-x (segment-a seg)) (vec-y (segment-a seg)) (vec-x (segment-b seg)) (vec-y (segment-b seg)) :color color))
 
 (defun render (world)
-  (world-hash-map (shape-with-color sdl:*green*) (world-static-shapes world)))
+  (map-world-hash (shape-with-color sdl:*green*) (world-static-shapes world))
+  (sdl:update-display))
 
 (defun quick-and-dirty ()
   (sdl:with-init ()
     (sdl:window 800 600 :title-caption "SQIRL PHYSICS" :icon-caption "SQUIRL-DEMO")
     (let ((world (init-world)))
+      (print 'after)
+      (add-box world)
       (sdl:with-events ()
 	(:idle () (update (sdl:sdl-get-ticks) world)  (render world))
 	(:quit-event () t)
-	(:video-expose-event ())
+	(:video-expose-event () (sdl:update-display))
 	(:key-down-event ()
 			 (when (sdl:key-down-p :sdl-key-escape)
 			   (sdl:push-quit-event))
