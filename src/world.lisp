@@ -171,3 +171,15 @@
         (unless (null contacts)
           (vector-push-extend (make-arbiter contacts shape1 shape2 (world-stamp world))
                               (world-arbiters world)))))))
+
+(defun filter-world-arbiters (world)
+  (with-accessors ((arbiters world-arbiters)) world
+    (loop
+       with new-arbiters = (make-array (length arbiters) :adjustable t :fill-pointer t)
+       for arbiter across arbiters
+       for a = (arbiter-shape-a arbiter) and b = (arbiter-shape-b arbiter)
+       for body-a = (shape-body a) and body-b = (shape-body b) do
+         (when (or (body-actor body-a) (body-actor body-b))
+           (when (collide (body-actor body-a) (body-actor body-b) (arbiter-contacts arbiter))
+             (vector-push arbiter new-arbiters)))
+       finally (setf arbiters new-arbiters))))
