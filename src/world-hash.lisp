@@ -82,9 +82,8 @@ list structure into the `world-hash-junk'."
 
 (defun hash (x y n)
   "Hash X, Y, and N to generate a hash code"
-  (when (minusp x) (setf x (mod x n)))
-  (when (minusp y) (setf y (mod y n)))
-  (expt-mod (* x 2185031351) (* y 4232417593) n))
+  #+ (or) (expt-mod (* x 2185031351) (* y 4232417593) n)
+  (mod (sxhash (cons x y)) n))
 
 (defmacro do-bbox ((chain-macro hash-form bbox-form) &body body)
   (with-gensyms (hash bbox size dim bb.l bb.r bb.b bb.t i j index)
