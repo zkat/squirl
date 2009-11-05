@@ -13,8 +13,6 @@
                     :depends-on ("vec"))
              (:file "bounding-box"
                     :depends-on ("vec"))
-             (:file "chipmunk"
-                    :depends-on ("vec"))
              (:file "collision"
                     :depends-on ("shape" "poly-shape"))
              (:file "hash-set"
@@ -24,6 +22,8 @@
                     :depends-on ("vec" "bounding-box" "body"))
              (:file "poly-shape"
                     :depends-on ("shape"))
+             (:file "squirl"
+                    :depends-on ("vec"))
              (:file "utils"
                     :depends-on ("package"))
              (:file "vec"
