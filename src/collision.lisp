@@ -226,13 +226,13 @@
                                    (circle-radius circle)
                                    0))
           ((< dt dta)
-           (make-contact (vec- (circle-transformed-center circle)
-                               (vec* normal
-                                     (+ (circle-radius circle)
-                                        (/ min 2))))
-                         (vec-neg normal)
-                         min
-                         0))
+           (list (make-contact (vec- (circle-transformed-center circle)
+                                     (vec* normal
+                                           (+ (circle-radius circle)
+                                              (/ min 2))))
+                               (vec-neg normal)
+                               min
+                               0)))
           (t
            (circle-to-circle-query (circle-transformed-center circle)
                                    a
