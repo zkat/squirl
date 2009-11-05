@@ -23,7 +23,7 @@
     (setf (shape-friction shape) 1.0)
     (setf (shape-layers shape) 1)
     (world-add-static-shape space shape)
-    
+
     (setf shape (make-segment static-body a4 b4 0.0))
     (setf (shape-elasticity shape) 1.0)
     (setf (shape-friction shape) 1.0)
@@ -58,7 +58,7 @@
 	 (mass 1.0)
 	 (radius (vec-length (vec size size))))
     (let ((body (make-body mass (moment-for-circle mass 1.0 size) 0 0)))
-      (setf (body-position body) (vec (- (* (/ 1.0 (+ (random 10) 1)) (- 640 (* 2 radius))) (- 320 radius)) (- (* (/ 1.0 (+ (random 10)1)) (- 400 (* 2 radius))) (- 240 radius))))     
+      (setf (body-position body) (vec (- (* (/ 1.0 (+ (random 10) 1)) (- 640 (* 2 radius))) (- 320 radius)) (- (* (/ 1.0 (+ (random 10)1)) (- 400 (* 2 radius))) (- 240 radius))))
       (setf (body-velocity body) (vec* (vec (- (* 2 (/ 1.0 (+ 1 (random 10)))) 1) (- (* 2 (/ 1.0 (+ (random 10) 1))) 1)) 200))
       (world-add-body world body)
       (let ((shape (make-circle body size)))
@@ -115,8 +115,8 @@
       (setf vert1-y (round (vec-y (elt (poly-transformed-vertices shape) (1- index)))))
       (setf vert2-x (round (vec-x (elt (poly-transformed-vertices shape) index))))
       (setf vert2-y (round (vec-y (elt (poly-transformed-vertices shape) index))))
-      (sdl:draw-line-*  (+ vert1-x *world-x-offset*) (+ vert1-y *world-y-offset*) 
-			(+ vert2-x *world-x-offset*) (+ vert2-y *world-y-offset*) 
+      (sdl:draw-line-*  (+ vert1-x *world-x-offset*) (+ vert1-y *world-y-offset*)
+			(+ vert2-x *world-x-offset*) (+ vert2-y *world-y-offset*)
 			:color color))))
 
 (defmethod draw-shape ((seg segment) color)
