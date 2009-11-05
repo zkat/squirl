@@ -220,7 +220,7 @@
          (loop for constraint across constraints
             do (apply-impulse constraint)))
     ;; Integrate velocities
-    (loop for body in bodies with damping = (expt (world-damping world) dt)
+    (loop for body across bodies with damping = (expt (world-damping world) dt)
        do (body-update-velocity body (world-gravity world) damping dt))
     (loop for arbiter across arbiters
        do (arbiter-apply-cached-impulse arbiter))
