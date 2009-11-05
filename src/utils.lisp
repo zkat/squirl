@@ -3,6 +3,9 @@
 
 (declaim (optimize safety debug))
 
+(defun make-adjustable-vector (length)
+  (make-array length :adjustable t :fill-pointer 0))
+
 (defmacro fun (&body body)
   `(lambda (&optional _) (declare (ignorable _)) ,@body))
 

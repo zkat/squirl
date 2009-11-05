@@ -26,12 +26,12 @@
   (static-shapes (make-world-hash *initial-cell-size* *initial-count* #'shape-bbox))
   (active-shapes (make-world-hash *initial-cell-size* *initial-count* #'shape-bbox))
   ;; Bodies in the system.
-  (bodies (make-array *initial-array-length* :fill-pointer 0 :adjustable t))
+  (bodies (make-adjustable-vector *initial-array-length*))
   ;; Active arbiters for the impulse solver.
-  (arbiters (make-array *initial-array-length* :fill-pointer 0 :adjustable t))
+  (arbiters (make-adjustable-vector *initial-array-length*))
   (contact-set (make-hash-set 0 #'arbiter-shapes-equal)) ; Persistent contact set.
   ;; Constraints in the system.
-  (constraints (make-array *initial-array-length* :fill-pointer 0 :adjustable t)))
+  (constraints (make-adjustable-vector *initial-array-length*)))
 
 (defgeneric collide (actor1 actor2 contacts)
   (:method (actor1 actor2 contacts)
@@ -64,13 +64,13 @@
 ;;; FIXME: I'm ported literally from C!
 (defun shape-removal-arbiter-reject (world shape)
   (with-accessors ((arbiters world-arbiters)) world
-   (let ((new-array (make-array (length arbiters) :adjustable t :fill-pointer t)))
-     (loop for arbiter across arbiters
-        when (with-place (arb. arbiter-) ((a shape-a) (b shape-b)) arbiter
-               (and (not (eq shape arb.a)) (not (eq shape arb.b)))) do
-          (vector-push arbiter new-array)
-        finally
-          (setf arbiters new-array)))))
+    (let ((new-array (make-adjustable-vector (length arbiters))))
+      (loop for arbiter across arbiters
+         when (with-place (arb. arbiter-) ((a shape-a) (b shape-b)) arbiter
+                (and (not (eq shape arb.a)) (not (eq shape arb.b)))) do
+           (vector-push arbiter new-array)
+         finally
+           (setf arbiters new-array)))))
 
 (defun world-remove-shape (world shape)
   (world-hash-remove (world-active-shapes world) shape (shape-id shape))
@@ -167,7 +167,7 @@
 (defun filter-world-arbiters (world)
   (with-accessors ((arbiters world-arbiters)) world
     (loop
-       with new-arbiters = (make-array (length arbiters) :adjustable t :fill-pointer t)
+       with new-arbiters = (make-adjustable-vector (length arbiters))
        for arbiter across arbiters
        for a = (arbiter-shape-a arbiter) and b = (arbiter-shape-b arbiter)
        for body-a = (shape-body a) and body-b = (shape-body b) do
