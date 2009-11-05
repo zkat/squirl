@@ -5,7 +5,9 @@
 
 (defstruct (body
              (:constructor
-              make-body (%mass %inertia &optional actor &aux
+              make-body (%mass %inertia x y 
+                               &optional actor &aux
+                               (position (vec x y))
                                (inverse-mass (/ %mass))
                                (inverse-inertia (/ %inertia)))))
   ;; Actor used for the COLLIDE "callback"
