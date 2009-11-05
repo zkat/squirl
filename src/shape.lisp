@@ -10,17 +10,17 @@
 ;;; Shape
 ;;;
 (defstruct shape
-  body ; body that the shape is attached to.
-  bbox ; Cached Bounding Box for the shape.
+  body                           ; body that the shape is attached to.
+  bbox                           ; Cached Bounding Box for the shape.
   ;; Surface Properties
   ;; ------------------
-  (elasticity 0) ; Coefficient of restitution.
-  (friction 0) ; Coefficient of friction.
+  (elasticity 0)                   ; Coefficient of restitution.
+  (friction 0)                     ; Coefficient of friction.
   (surface-velocity +zero-vector+) ; Surface velocity used when solving for friction
   ;; User-definable slots
   ;; --------------------
-  (group 0); User defined collision group for the shape.
-  (layers -1); User defined layer bitmask for the shape.
+  group                  ; User defined collision group for the shape.
+  (layers -1)            ; User defined layer bitmask for the shape.
   ;; Internally used slots
   ;; ---------------------
   (id (prog1 *shape-id-counter* (incf *shape-id-counter*)))) ; Unique id used as the hash value.
