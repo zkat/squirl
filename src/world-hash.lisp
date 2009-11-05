@@ -82,6 +82,8 @@ list structure into the `world-hash-junk'."
 
 (defun hash (x y n)
   "Hash X, Y, and N to generate a hash code"
+  (when (minusp x) (setf x (mod x n)))
+  (when (minusp y) (setf y (mod y n)))
   (expt-mod (* x 2185031351) (* y 4232417593) n))
 
 (defmacro do-bbox ((chain-macro hash-form bbox-form) &body body)
@@ -101,7 +103,7 @@ list structure into the `world-hash-junk'."
 
 (defun hash-handle (hash handle bbox)
   (do-bbox (chain hash bbox)
-    unless (find handle chain :key #'eq) do
+    unless (find handle chain) do
       (push-handle handle hash chain)))
 
 (defun world-hash-insert (hash object id bbox)

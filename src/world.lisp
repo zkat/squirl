@@ -10,7 +10,9 @@
 (defparameter *initial-count* 1000)
 (defparameter *initial-array-length* 4)
 
-(defstruct world
+(defstruct (world
+             (:constructor make-world
+                           (&key iterations elastic-iterations gravity damping)))
   ;; Number of iterations to use in the impulse solver to solve contacts.
   (iterations *default-iterations* :type fixnum)
   ;; Number of iterations to use in the impulse solver to solve elastic collisions.
