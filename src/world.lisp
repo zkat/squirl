@@ -183,3 +183,52 @@
            (when (collide (body-actor body-a) (body-actor body-b) (arbiter-contacts arbiter))
              (vector-push arbiter new-arbiters)))
        finally (setf arbiters new-arbiters))))
+
+;;;
+;;; All-Important WORLD-STEP Function
+;;;
+
+(defun world-step (world dt &aux (dt-inv (/ dt))) ; This is our assertion
+  (with-place (|| world-) (bodies constraints static-shapes active-shapes arbiters) world
+    ;; Flush outdated arbiters
+    (hash-set-delete-if (fun (> (- (arbiter-stamp _) (world-stamp world)) *contact-persistence*))
+                        (world-contact-set world))
+    (setf (fill-pointer arbiters) 0)
+    ;; Integrate positions
+    (loop for body across bodies
+       do (body-update-position body dt))
+    ;; Pre-cache BBoxen
+    (map-world-hash #'shape-cache-bbox active-shapes)
+    ;; Collide!
+    (let ((detector (make-collision-detector world)))
+      (map-world-hash (fun (world-hash-query detector static-shapes _ (shape-bbox _))) active-shapes)
+      (world-hash-query-rehash detector active-shapes))
+    ;; Filter arbiter list based on collisions
+    (filter-world-arbiters world)
+    ;; Prestep the arbiters
+    (loop for arbiter across (world-arbiters world)
+       do (arbiter-prestep arbiter dt-inv))
+    ;; Prestep the constraints
+    (loop for constraint across constraints
+       do (pre-step constraint dt dt-inv))
+    (loop
+       repeat (world-elastic-iterations world) do
+         (loop for arbiter across arbiters
+            do (arbiter-apply-impulse arbiter 1.0))
+         (loop for constraint across constraints
+            do (apply-impulse constraint)))
+    ;; Integrate velocities
+    (loop for body in bodies with damping = (expt (world-damping world) dt)
+       do (body-update-velocity body (world-gravity world) damping dt))
+    (loop for arbiter across arbiters
+       do (arbiter-apply-cached-impulse arbiter))
+    ;; Run the impulse solver, using the old-style elastic solver if
+    ;; elastic iterations are disabled
+    (loop repeat (world-iterations world)
+       with elastic-coef = (if (zerop (world-elastic-iterations world)) 1.0 0.0) do
+         (loop for arbiter across arbiters
+            do (arbiter-apply-impulse arbiter elastic-coef))
+         (loop for constraint across constraints
+            do (apply-impulse constraint)))
+    (incf (world-stamp world)))
+  (values))
