@@ -25,7 +25,10 @@
 (defstruct (world-hash
              (:constructor make-world-hash
                            (cell-size size bbox-function &aux
-                                      (table (make-world-hash-table size)))))
+                                      (table (make-world-hash-table size))))
+             (:print-object
+              (lambda (world-hash stream)
+                (print-unreadable-object (world-hash stream :type t :identity t)))))
   "The spatial hash is SquirL's default (and currently only) spatial index"
   cell-size                             ; Size of the hash's cells
   bbox-function                         ; Bounding box callback

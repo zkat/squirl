@@ -17,7 +17,11 @@
              (:constructor
               make-hash-set (size test &aux
                                   (table (make-array (next-prime size)
-                                                     :initial-element nil)))))
+                                                     :initial-element nil))))
+             (:print-object
+              (lambda (hash-set stream)
+                (print-unreadable-object (hash-set stream :type t :identity t)
+                  (format stream "Count: ~D" (hash-set-count hash-set))))))
   (count 0) test (default-value nil) table)
 
 (defun hash-set-size (set)
