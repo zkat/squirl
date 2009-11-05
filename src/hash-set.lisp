@@ -77,6 +77,7 @@ values are returned: the datum removed from SET, and T. On failure, the values
 are the `hash-set-default-value' for SET, and NIL. See `cl:remhash'."
   (multiple-value-bind (datum found) (hash-set-find set code data)
     (when found
+      (decf (hash-set-count set))
       (let ((index (mod code (hash-set-size set))))
         (deletef (hash-set-chain set index)
                  datum :test #'eq :key #'cdr)))
@@ -85,9 +86,13 @@ are the `hash-set-default-value' for SET, and NIL. See `cl:remhash'."
 (defun map-hash-set (function set)
   "Calls FUNCTION once on each datum in the `hash-set' SET, and returns NIL."
   (loop for chain across (hash-set-table set)
-     do (mapc function chain)))
+     do (dolist (bin chain)
+          (funcall function (cdr bin)))))
 
 (defun hash-set-delete-if (predicate set)
   "Deletes the items from `hash-set' SET on which PREDICATE is true. Returns NIL."
   (dotimes (index (hash-set-size set))
-    (delete-iff (hash-set-chain set index) predicate :key #'cdr)))
+    (when (hash-set-chain set index)
+      (let ((before (length (hash-set-chain set index))))
+        (delete-iff (hash-set-chain set index) predicate :key #'cdr)
+        (decf (hash-set-count set) (- before (length (hash-set-chain set index))))))))
