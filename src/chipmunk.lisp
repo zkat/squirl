@@ -6,7 +6,7 @@
 (defun clamp (n min max)
   (min (max n min) max))
 
-(defun moment-for-circle (mass inner-diameter outer-diameter offset)
+(defun moment-for-circle (mass inner-diameter outer-diameter &optional (offset +zero-vectoc+))
   "Calculate the moment of inertia for a circle.
 A solid circle has an inner diameter of 0."
   ;; c version: return (1.0f/2.0f)*m*(inner*inner + outer*outer) + m*cpvdot(offset, offset);
@@ -27,7 +27,7 @@ A solid circle has an inner diameter of 0."
      (* mass length (/ length 12))
      (* mass (vec. offset offset)))))
 
-(defun moment-for-poly (m num-verts verts offset)
+(defun moment-for-poly (m num-verts verts &optional (offset +zero-vector+))
   "Calculate the moment of inertia for a solid convex polygon."
   ;; C version:
   ;; cpVect *tVerts = (cpVect *)calloc(numVerts, sizeof(cpVect));
