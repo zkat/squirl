@@ -73,19 +73,29 @@
       (setf (shape-friction shape) 0.0)
       (world-add-shape world shape))))
 
-(defun render (world) world)
+(defgeneric draw-shape (shape color))
+
+(defun shape-with-color (color)
+  (lambda (element)
+    (draw-shape element color)))
+
+(defmethod draw-shape ((seg segment) color)
+  (sdl:draw-line-* (vec-x (segment-a seg)) (vec-y (segment-a seg)) (vec-x (segment-b seg)) (vec-y (segment-b seg)) :color color))
+
+(defun render (world)
+  (world-hash-map (shape-with-color sdl:*green*) (world-static-shapes world)))
 
 (defun quick-and-dirty ()
   (sdl:with-init ()
-    (sdl:window 800 600 :title-caption "SQIRL PYHSICS" :icon-caption "SQUIRL-DEMO")
+    (sdl:window 800 600 :title-caption "SQIRL PHYSICS" :icon-caption "SQUIRL-DEMO")
     (let ((world (init-world)))
       (sdl:with-events ()
 	(:idle () (update (sdl:sdl-get-ticks) world)  (render world))
 	(:quit-event () t)
-	(:video-expose-event () )
+	(:video-expose-event ())
 	(:key-down-event ()
 			 (when (sdl:key-down-p :sdl-key-escape)
 			   (sdl:push-quit-event))
 			 (when (sdl:key-down-p :sdl-key-a)
 			   (add-box world))))
-      (sdl:quit-sdl :force t)))
+      (sdl:quit-sdl :force t))))
