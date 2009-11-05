@@ -162,17 +162,10 @@
           (zerop (logand a.layers b.layers))))))
 
 (defun filter-world-arbiters (world)
-  (with-accessors ((arbiters world-arbiters)) world
-    (loop
-       with new-arbiters = (make-adjustable-vector (length arbiters))
-       for arbiter across arbiters
-       for a = (arbiter-shape-a arbiter) and b = (arbiter-shape-b arbiter)
-       for body-a = (shape-body a) and body-b = (shape-body b) do
-         (if (or (body-actor body-a) (body-actor body-b))
-             (when (collide (body-actor body-a) (body-actor body-b) (arbiter-contacts arbiter))
-               (vector-push arbiter new-arbiters))
-             (vector-push arbiter new-arbiters))
-       finally (setf arbiters new-arbiters))))
+  (delete-iff (world-arbiters world)
+              (fun (let ((a (body-actor (shape-body (arbiter-shape-a _))))
+                         (b (body-actor (shape-body (arbiter-shape-b _)))))
+                     (when (or a b) (not (collide a b (arbiter-contacts _))))))))
 
 ;;;
 ;;; All-Important WORLD-STEP Function
