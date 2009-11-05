@@ -164,14 +164,6 @@
           (and a.group b.group (eq a.group b.group))
           (zerop (logand a.layers b.layers))))))
 
-(defun make-collision-detector (world)
-  (lambda (shape1 shape2)
-    (unless (collision-impossible-p shape1 shape2)
-      (let ((contacts (collide-shapes shape1 shape2)))
-        (unless (null contacts)
-          (vector-push-extend (make-arbiter contacts shape1 shape2 (world-stamp world))
-                              (world-arbiters world)))))))
-
 (defun filter-world-arbiters (world)
   (with-accessors ((arbiters world-arbiters)) world
     (loop
@@ -200,9 +192,19 @@
     ;; Pre-cache BBoxen
     (map-world-hash #'shape-cache-bbox active-shapes)
     ;; Collide!
-    (let ((detector (make-collision-detector world)))
-      (map-world-hash (fun (world-hash-query detector static-shapes _ (shape-bbox _))) active-shapes)
-      (world-hash-query-rehash detector active-shapes))
+    (flet ((detector (shape1 shape2)
+             (unless (collision-impossible-p shape1 shape2)
+               (let ((contacts (collide-shapes shape1 shape2)))
+                 (unless (null contacts)
+                   (let* ((hash (hash-pair (shape-id shape1) (shape-id shape2)))
+                          (arbiter (hash-set-find-if (fun (arbiter-has-shapes-p _ shape1 shape2))
+                                                     (world-contact-set world) hash)))
+                     (when arbiter (return-from detector (arbiter-inject arbiter contacts)))
+                     (setf arbiter (make-arbiter contacts shape1 shape2 hash))
+                     (vector-push-extend arbiter arbiters)
+                     (hash-set-insert (world-contact-set world) hash arbiter)))))))
+      (map-world-hash (fun (world-hash-query #'detector static-shapes _ (shape-bbox _))) active-shapes)
+      (world-hash-query-rehash #'detector active-shapes))
     ;; Filter arbiter list based on collisions
     (filter-world-arbiters world)
     ;; Prestep the arbiters
