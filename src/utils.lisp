@@ -6,6 +6,8 @@
 (defun make-adjustable-vector (length)
   (make-array length :adjustable t :fill-pointer 0))
 
+(defun ensure-list (x) (if (listp x) x (list x)))
+
 (defmacro fun (&body body)
   `(lambda (&optional _) (declare (ignorable _)) ,@body))
 

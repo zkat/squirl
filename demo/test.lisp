@@ -21,7 +21,7 @@
 
 (defreply update ((demo =squirl-demo=) dt &key)
   (declare (ignore dt)) ; Physics timestep should be constant
-  (squirl::world-step (world demo) 1/80))
+  (squirl::world-step (world demo) 1/60))
 
 (defun add-circle (demo x y)
   (let* ((mass 1)
