@@ -25,12 +25,12 @@
           (groove-joint-r2 joint) (vec-rotate (groove-joint-anchor2 joint)
                                               (body-rotation body-b)))
     ;; calculate tangential distance along the axis of r2
-    (let ((td (vecx (vec+ (body-position body-b) (groove-joint-r2 joint)) normal)))
+    (let ((td (vec-cross (vec+ (body-position body-b) (groove-joint-r2 joint)) normal)))
       ;; Calculate the clamping factor and r2
-      (cond ((<= td (vecx trans-a normal))
+      (cond ((<= td (vec-cross trans-a normal))
              (setf (groove-joint-clamp joint) 1.0
                    (groove-joint-r1 joint) (vec- trans-a (body-position body-a))))
-            ((>= td (vecx trans-b normal))
+            ((>= td (vec-cross trans-b normal))
              (setf (groove-joint-clamp joint) -1.0
                    (groove-joint-r1 joint) (vec- trans-b (body-position body-a))))
             (t
@@ -62,7 +62,7 @@
 
 (defun constrain-groove (joint j)
   (let* ((normal (groove-joint-groove-transformed-normal joint))
-         (j-clamp (if (plusp (* (groove-joint-clamp joint) (vecx j normal)))
+         (j-clamp (if (plusp (* (groove-joint-clamp joint) (vec-cross j normal)))
                       j (vec-project j normal))))
     (vec-clamp j-clamp (groove-joint-j-max-length joint))))
 

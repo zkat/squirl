@@ -25,8 +25,8 @@
 (defun k-scalar (body1 body2 r1 r2 normal)
   (let ((mass-sum (+ (body-inverse-mass body1)
                      (body-inverse-mass body2)))
-        (r1-cross-normal (vecx r1 normal))
-        (r2-cross-normal (vecx r2 normal)))
+        (r1-cross-normal (vec-cross r1 normal))
+        (r2-cross-normal (vec-cross r2 normal)))
     (+ mass-sum
        (* r1-cross-normal r1-cross-normal
           (body-inverse-inertia body1))
