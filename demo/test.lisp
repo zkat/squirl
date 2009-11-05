@@ -8,14 +8,16 @@
    (window-height 500)
    (world (squirl::make-world :gravity (squirl::vec 0 -90)))))
 
-(defparameter *blocks* nil)
+(defparameter *circles* nil)
 
-(defun draw-block (blk)
-  (let ((position (squirl::body-position blk)))
-    (draw-rectangle (squirl::vec-x position) (squirl::vec-y position) 15 15)))
+(defun draw-a-circle (circle)
+  (let* ((position (squirl::body-position blk))
+         (x (squirl::vec-x position))
+         (y (squirl::vec-y position)))
+    (draw-circle (make-point x y) 15)))
 
 (defreply draw ((demo =squirl-demo=) &key)
-  (map nil #'draw-block *blocks*))
+  (map nil #'draw-a-circle *circle*))
 
 (defreply update ((demo =squirl-demo=) dt &key)
   (when (plusp dt)
