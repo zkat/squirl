@@ -34,7 +34,7 @@
      do (setf (svref (poly-vertices poly) i) a
               (svref (poly-axes poly) i) (make-poly-axis normal (vec. normal a)))))
 
-(defun make-poly (body vertices offset)
+(defun make-poly (body vertices &optional (offset +zero-vector+))
   (let ((poly (%make-poly body (length vertices))))
     (set-up-vertices poly vertices offset)
     (shared-shape-init poly)

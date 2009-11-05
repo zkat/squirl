@@ -64,7 +64,7 @@
   radius
   transformed-center); Transformed center. (world space coordinates)
 
-(defun make-circle (body radius offset)
+(defun make-circle (body radius &optional (offset +zero-vector+))
   (let ((circle (%make-circle body radius offset)))
     (shared-shape-init circle)
     circle))
