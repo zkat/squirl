@@ -156,7 +156,7 @@
 ;;; Collision Detection Functions
 ;;;
 
-(defun collision-possible-p (shape1 shape2)
+(defun collision-impossible-p (shape1 shape2)
   (with-place (a. shape-) ((bb bbox) body group layers) shape1
     (with-place (b. shape-) ((bb bbox) body group layers) shape2
       (or (not (bbox-intersects-p a.bb b.bb))
