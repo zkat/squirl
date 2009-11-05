@@ -61,6 +61,12 @@ are the `hash-set-default-value' for SET, and NIL. See `cl:gethash'."
       (when (funcall (hash-set-test set) data (cdr bin))
         (return (values (cdr bin) t))))))
 
+(defun hash-set-find-if (predicate set code)
+  (let ((chain (hash-set-chain set (mod code (hash-set-size set)))))
+    (dolist (bin chain (values (hash-set-default-value set) nil))
+      (when (funcall predicate (cdr bin))
+        (return (values (cdr bin) t))))))
+
 (defun hash-set-remove (set code data)
   "Removes DATA from `hash-set' SET, using hash value CODE. On success, two
 values are returned: the datum removed from SET, and T. On failure, the values
