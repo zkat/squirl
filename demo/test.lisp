@@ -6,7 +6,7 @@
   ((title "Demo for SquirL")
    (window-width 500)
    (window-height 500)
-   (world (squirl::make-world :gravity (squirl::vec 0 -9.8)))))
+   (world (squirl::make-world :gravity (squirl::vec 0 -90)))))
 
 (defparameter *blocks* nil)
 
@@ -18,7 +18,8 @@
   (map nil #'draw-block *blocks*))
 
 (defreply update ((demo =squirl-demo=) dt &key)
-  (squirl::world-step (world demo) dt))
+  (when (plusp dt)
+    (squirl::world-step (world demo) dt)))
 
 (defun add-circle (demo x y)
   (let* ((mass 1)
