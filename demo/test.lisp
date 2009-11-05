@@ -27,9 +27,9 @@
          (inertia (squirl::moment-for-circle mass 0 radius (squirl::vec 0 0)))
          (body (squirl::make-body mass inertia)))
     (setf (squirl::body-position body) (squirl::vec x y))
-    (squirl::world-add-body (world demo) body)
-    (push body *blocks*)
-    (squirl::make-circle body radius (squirl::vec 0 0))))
+    (squirl::world-add-shape (world demo)
+                             (squirl::make-circle body radius (squirl::vec 0 0)))
+    (push body *blocks*)))
 
 (defreply mouse-down ((engine =squirl-demo=) button)
   (case button
