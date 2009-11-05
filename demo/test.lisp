@@ -6,7 +6,7 @@
   ((title "Demo for SquirL")
    (window-width 500)
    (window-height 500)
-   (world (make-world :gravity (vec 0 -100)))
+   (world nil)
    (circles nil)
    (accumulator 0)
    (physics-timestep 1/100)))
@@ -16,6 +16,12 @@
          (x (vec-x position))
          (y (vec-y position)))
     (draw-circle (make-point x y) 15)))
+
+(defreply init ((demo =squirl-demo=))
+  (setf (world demo) (make-world :gravity (vec 0 -100)))
+  (let ((body (make-body most-positive-double-float most-positive-double-float 250 0)))
+    (world-add-static-shape (world demo) (make-segment body (vec 0 0) (vec 500 0) 1))
+    (world-add-body (world demo) body)))
 
 (defreply draw ((demo =squirl-demo=) &key)
   (map nil #'draw-a-circle (circles demo)))
