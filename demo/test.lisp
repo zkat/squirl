@@ -6,7 +6,7 @@
   ((title "Demo for SquirL")
    (window-width 500)
    (window-height 500)
-   (world (squirl::make-world :gravity (squirl::vec 0 -90)))))
+   (world (squirl::make-world :gravity (squirl::vec 0 -50)))))
 
 (defparameter *circles* nil)
 
@@ -19,9 +19,16 @@
 (defreply draw ((demo =squirl-demo=) &key)
   (map nil #'draw-a-circle *circles*))
 
+;; This allows us to fix the physics timestep without fixing the framerate.
+;; This means the physics -should- run at the same perceived speed no matter
+;; how fast your computer's calculating :)
+(defparameter *accumulator* 0)
+(defparameter *physics-timestep* 1/100)
 (defreply update ((demo =squirl-demo=) dt &key)
-  (declare (ignore dt)) ; Physics timestep should be constant
-  (squirl::world-step (world demo) 1/60))
+  (incf *accumulator* dt)
+  (loop while (>= *accumulator* *physics-timestep*)
+     do (squirl::world-step (world demo) *physics-timestep*)
+       (decf *accumulator* *physics-timestep*)))
 
 (defun add-circle (demo x y)
   (let* ((mass 1)
