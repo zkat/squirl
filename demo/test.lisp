@@ -20,8 +20,7 @@
   (map nil #'draw-a-circle *circle*))
 
 (defreply update ((demo =squirl-demo=) dt &key)
-  (when (plusp dt)
-    (squirl::world-step (world demo) dt)))
+  (squirl::world-step (world demo) 1/80))
 
 (defun add-circle (demo x y)
   (let* ((mass 1)
