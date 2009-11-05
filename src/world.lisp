@@ -163,3 +163,11 @@
           (eq a.body b.body)
           (and a.group b.group (eq a.group b.group))
           (zerop (logand a.layers b.layers))))))
+
+(defun make-collision-detector (world)
+  (lambda (shape1 shape2)
+    (unless (collision-impossible-p shape1 shape2)
+      (let ((contacts (collide-shapes shape1 shape2)))
+        (unless (null contacts)
+          (vector-push-extend (make-arbiter contacts shape1 shape2 (world-stamp world))
+                              (world-arbiters world)))))))
