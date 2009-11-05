@@ -34,7 +34,7 @@
   bbox-function                         ; Bounding box callback
   (handle-set (make-hash-set 0 #'handle-equal)) ; `hash-set' of all handles
   table                                         ; Bins in use
-  (junk nil)                                    ; The "recycle bin"
+  ;;  (junk nil)                                    ; The "recycle bin"
   (stamp 1)            ; Incremented on each query; see `handle-stamp'
   )
 
@@ -52,7 +52,8 @@
 (defun clear-hash-cell (hash index)
   "Releases the handles under INDEX in `world-hash' HASH, and links the
 list structure into the `world-hash-junk'."
-  (do* ((chain (world-hash-chain hash index) next)
+  (setf (world-hash-chain hash index) nil)
+  #+ (or) (do* ((chain (world-hash-chain hash index) next)
         ;; We need to hang onto the CDR because we 'recycle' NODE
         (next (cdr chain) (cdr chain)))
        ((null chain) (setf (world-hash-chain hash index) nil))
@@ -69,16 +70,16 @@ list structure into the `world-hash-junk'."
   (setf (world-hash-cell-size hash) new-cell-size
         (world-hash-table hash) (make-world-hash-table new-size)))
 
-(defun get-new-node (hash)
-  "Get a recycled node or cons a new one"
-  (let ((node (pop (world-hash-junk hash))))
-    (if (null node) (cons nil nil) node)))
+;; (defun get-new-node (hash)
+;;   "Get a recycled node or cons a new one"
+;;   (let ((node (pop (world-hash-junk hash))))
+;;     (if (null node) (cons nil nil) node)))
 
-(defmacro push-handle (handle hash chain)
-  (with-gensyms (node)
-    `(let ((,node (get-new-node ,hash)))
-       (setf (car ,node) ,handle)
-       (push-cons ,node ,chain))))
+;; (defmacro push-handle (handle hash chain)
+;;   (with-gensyms (node)
+;;     `(let ((,node (get-new-node ,hash)))
+;;        (setf (car ,node) ,handle)
+;;        (push-cons ,node ,chain))))
 
 (defun hash (x y n)
   "Hash X, Y, and N to generate a hash code"
@@ -103,7 +104,7 @@ list structure into the `world-hash-junk'."
 (defun hash-handle (hash handle bbox)
   (do-bbox (chain hash bbox)
     unless (find handle chain) do
-      (push-handle handle hash chain)))
+      (push handle chain)))
 
 (defun world-hash-insert (hash object id bbox)
   (with-accessors ((handle-set world-hash-handle-set)) hash
@@ -163,7 +164,7 @@ list structure into the `world-hash-junk'."
                       for chain = chain-form
                       unless (find _ chain) do
                         (query function hash chain object)
-                        (push-handle _ hash chain-form)))
+                        (push _ chain-form)))
                   (incf (world-hash-stamp hash)))
                 (world-hash-handle-set hash)))
 
