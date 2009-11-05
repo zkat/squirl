@@ -29,6 +29,7 @@
     (setf (squirl::body-position body) (squirl::vec x y))
     (squirl::world-add-shape (world demo)
                              (squirl::make-circle body radius (squirl::vec 0 0)))
+    (squirl::world-add-body (world demo) body)
     (push body *blocks*)))
 
 (defreply mouse-down ((engine =squirl-demo=) button)
