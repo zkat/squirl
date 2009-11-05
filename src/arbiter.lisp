@@ -51,6 +51,12 @@
   ;; Timestamp of the arbiter (from world)
   stamp)
 
+(defun arbiter-shapes-equal (arbiter1 arbiter2)
+  (or (and (eq (arbiter-shape-a arbiter1) (arbiter-shape-a arbiter2))
+           (eq (arbiter-shape-b arbiter1) (arbiter-shape-b arbiter2)))
+      (and (eq (arbiter-shape-b arbiter1) (arbiter-shape-b arbiter2))
+           (eq (arbiter-shape-a arbiter1) (arbiter-shape-a arbiter2)))))
+
 (defun arbiter-inject (arbiter &rest contacts)
   "Replaces ARBITER's contacts with the supplied set, saving state for persistent contacts."
   (dolist (old-contact (arbiter-contacts arbiter))

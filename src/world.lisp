@@ -10,12 +10,6 @@
 (defparameter *initial-count* 1000)
 (defparameter *initial-array-length* 4)
 
-(defun contact-set-equal (shape-pair arbiter)
-  (or (and (eq (car shape-pair) (arbiter-shape-a arbiter))
-           (eq (cdr shape-pair) (arbiter-shape-b arbiter)))
-      (and (eq (car shape-pair) (arbiter-shape-b arbiter))
-           (eq (cdr shape-pair) (arbiter-shape-a arbiter)))))
-
 (defstruct world
   ;; Number of iterations to use in the impulse solver to solve contacts.
   (iterations *default-iterations* :type fixnum)
@@ -35,7 +29,7 @@
   (bodies (make-array *initial-array-length* :fill-pointer t :adjustable t))
   ;; Active arbiters for the impulse solver.
   (arbiters (make-array *initial-array-length* :fill-pointer t :adjustable t))
-  (contact-set (make-hash-set 0 #'contact-set-equal)) ; Persistent contact set.
+  (contact-set (make-hash-set 0 #'arbiter-shapes-equal)) ; Persistent contact set.
   ;; Constraints in the system.
   (constraints (make-array *initial-array-length* :fill-pointer t :adjustable t)))
 
