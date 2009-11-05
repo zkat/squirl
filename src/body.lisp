@@ -14,6 +14,8 @@
   ;; Actor used for the COLLIDE "callback"
   actor
 
+  shapes ; shapes associated with this body.
+  
   ;; Mass properties, and cached inverses
   %mass inverse-mass %inertia inverse-inertia
 

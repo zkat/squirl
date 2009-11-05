@@ -26,6 +26,7 @@
   (id (prog1 *shape-id-counter* (incf *shape-id-counter*)))) ; Unique id used as the hash value.
 
 (defun shared-shape-init (shape)
+  (pushnew shape (body-shapes (shape-body shape)))
   (shape-cache-bbox shape)
   shape)
 
