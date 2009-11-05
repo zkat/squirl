@@ -26,12 +26,12 @@
   (static-shapes (make-world-hash *initial-cell-size* *initial-count* #'shape-bbox))
   (active-shapes (make-world-hash *initial-cell-size* *initial-count* #'shape-bbox))
   ;; Bodies in the system.
-  (bodies (make-array *initial-array-length* :fill-pointer t :adjustable t))
+  (bodies (make-array *initial-array-length* :fill-pointer 0 :adjustable t))
   ;; Active arbiters for the impulse solver.
-  (arbiters (make-array *initial-array-length* :fill-pointer t :adjustable t))
+  (arbiters (make-array *initial-array-length* :fill-pointer 0 :adjustable t))
   (contact-set (make-hash-set 0 #'arbiter-shapes-equal)) ; Persistent contact set.
   ;; Constraints in the system.
-  (constraints (make-array *initial-array-length* :fill-pointer t :adjustable t)))
+  (constraints (make-array *initial-array-length* :fill-pointer 0 :adjustable t)))
 
 (defgeneric collide (actor1 actor2 contacts)
   (:method (actor1 actor2 contacts)
