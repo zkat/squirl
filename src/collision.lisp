@@ -48,8 +48,7 @@
                              (segment-trans-normal segment)
                              (vec- (segment-trans-normal segment)))))
              (make-contact (vec+ (circle-transformed-center circle)
-                                 (vec* normal (+ (circle-radius circle)
-                                                 (/ distance 2))))
+                                 (vec* normal (+ (circle-radius circle) (/ distance 2))))
                            normal distance 0)))
           ((< tangent-distance (+ tangent-distance-max radius-sum))
            (circle-to-circle-query (circle-transformed-center circle)
@@ -58,16 +57,15 @@
                                    (segment-radius segment)))
           (t nil))))))
 
-(defun find-min-separating-axis (poly1 poly2)
-  (loop with msa with min-distance
+(defun find-min-separating-axis (poly1 poly2 &aux msa min-distance)
+  (loop
      for axis across (poly-transformed-axes poly2)
      for distance = (poly-value-on-axis poly1 (poly-axis-normal axis) (poly-axis-distance axis))
      if (plusp distance)
      return nil
      else if (or (null min-distance) (> distance min-distance))
-     do (setf min-distance distance
-              msa axis)
-     finally (return (values msa min-distance))))
+     do (setf min-distance distance msa axis))
+  (values msa min-distance))
 
 (defun find-vertices (poly1 poly2 normal distance &aux contacts)
   "Add contacts for penetrating vertices"
@@ -88,16 +86,14 @@
           (- (vec. normal (segment-trans-b segment)) (segment-radius segment)))
      distance))
 
-(defun find-points-behind-segment (segment poly p-dist coefficient)
+(defun find-points-behind-segment (segment poly p-dist coefficient &aux contacts)
   "Identify vertices that have penetrated the segment."
   (let ((dta (vec-cross (segment-trans-normal segment)
                    (segment-trans-a segment)))
         (dtb (vec-cross (segment-trans-normal segment)
                    (segment-trans-b segment)))
-        (normal (vec* (segment-trans-normal segment)
-                      coefficient)))
+        (normal (vec* (segment-trans-normal segment) coefficient)))
     (loop
-       with contacts
        for i from 0
        for vertex across (poly-vertices poly)
        when (< (vec. vertex normal)
@@ -105,26 +101,21 @@
                            (segment-trans-a segment))
                      coefficient)
                   (segment-radius segment)))
-       do (let ((dt (vec-cross (segment-trans-normal segment)
-                          vertex)))
-            (when (and (>= dta dt)
-                       (>= dt dtb))
+       do (let ((dt (vec-cross (segment-trans-normal segment) vertex)))
+            (when (and (>= dta dt) (>= dt dtb))
               (push (make-contact vertex normal p-dist (hash-pair (shape-id poly) i))
-                    contacts)))
-       finally (return contacts))))
+                    contacts))))
+    contacts))
 
-(defun segment-to-poly (segment poly)
-  (let* (contacts
-         (axes (poly-transformed-axes poly))
+;;; This is complicated. Not gross, but just complicated. It needs to be simpler
+;;; and/or commented, preferably both.
+(defun segment-to-poly (segment poly &aux contacts)
+  (let* ((axes (poly-transformed-axes poly))
          (segD (vec. (segment-trans-normal segment)
                      (segment-trans-a segment)))
-         (min-norm (- (poly-value-on-axis poly
-                                          (segment-trans-normal segment)
-                                          segD)
-                     (segment-radius segment)))
-         (min-neg (- (poly-value-on-axis poly
-                                         (vec-neg (segment-trans-normal segment))
-                                         (- segD))
+         (min-norm (- (poly-value-on-axis poly (segment-trans-normal segment) segD)
+                      (segment-radius segment)))
+         (min-neg (- (poly-value-on-axis poly (vec-neg (segment-trans-normal segment)) (- segD))
                      (segment-radius segment))))
     (unless (or (> min-neg 0) (> min-norm 0))
       (let ((min-i 0)
@@ -163,16 +154,10 @@
               (if (> min-norm min-neg)
                   (setf contacts
                         (append contacts
-                                (find-points-behind-segment segment
-                                                            poly
-                                                            min-norm
-                                                            1)))
+                                (find-points-behind-segment segment poly min-norm 1)))
                   (setf contacts
                         (append contacts
-                                (find-points-behind-segment segment
-                                                            poly
-                                                            min-neg
-                                                            (- 1))))))
+                                (find-points-behind-segment segment poly min-neg -1)))))
             ;; If no other collision points were found, try colliding endpoints.
             (unless contacts
               (loop
@@ -220,31 +205,22 @@
         (cond
           ((< dt dtb)
            (circle-to-circle-query (circle-transformed-center circle)
-                                   b
-                                   (circle-radius circle)
-                                   0))
+                                   b (circle-radius circle) 0))
           ((< dt dta)
            (list (make-contact (vec- (circle-transformed-center circle)
                                      (vec* normal
                                            (+ (circle-radius circle)
                                               (/ min 2))))
-                               (vec-neg normal)
-                               min
-                               0)))
-          (t
-           (circle-to-circle-query (circle-transformed-center circle)
-                                   a
-                                   (circle-radius circle)
-                                   0)))))))
+                               (vec-neg normal) min 0)))
+          (t (circle-to-circle-query (circle-transformed-center circle)
+                                     a (circle-radius circle) 0)))))))
 (defun poly-to-poly (poly1 poly2)
   (multiple-value-bind (msa1 min1) (find-min-separating-axis poly2 poly1)
     (multiple-value-bind (msa2 min2) (find-min-separating-axis poly1 poly2)
-      (cond ((not (and msa1 msa2))
-             nil)
+      (cond ((not (and msa1 msa2)) nil)
             ((> min1 min2)
              (find-vertices poly1 poly2 (poly-axis-normal msa1) min1))
-            (t
-             (find-vertices poly1 poly2 (vec-neg (poly-axis-normal msa2)) min2))))))
+            (t (find-vertices poly1 poly2 (vec-neg (poly-axis-normal msa2)) min2))))))
 
 ;;;
 ;;; Generic function
