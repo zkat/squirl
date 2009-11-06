@@ -14,7 +14,7 @@
   (let* ((position (body-position circle))
          (x (vec-x position))
          (y (vec-y position)))
-    (draw-circle (make-point x y) 15)))
+    (draw-circle (make-point x y) 15 :resolution 30)))
 
 (defparameter *point-a* (make-point 0 10))
 (defparameter *point-b* (make-point 500 10))
@@ -23,7 +23,7 @@
   (let* ((position (body-position body))
          (x (vec-x position))
          (y (vec-y position)))
-    (draw-circle (make-point x y) 5)))
+    (draw-circle (make-point x y) 5 :resolution 30)))
 
 (defreply init ((demo =squirl-demo=))
   (setf (world demo) (make-world :gravity (vec 0 -100)))
