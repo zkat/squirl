@@ -87,9 +87,9 @@
 ;;; Point Query Functions
 ;;;
 
-(defun world-point-query (function world point layers groups)
+(defun world-point-query (function world point)
   (flet ((query-point-and-shape (point shape)
-           (when (point-inside-shape-p shape point layers groups)
+           (when (point-inside-shape-p shape point)
              (funcall function shape))))
     (world-hash-point-query #'query-point-and-shape (world-active-shapes world) point)
     (world-hash-point-query #'query-point-and-shape (world-static-shapes world) point)))
@@ -98,9 +98,9 @@
 ;;; encountered which matches the layers, groups, and point. It
 ;;; uses a functional RETURN-FROM rather than the pointer juggling
 ;;; from the C version, for speed and clarity.
-(defun world-point-query-first (world point layers groups)
+(defun world-point-query-first (world point)
   (world-point-query (fun (return-from world-point-query-first _))
-                     world point layers groups))
+                     world point))
 
 ;;; Why is this here? Shouldn't it be in another section?
 (defun map-world (function world)
@@ -110,22 +110,22 @@
 ;;; Segment Query Functions
 ;;;
 
-(defun world-shape-segment-query (function world start end layers group)
+(defun world-shape-segment-query (function world start end)
   (let (collision-p)
     (flet ((query-shape (shape)
              (prog1 1.0
-               (when (segment-intersects-shape-p shape start end layers group)
+               (when (segment-intersects-shape-p shape start end)
                  (when function (funcall function shape 0.0 +zero-vector+))
                  (setf collision-p t)))))
       (world-hash-query-segment #'query-shape (world-static-shapes world) start end)
       (world-hash-query-segment #'query-shape (world-active-shapes world) start end)
       collision-p)))
 
-(defun world-shape-segment-query-first (world start end layers group)
+(defun world-shape-segment-query-first (world start end)
   (let (first-shape min-ratio first-normal)
    (flet ((query-shape (shape)
             (multiple-value-bind (hitp ratio normal)
-                (segment-intersects-shape-p shape start end layers group)
+                (segment-intersects-shape-p shape start end)
               (when (and hitp (< ratio min-ratio))
                 (setf first-shape  shape
                       min-ratio    ratio
@@ -157,9 +157,7 @@
   (with-place (a. shape-) ((bb bbox) body group layers) shape1
     (with-place (b. shape-) ((bb bbox) body group layers) shape2
       (or (not (bbox-intersects-p a.bb b.bb))
-          (eq a.body b.body)
-          (and a.group b.group (eq a.group b.group))
-          (zerop (logand a.layers b.layers))))))
+          (eq a.body b.body)))))
 
 (defun filter-world-arbiters (world)
   (delete-iff (world-arbiters world)

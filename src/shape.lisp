@@ -13,17 +13,11 @@
   body                           ; Body to which the shape is attached
   bbox                           ; Cached BBox for the shape
   ;; Surface Properties
-  ;; ------------------
   (elasticity 0)                   ; Coefficient of restitution.
   (friction 0)                     ; Coefficient of friction.
   (surface-velocity +zero-vector+) ; Surface velocity used when solving for friction
-  ;; User-definable slots
-  ;; --------------------
-  group                  ; User defined collision group for the shape.
-  (layers -1)            ; User defined layer bitmask for the shape.
-  ;; Internally used slots
-  ;; ---------------------
-  (id (prog1 *shape-id-counter* (incf *shape-id-counter*)))) ; Unique id used as the hash value.
+  ;; Unique ID, used internally for hashing
+  (id (prog1 *shape-id-counter* (incf *shape-id-counter*))))
 
 (defun shared-shape-init (shape)
   (pushnew shape (body-shapes (shape-body shape)))
@@ -40,19 +34,15 @@
 (defgeneric shape-cache-data (shape position rotation)
   (:documentation "Cache the BBox of the shape."))
 
-(defun point-inside-shape-p (shape point layers group)
-  (when (and (not (and (not (zerop group)) (shape-group shape) (= group (shape-group shape))))
-             (logand layers (shape-layers shape)))
-    (shape-point-query shape point)))
+(defun point-inside-shape-p (shape point)
+  (shape-point-query shape point))
 
 (defgeneric shape-point-query (shape point)
   (:documentation "Test if a point lies within a shape."))
 
-(defun segment-intersects-shape-p (shape segment-point-a segment-point-b layers group)
+(defun segment-intersects-shape-p (shape segment-point-a segment-point-b)
   "Tests if the line segment that runs between point A and point B intersects SHAPE."
-  (when (and (not (and (not (zerop group)) (shape-group shape) (= group (shape-group shape))))
-             (logand layers (shape-layers shape)))
-    (shape-segment-query shape segment-point-a segment-point-b)))
+  (shape-segment-query shape segment-point-a segment-point-b))
 
 (defgeneric shape-segment-query (shape a b))
 
