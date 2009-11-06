@@ -38,6 +38,8 @@
    :poly
    :make-poly
    :poly-transformed-vertices
+   :attach-shape
+   :detach-shape
 
    ;; moments
    :moment-for-circle
