@@ -7,26 +7,26 @@
 (defparameter *body-radius* 2) ;;for visualisation
 
 (defun world-box (a1 b1 a2 b2 a3 b3 a4 b4 space static-body)
-  (let ((shape (make-segment static-body a1 b1 0.0)))
+  (let ((shape (make-segment static-body a1 b1 1.0)))
     (setf (shape-elasticity shape) 1.0)
     (setf (shape-friction shape) 1.0)
     (setf (shape-layers shape) 1)
 
     (world-add-static-shape space shape)
 
-    (setf shape (make-segment static-body a2 b2 0.0))
+    (setf shape (make-segment static-body a2 b2 1.0))
     (setf (shape-elasticity shape) 1.0)
     (setf (shape-friction shape) 1.0)
     (setf (shape-layers shape) 1)
     (world-add-static-shape space shape)
 
-    (setf shape ( make-segment static-body a3 b3 0.0))
+    (setf shape ( make-segment static-body a3 b3 1.0))
     (setf (shape-elasticity shape) 1.0)
     (setf (shape-friction shape) 1.0)
     (setf (shape-layers shape) 1)
     (world-add-static-shape space shape)
 
-    (setf shape (make-segment static-body a4 b4 0.0))
+    (setf shape (make-segment static-body a4 b4 1.0))
     (setf (shape-elasticity shape) 1.0)
     (setf (shape-friction shape) 1.0)
     (setf (shape-layers shape) 1)
@@ -34,7 +34,7 @@
 
 (defun init-world ()
   (reset-shape-id-counter)
-  (let* ((static-body (make-body most-positive-double-float most-positive-double-float 0 0))
+  (let* ((static-body (make-body most-positive-short-float most-positive-short-float 0 0))
 	 (world (make-world :iterations 10))
 	 (body (make-body 100.0 10000.0 0 1 1))
 	 (shape (make-segment body (vec -75 0) (vec 75 0) 5)))
@@ -46,7 +46,7 @@
     (setf (shape-elasticity shape) 1.0)
     (setf (shape-friction shape) 1.0)
     (world-add-shape world shape)
-;    (world-add-constraint world (make-pivot-joint static-body body (vec 1 1) (vec 1 1)))
+    (world-add-constraint world (make-pivot-joint body static-body (vec 0 0) (vec 0 0)))
     (return-from init-world world)))
 
 (defun update (ticks world)
