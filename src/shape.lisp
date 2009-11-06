@@ -169,8 +169,7 @@
                           (return-from shape-point-query
                             (< (vec-length-sq (vec- seg-tb point))
                                (expt seg-r 2)))
-                          (return-from shape-point-query nil))))
-              (return-from shape-point-query t)))))))
+                          (return-from shape-point-query nil))))))))))
 
 (defmethod shape-segment-query ((seg segment) a b)
   (let ((n (segment-trans-normal seg)))
@@ -186,7 +185,6 @@
                (dt-min (- (vec-cross (segment-trans-normal seg) (segment-trans-a seg))))
                (dt-max (- (vec-cross (segment-trans-normal seg) (segment-trans-b seg)))))
           (when (< dt-min dt dt-max)
-            (values seg ratio n)
             (return-from shape-segment-query (values seg ratio n)))))
       (unless (zerop (segment-radius seg))
         (multiple-value-bind (shape1 t1 n1)
