@@ -139,7 +139,8 @@ This function is symmetric between VEC and ROT."
       (vec-normalize vec)))
 
 (defun vec-clamp (vec len)
-  (if (> (vec-length-sq vec) (* len len))
+  (if (and (< len (sqrt most-positive-double-float))
+           (> (vec-length-sq vec) (* len len)))
       (vec* (vec-normalize vec) len)
       vec))
 
