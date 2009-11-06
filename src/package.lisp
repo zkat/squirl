@@ -10,20 +10,34 @@
    :vec
    :vec-x
    :vec-y
+   :vec+
+   :vec-
+   :vec*
    :+zero-vector+
+   :vec-length
 
    ;; Bodies
    :body
    :make-body
    :body-position
+   :body-velocity
 
    ;; Shapes
+   :reset-shape-id-counter
+   :shape-elasticity
+   :shape-friction
+   :shape-layers
    :circle
    :make-circle
+   :circle-radius
+   :circle-transformed-center
    :segment
    :make-segment
+   :segment-trans-a
+   :segment-trans-b
    :poly
    :make-poly
+   :poly-transformed-vertices
 
    ;; moments
    :moment-for-circle
@@ -34,6 +48,7 @@
    :world
    :make-world
    :map-world
+   :map-world-hash
    :world-bodies
    :world-constraints
    :world-add-body
@@ -44,6 +59,8 @@
    :world-remove-static-shape
    :world-remove-body
    :world-remove-constraint
+   :world-active-shapes
+   :world-static-shapes
    :resize-world-static-hash
    :resize-world-active-hash
    :world-step
