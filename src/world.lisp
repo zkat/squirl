@@ -36,6 +36,13 @@
   ;; Constraints in the system.
   (constraints (make-adjustable-vector *initial-array-length*)))
 
+(define-print-object (world)
+  (format t "Iterations: ~a; Elastic iterations: ~a; Gravity: ~a; Body count: ~a"
+          (world-iterations world)
+          (world-elastic-iterations world)
+          (world-gravity world)
+          (length (world-bodies world))))
+
 (defgeneric collide (actor1 actor2 contacts)
   (:method (actor1 actor2 contacts)
     (declare (ignore actor1 actor2 contacts))
