@@ -26,6 +26,9 @@
                                    (transformed-axes (make-array length)))))
   vertices axes transformed-vertices transformed-axes)
 
+(defmethod print-shape progn ((poly poly))
+  (format t "Vertex count: ~a" (length (poly-vertices poly))))
+
 (defun set-up-vertices (poly vertices offset)
   (loop for vert across vertices for i from 0
      for a = (vec+ offset vert)
