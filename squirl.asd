@@ -36,3 +36,23 @@
                        (:file "slide-joint"          :depends-on ("constraints"))
                        (:file "spring"               :depends-on ("constraints"))
                        (:file "util")))))))
+
+(asdf:defsystem squirl.demo
+  :version "0.1 (unreleased)"
+  :maintainer "Kat Marchán <kzm@sykosomatic.org>"
+  :licence "MIT"
+  :depends-on (:squirl :until-it-dies)
+  :components
+  ((:module "demo"
+            :components
+            ((:file "test")))))
+
+(asdf:defsystem squirl.demo-2
+  :version "0.1 (unreleased)"
+  :maintainer "Michael Compton <michael.compton@littleedge.co.uk>"
+  :licence "MIT"
+  :depends-on (:squirl :lispbuilder-sdl)
+  :components
+  ((:module "demo"
+            :components
+            ((:file "demo")))))
