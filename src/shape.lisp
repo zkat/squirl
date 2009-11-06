@@ -25,6 +25,13 @@
 (define-print-object (shape)
   (print-shape shape))
 
+(defmethod print-shape progn ((shape shape))
+  (format t "Body: ~a; "
+          (remove #\Space
+                  (with-output-to-string (*standard-output*)
+                    (print-unreadable-object ((shape-body shape)
+                                              *standard-output* :identity t :type nil))))))
+
 (defun shared-shape-init (shape)
   (pushnew shape (body-shapes (shape-body shape)))
   (shape-cache-bbox shape)
