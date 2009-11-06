@@ -37,9 +37,16 @@
      do (setf (svref (poly-vertices poly) i) a
               (svref (poly-axes poly) i) (make-poly-axis normal (vec. normal a)))))
 
+(defun ensure-vector (obj)
+  (cond ((vectorp obj)
+         obj)
+        ((listp obj)
+         (make-array (length obj) :initial-contents obj))
+        (t (vector obj))))
+
 (defun make-poly (vertices &optional (offset +zero-vector+))
   (let ((poly (%make-poly (length vertices))))
-    (set-up-vertices poly vertices offset)
+    (set-up-vertices poly (ensure-vector vertices) offset)
     poly))
 
 (defun validate-vertices (vertices)
