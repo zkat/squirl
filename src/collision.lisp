@@ -138,10 +138,11 @@
             (decf poly-min +collision-slop+)
             (when (or (>= min-norm poly-min)
                       (>= min-neg poly-min))
-              (push (if (> min-norm min-neg)
-                        (find-points-behind-segment segment poly min-norm 1)
-                        (find-points-behind-segment segment poly min-neg -1))
-                    contacts))
+              (setf contacts
+                    (append contacts
+                            (if (> min-norm min-neg)
+                                (find-points-behind-segment segment poly min-norm 1)
+                                (find-points-behind-segment segment poly min-neg -1)))))
             ;; If no other collision points were found, try colliding endpoints.
             (unless contacts
               (loop
