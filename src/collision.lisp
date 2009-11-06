@@ -83,24 +83,19 @@
 
 (defun find-points-behind-segment (segment poly p-dist coefficient &aux contacts)
   "Identify vertices that have penetrated the segment."
-  (let ((dta (vec-cross (segment-trans-normal segment)
-                   (segment-trans-a segment)))
-        (dtb (vec-cross (segment-trans-normal segment)
-                   (segment-trans-b segment)))
-        (normal (vec* (segment-trans-normal segment) coefficient)))
-    (loop
-       for i from 0
-       for vertex across (poly-vertices poly)
-       when (< (vec. vertex normal)
-               (+ (* (vec. (segment-trans-normal segment)
-                           (segment-trans-a segment))
-                     coefficient)
-                  (segment-radius segment)))
-       do (let ((dt (vec-cross (segment-trans-normal segment) vertex)))
-            (when (and (>= dta dt) (>= dt dtb))
-              (push (make-contact vertex normal p-dist (hash-pair (shape-id poly) i))
-                    contacts))))
-    contacts))
+  (let* ((segment-normal (segment-trans-normal segment))
+         (dta (vec-cross segment-normal (segment-trans-a segment)))
+         (dtb (vec-cross segment-normal (segment-trans-b segment)))
+         (normal (vec* segment-normal coefficient))
+         (threshhold (+ (* (vec. segment-normal (segment-trans-a segment))
+                           coefficient)
+                        (segment-radius segment))))
+    (do-vector ((i vertex) (poly-vertices poly) contacts)
+      (when (< (vec. vertex normal) threshhold)
+        (let ((dt (vec-cross segment-normal vertex)))
+          (when (and (>= dta dt) (>= dt dtb))
+            (push (make-contact vertex normal p-dist (hash-pair (shape-id poly) i))
+                  contacts)))))))
 
 ;;; This is complicated. Not gross, but just complicated. It needs to be simpler
 ;;; and/or commented, preferably both.
