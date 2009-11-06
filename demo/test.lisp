@@ -53,8 +53,25 @@
          do (draw-line (make-point (vec-x a) (vec-y a))
                        (make-point (vec-x b) (vec-y b)))))))
 
+(defun draw-scale (length x y)
+  (let ((left (make-point (- x (/ length 2)) y))
+        (right (make-point (+ x (/ length 2)) y))
+        (half-edge-height 2))
+    (draw-line left right :color *red*)
+    (draw-line (make-point (point-x left)
+                           (- (point-y left) half-edge-height))
+               (make-point (point-x left)
+                           (+ (point-y left) half-edge-height))
+               :color *blue*)
+    (draw-line (make-point (point-x right)
+                           (- (point-y left) half-edge-height))
+               (make-point (point-x right)
+                           (+ (point-y left) half-edge-height))
+               :color *blue*)))
+
 (defreply draw ((demo =squirl-demo=) &key)
-  (map nil #'draw-body (world-bodies (world demo))))
+  (map nil #'draw-body (world-bodies (world demo)))
+  (draw-scale (shape-dimension demo) (mouse-x demo) (mouse-y demo)))
 
 ;; This allows us to fix the physics timestep without fixing the framerate.
 ;; This means the physics -should- run at the same perceived speed no matter
