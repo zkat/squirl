@@ -185,7 +185,7 @@
     ;; Collide!
     (flet ((detector (shape1 shape2)
              (unless (collision-impossible-p shape1 shape2)
-               (let ((contacts (collide-shapes shape1 shape2)))
+               (let ((contacts (ensure-list (collide-shapes shape1 shape2))))
                  (unless (null contacts)
                    (let* ((hash (hash-pair (shape-id shape1) (shape-id shape2)))
                           (arbiter (hash-set-find-if (fun (arbiter-has-shapes-p _ shape1 shape2))
