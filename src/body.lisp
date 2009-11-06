@@ -33,6 +33,10 @@
   ;; Velocity bias values used when solving penetrations and correcting constraints.
   (velocity-bias +zero-vector+) (angular-velocity-bias 0))
 
+(define-print-object (body)
+  (format t "~@[Actor: ~a; ~]Mass: ~a; Inertia: ~a"
+          (body-actor body) (body-mass body) (body-inertia body)))
+
 ;;; Wraps the mass, inertia, and angle slots so that setting them updates
 ;;; the inverse-mass, inverse-inertia, and rotation slots.
 (macrolet ((wrap (external internal cached wrapper)
