@@ -62,11 +62,8 @@
         (world-hash-insert (world-active-shapes world) shape shape.id shape.bbox))))
 
 (defun world-add-body (world body)
-  ;; Right now, static bodies should not be added to world-bodies, or they'll start simulating.
-  (unless (staticp body)
-    (vector-push-extend body (world-bodies world)))
-  (map nil (fun (world-add-shape world _))
-       (body-shapes body))
+  (vector-push-extend body (world-bodies world))
+  (map nil (fun (world-add-shape world _)) (body-shapes body))
   body)
 
 (defun world-add-constraint (world constraint)
@@ -86,8 +83,7 @@
   (shape-removal-arbiter-reject world shape))
 
 (defun world-remove-body (world body)
-  (map nil (fun (world-remove-shape world _))
-       (body-shapes body))
+  (map nil (fun (world-remove-shape world _))  (body-shapes body))
   (deletef (world-bodies world) body))
 
 (defun world-remove-constraint (world constraint)
