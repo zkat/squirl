@@ -7,8 +7,11 @@
 
 (defstruct (body
              (:constructor
-              %make-body (%mass %inertia position velocity force actor %angle
-                                &aux (inverse-mass (/ %mass)) (inverse-inertia (/ %inertia)))))
+              %make-body (%mass %inertia position velocity force actor (%angle 0d0 angle-p)
+                                &aux (inverse-mass (/ %mass))
+                                     (inverse-inertia (/ %inertia))
+                                     (rotation (if angle-p (angle->vec angle)
+                                                   +initial-rotation+)))))
   world ; world that this body is attached to, if any.
   actor ; Actor used for the COLLIDE "callback"
   %shapes ; shapes associated with this body.
@@ -19,15 +22,17 @@
   (velocity +zero-vector+ :type vec)
   (force    +zero-vector+ :type vec)
   ;; Angular components of motion, and cached rotation vector
-  (%angle 0) (rotation +initial-rotation+)
-  (angular-velocity 0) (torque 0)
+  (%angle 0d0 :type double-float)
+  (rotation +initial-rotation+ :type vec)
+  (angular-velocity 0d0) (torque 0d0)
   ;; Velocity bias values used when solving penetrations and correcting constraints.
   (velocity-bias +zero-vector+) (angular-velocity-bias 0))
 
 (defun make-body (&key (mass most-positive-double-float) (inertia most-positive-double-float)
                   (position +zero-vector+) (velocity +zero-vector+) (force +zero-vector+) actor
-                  shapes (angle 0))
-  (let ((body (%make-body mass inertia position velocity force actor angle)))
+                  shapes (angle 0d0))
+  (let ((body (%make-body (float mass 0d0) (float inertia 1d0) position velocity
+                          force actor (float angle 0d0))))
     (map nil (fun (attach-shape _ body)) shapes)
     body))
 
