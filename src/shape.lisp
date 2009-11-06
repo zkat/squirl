@@ -72,7 +72,10 @@
 ;;;
 ;;; Circles
 ;;;
-(defstruct (circle (:constructor make-circle (body radius &optional (center +zero-vector+)))
+(defstruct (circle (:constructor make-circle (radius
+                                              &key (center +zero-vector+)
+                                              (elasticity 0)
+                                              (friction 0)))
                    (:include shape))
   radius
   ;; Center, in body-relative and world coordinates
@@ -118,9 +121,10 @@
 ;;;
 ;;; Segments
 ;;;
-(defstruct (segment (:constructor make-segment (body a b radius &aux
-                                                     (normal (vec-perp
-                                                              (vec-normalize (vec- b a))))))
+(defstruct (segment (:constructor make-segment
+                                  (a b  &key (friction 0) (elasticity 0) (radius 1)
+                                     &aux (normal (vec-perp
+                                                   (vec-normalize (vec- b a))))))
                     (:include shape))
   radius                                ; Thickness
   ;; Body-relative endpoints & normal

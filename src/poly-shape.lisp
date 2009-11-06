@@ -19,11 +19,11 @@
 
 (defstruct (poly (:include shape)
                  (:constructor
-                  %make-poly (body length &aux
-                                   (vertices (make-array length))
-                                   (axes (make-array length))
-                                   (transformed-vertices (make-array length))
-                                   (transformed-axes (make-array length)))))
+                  %make-poly (length &aux
+                                     (vertices (make-array length))
+                                     (axes (make-array length))
+                                     (transformed-vertices (make-array length))
+                                     (transformed-axes (make-array length)))))
   vertices axes transformed-vertices transformed-axes)
 
 (defmethod print-shape progn ((poly poly))
@@ -37,8 +37,8 @@
      do (setf (svref (poly-vertices poly) i) a
               (svref (poly-axes poly) i) (make-poly-axis normal (vec. normal a)))))
 
-(defun make-poly (body vertices &optional (offset +zero-vector+))
-  (let ((poly (%make-poly body (length vertices))))
+(defun make-poly (vertices &optional (offset +zero-vector+))
+  (let ((poly (%make-poly (length vertices))))
     (set-up-vertices poly vertices offset)
     poly))
 
