@@ -32,8 +32,8 @@
   (setf (aref (hash-set-table set) index) new-chain))
 
 (defun hash-set-full-p (set)
-  (> (hash-set-count set)
-     (hash-set-size set)))
+  (>= (hash-set-count set)
+      (hash-set-size set)))
 
 (defun hash-set-resize (set &aux (new-size (next-prime (1+ (hash-set-size set)))))
   "Adjusts `hash-set' SET to accomodate more elements"
@@ -49,10 +49,10 @@
 insertion was made, or NIL if DATA was already present in the table."
   (with-accessors ((test hash-set-test)) set
     (unless (find data (hash-set-chain set index) :test test :key #'cdr)
-      (push (cons code data) (hash-set-chain set index))
-      (incf (hash-set-count set))
       (when (hash-set-full-p set)
         (hash-set-resize set))
+      (push (cons code data) (hash-set-chain set index))
+      (incf (hash-set-count set))
       data)))
 
 (defun hash-set-find (set code data)
