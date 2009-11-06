@@ -8,7 +8,8 @@
    (window-height 500)
    (world nil)
    (accumulator 0)
-   (physics-timestep 1/100)))
+   (physics-timestep 1/100)
+   (shape-dimension 30)))
 
 (defun draw-a-circle (circle)
   (let* ((position (body-position circle))
@@ -76,7 +77,7 @@
 
 (defun add-circle (demo x y)
   (let* ((mass 1)
-         (radius 15)
+         (radius (/ (shape-dimension demo) 2))
          (inertia (moment-for-circle mass 0 radius (vec 0 0)))
          (body (make-body :mass mass :inertia inertia :position (vec x y))))
     (attach-shape (make-circle radius :elasticity 0.5 :friction 0.01) body)
@@ -84,7 +85,7 @@
 
 (defun add-poly (demo x y)
   (let* ((mass 1)
-         (size 15)
+         (size (/ (shape-dimension demo) 2))
          (verts (list (vec (- size) (- size))
                       (vec (- size) size)
                       (vec size size)
