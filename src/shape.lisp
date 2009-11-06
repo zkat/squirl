@@ -19,13 +19,11 @@
   ;; Unique ID, used internally for hashing
   (id (prog1 *shape-id-counter* (incf *shape-id-counter*))))
 
-(defgeneric print-shape (shape) (:method-combination progn))
+(defgeneric print-shape (shape)
+  (:method-combination progn :most-specific-last))
 
 (define-print-object ((shape shape))
   (print-shape shape))
-
-(defmethod print-shape progn ((shape shape))
-  (format t "Body: ~a" (shape-body shape)))
 
 (defun shared-shape-init (shape)
   (pushnew shape (body-shapes (shape-body shape)))
