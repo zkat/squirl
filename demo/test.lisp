@@ -79,6 +79,19 @@
     (attach-shape (make-circle radius :elasticity 0.5 :friction 0.01) body)
     (world-add-body (world demo) body)))
 
+(defun add-poly (demo x y)
+  (let* ((mass 1)
+         (size 15)
+         (verts (list (vec (- size) (- size))
+                      (vec (- size) size)
+                      (vec size size)
+                      (vec size (- size))))
+         (body (make-body :mass mass :inertia (squirl:moment-for-poly mass 4 verts)
+                          :position (vec x y))))
+    (attach-shape (make-poly verts) body)
+    (world-add-body (world demo) body)))
+
 (defreply mouse-down ((engine =squirl-demo=) button)
   (case button
-    (0 (add-circle engine (mouse-x engine) (mouse-y engine)))))
+    (0 (add-circle engine (mouse-x engine) (mouse-y engine)))
+    (1 (add-poly engine (mouse-x engine) (mouse-y engine)))))
