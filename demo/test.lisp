@@ -35,11 +35,10 @@
 ;; how fast your computer's calculating :)
 (defreply update ((demo =squirl-demo=) dt &key)
   ;; update the physics world
-  (incf (accumulator demo) dt)
+  (incf (accumulator demo) (if (> dt 0.5) 0.5 dt))
   (loop while (>= (accumulator demo) (physics-timestep demo))
      do (world-step (world demo) (physics-timestep demo))
-       (decf (accumulator demo) (physics-timestep demo)))
-
+     (decf (accumulator demo) (physics-timestep demo)))
   ;; remove shapes that are long gone
   (map nil (lambda (c) (setf (circles demo)
                              (delete c (circles demo)))
