@@ -17,13 +17,17 @@
          (y (vec-y position)))
     (draw-circle (make-point x y) 15)))
 
+(defparameter *point-a* (make-point 0 10))
+(defparameter *point-b* (make-point 500 10))
+
 (defreply init ((demo =squirl-demo=))
   (setf (world demo) (make-world :gravity (vec 0 -100)))
   (let ((body (make-body most-positive-double-float most-positive-double-float 250 0)))
-    (world-add-static-shape (world demo) (make-segment body (vec 0 0) (vec 500 0) 1))
+    (world-add-static-shape (world demo) (make-segment body (vec -249 10) (vec 250 10) 1))
     (world-add-body (world demo) body)))
 
 (defreply draw ((demo =squirl-demo=) &key)
+  (draw-line *point-a* *point-b* :color *red*)
   (map nil #'draw-a-circle (circles demo)))
 
 ;; This allows us to fix the physics timestep without fixing the framerate.
