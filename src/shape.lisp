@@ -10,8 +10,8 @@
 ;;; Shape
 ;;;
 (defstruct shape
-  body                           ; body that the shape is attached to.
-  bbox                           ; Cached Bounding Box for the shape.
+  body                           ; Body to which the shape is attached
+  bbox                           ; Cached BBox for the shape
   ;; Surface Properties
   ;; ------------------
   (elasticity 0)                   ; Coefficient of restitution.
@@ -61,14 +61,12 @@
 ;;;
 (defstruct (circle (:constructor %make-circle (body radius center))
                    (:include shape))
-  center ; Center in body space coordinates.
   radius
-  transformed-center); Transformed center. (world space coordinates)
+  ;; Center, in body-relative and world coordinates
+  center transformed-center)
 
 (defun make-circle (body radius &optional (offset +zero-vector+))
-  (let ((circle (%make-circle body radius offset)))
-    (shared-shape-init circle)
-    circle))
+  (shared-shape-init (%make-circle body radius offset)))
 
 (defun bbox-from-circle (vec r)
   (make-bbox (- (vec-x vec) r)
@@ -110,16 +108,14 @@
                                                       (normal (vec-perp
                                                                (vec-normalize (vec- b a))))))
                     (:include shape))
-  a b ; endpoints (body space coords)
-  normal ; normal (body space coords)
-  radius ; Thickness
-  trans-a trans-b ;transformed endpoints (world space coords)
-  trans-normal) ;transformed normal (world space coords)
+  radius                                ; Thickness
+  ;; Body-relative endpoints & normal
+  a b normal
+  ;; World-relative endpoints & normal
+  trans-a trans-b trans-normal)
 
 (defun make-segment (body a b radius)
-  (let ((segment (%make-segment body a b radius)))
-    (shared-shape-init segment)
-    segment))
+  (shared-shape-init (%make-segment body a b radius)))
 
 (defmethod shape-cache-data ((seg segment) position rotation)
   (with-accessors ((seg-ta segment-trans-a) (seg-tb segment-trans-b)
@@ -178,7 +174,7 @@
     (let* ((an (vec. a n))
            (bn (vec. b n))
            (d (+ (vec. (segment-trans-a seg) n) (segment-radius seg)))
-           (ratio (/ (- d an) (- bn an)))) ;adlai said t is 'ratio'
+           (ratio (/ (- d an) (- bn an))))
       (when (< 0 ratio 1)
         (let* ((point (vec-lerp a b ratio))
                (dt (- (vec-cross (segment-trans-normal seg) point)))
