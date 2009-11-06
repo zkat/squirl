@@ -10,12 +10,12 @@
 ;;; Shape
 ;;;
 (defstruct shape
-  body                           ; Body to which the shape is attached
-  bbox                           ; Cached BBox for the shape
+  body                                  ; Body to which the shape is attached
+  bbox                                  ; Cached BBox for the shape
   ;; Surface Properties
-  (elasticity 0)                   ; Coefficient of restitution.
-  (friction 0)                     ; Coefficient of friction.
-  (surface-velocity +zero-vector+) ; Surface velocity used when solving for friction
+  (elasticity 0)                        ; Coefficient of restitution.
+  (friction 0)                          ; Coefficient of friction.
+  (surface-velocity +zero-vector+)      ; Surface velocity used when solving for friction
   ;; Unique ID, used internally for hashing
   (id (prog1 *shape-id-counter* (incf *shape-id-counter*))))
 
@@ -32,9 +32,19 @@
                     (print-unreadable-object ((shape-body shape)
                                               *standard-output* :identity t :type nil))))))
 
-(defun shared-shape-init (shape)
-  (pushnew shape (body-shapes (shape-body shape)))
+(defun attach-shape (shape body)
+  "Attaches SHAPE to BODY. All shapes must be attached to a body before they're used."
+  (pushnew shape (body-%shapes (shape-body shape)))
   (shape-cache-bbox shape)
+  (when (body-world body)
+    (world-add-shape (body-world body) shape))
+  body)
+
+(defun detach-shape (shape body)
+  "Detaches SHAPE from BODY. If BODY is already attached to a world, the shape is removed from there."
+  (setf (body-%shapes body) (delete shape (body-%shapes body)))
+  (when (body-world body)
+    (world-remove-shape (body-world body) shape))
   shape)
 
 (defun shape-cache-bbox (shape)
@@ -62,7 +72,7 @@
 ;;;
 ;;; Circles
 ;;;
-(defstruct (circle (:constructor %make-circle (body radius center))
+(defstruct (circle (:constructor make-circle (body radius &optional (center +zero-vector+)))
                    (:include shape))
   radius
   ;; Center, in body-relative and world coordinates
@@ -71,9 +81,6 @@
 (defmethod print-shape progn ((circle circle))
   (format t "Center: ~a; Radius: ~a"
           (circle-center circle) (circle-radius circle)))
-
-(defun make-circle (body radius &optional (offset +zero-vector+))
-  (shared-shape-init (%make-circle body radius offset)))
 
 (defun bbox-from-circle (vec r)
   (make-bbox (- (vec-x vec) r)
@@ -111,9 +118,9 @@
 ;;;
 ;;; Segments
 ;;;
-(defstruct (segment (:constructor %make-segment (body a b radius &aux
-                                                      (normal (vec-perp
-                                                               (vec-normalize (vec- b a))))))
+(defstruct (segment (:constructor make-segment (body a b radius &aux
+                                                     (normal (vec-perp
+                                                              (vec-normalize (vec- b a))))))
                     (:include shape))
   radius                                ; Thickness
   ;; Body-relative endpoints & normal
@@ -125,9 +132,6 @@
   (format t "Point A: ~a; Point B: ~a; Radius: ~a"
           (segment-a segment) (segment-b segment)
           (segment-radius segment)))
-
-(defun make-segment (body a b radius)
-  (shared-shape-init (%make-segment body a b radius)))
 
 (defmethod shape-cache-data ((seg segment) position rotation)
   (with-accessors ((seg-ta segment-trans-a) (seg-tb segment-trans-b)

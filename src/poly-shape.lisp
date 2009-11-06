@@ -40,7 +40,6 @@
 (defun make-poly (body vertices &optional (offset +zero-vector+))
   (let ((poly (%make-poly body (length vertices))))
     (set-up-vertices poly vertices offset)
-    (shared-shape-init poly)
     poly))
 
 (defun validate-vertices (vertices)

@@ -55,16 +55,18 @@
 (defun world-add-shape (world shape)
   (with-place (shape. shape-) (id bbox body) shape
     (assert shape.body)
-    (world-hash-insert (world-active-shapes world) shape shape.id shape.bbox)))
-
-(defun world-add-static-shape (world shape)
-  (with-place (shape. shape-) (id bbox body) shape
-    (assert shape.body)
-    (shape-cache-bbox shape)
-    (world-hash-insert (world-static-shapes world) shape shape.id shape.bbox)))
+    (if (staticp (shape-body shape))
+        (progn
+          (shape-cache-bbox shape)
+          (world-hash-insert (world-static-shapes world) shape shape.id shape.bbox))
+        (world-hash-insert (world-active-shapes world) shape shape.id shape.bbox))))
 
 (defun world-add-body (world body)
-  (vector-push-extend body (world-bodies world))
+  ;; Right now, static bodies should not be added to world-bodies, or they'll start simulating.
+  (unless (staticp body)
+    (vector-push-extend body (world-bodies world)))
+  (map nil (fun (if (staticp body) (world-add-static-shape world _) (world-add-shape world _)))
+       (body-shapes body))
   body)
 
 (defun world-add-constraint (world constraint)
@@ -77,14 +79,15 @@
                      (and (not (eq shape arb.a)) (not (eq shape arb.b)))))))
 
 (defun world-remove-shape (world shape)
-  (world-hash-remove (world-active-shapes world) shape (shape-id shape))
-  (shape-removal-arbiter-reject world shape))
-
-(defun world-remove-static-shape (world shape)
-  (world-hash-remove (world-static-shapes world) shape (shape-id shape))
+  (world-hash-remove (if (staticp (shape-body shape))
+                         (world-static-shapes world)
+                         (world-active-shapes world))
+                     shape (shape-id shape))
   (shape-removal-arbiter-reject world shape))
 
 (defun world-remove-body (world body)
+  (map nil (fun (if (staticp body) (world-remove-static-shape world _) (world-remove-shape world _)))
+       (body-shapes body))
   (deletef (world-bodies world) body))
 
 (defun world-remove-constraint (world constraint)

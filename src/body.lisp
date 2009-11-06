@@ -7,31 +7,39 @@
 
 (defstruct (body
              (:constructor
-              make-body (%mass %inertia x y
-                               &optional actor &aux
-                               (position (if (and (zerop x) (zerop y))
-                                             +zero-vector+ (vec x y)))
-                               (inverse-mass (/ %mass))
-                               (inverse-inertia (/ %inertia)))))
-  ;; Actor used for the COLLIDE "callback"
-  actor
-
-  shapes ; shapes associated with this body.
-
+              %make-body (%mass %inertia position velocity force actor angle
+                                &aux (inverse-mass (/ %mass)) (inverse-inertia (/ %inertia)))))
+  world ; world that this body is attached to, if any.
+  actor ; Actor used for the COLLIDE "callback"
+  %shapes ; shapes associated with this body.
   ;; Mass properties, and cached inverses
   %mass inverse-mass %inertia inverse-inertia
-
   ;; Linear components of motion
   (position +zero-vector+ :type vec)
   (velocity +zero-vector+ :type vec)
   (force    +zero-vector+ :type vec)
-
   ;; Angular components of motion, and cached rotation vector
   (%angle 0) (rotation +initial-rotation+)
   (angular-velocity 0) (torque 0)
-
   ;; Velocity bias values used when solving penetrations and correcting constraints.
   (velocity-bias +zero-vector+) (angular-velocity-bias 0))
+
+(defun make-body (&key (mass most-positive-double-float) (inertia most-positive-double-float)
+                  (position +zero-vector+) (velocity +zero-vector+) (force +zero-vector+) actor
+                  shapes (angle 0))
+  (let ((body (%make-body mass inertia position velocity force actor angle)))
+    (map nil (fun (attach-shape _ body)) shapes)
+    body))
+
+(defun staticp (body)
+  (when (= most-positive-double-float (body-mass body) (body-inertia body))
+    t))
+
+(defun body-attached-p (body world)
+  (eq world (body-world body)))
+
+(defun body-shapes (body)
+  (body-%shapes body))
 
 (define-print-object (body)
   (format t "~@[Actor: ~a; ~]Mass: ~a; Inertia: ~a"
