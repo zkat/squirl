@@ -57,6 +57,7 @@
                                    (segment-radius segment)))
           (t nil))))))
 
+;;; This function has VERY HAIRY control flow. Frob with EXTREME caution.
 (defun find-min-separating-axis (poly1 poly2 &aux msa min-distance)
   (loop
      for axis across (poly-transformed-axes poly2)
