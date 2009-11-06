@@ -2,6 +2,9 @@
   (:use :cl :squirl))
 (in-package :squirl-demo-2)
 
+(defparameter *physics-timestep* 1/100)
+(defparameter *accumulator* 0)
+
 (defparameter *world-x-offset* 0)
 (defparameter *world-y-offset* 0)
 (defparameter *body-radius* 1) ;;for visualisation
@@ -46,10 +49,10 @@
     (return-from init-world world)))
 
 (defun update (ticks world)
-  (let* ((steps 3)
-         (dt (/ 1.0 60.0 steps)))
-    (dotimes (count steps)
-      (world-step world dt))))
+  (incf *accumulator* (min ticks 0.5))
+  (loop while (>= *accumulator* *physics-timestep*)
+     do (world-step world *physics-timestep*)
+        (decf *accumulator* *physics-timestep*)))
 
 (defun add-circle (world)
   (let* ((size 10.0)
@@ -131,17 +134,19 @@
   (map 'vector (body-with-color sdl:*blue*) (world-bodies world))
   (sdl:update-display))
 
-(defun quick-and-dirty ()
+(defun now ()
+  (/ (sdl:sdl-get-ticks) 1000))
+
+(defun quick-and-dirty (&aux (world (init-world)))
   (sdl:with-init ()
     (sdl:window 800 600 :title-caption "SqirL SDL Demo" :icon-caption "SquirL")
     (setf *world-x-offset* (/ 800 2))
     (setf *world-y-offset* (/ 600 2))
-    (let ((world (init-world))
-          (previous-tick (sdl:sdl-get-ticks)))
+    (let ((previous-tick (now)))
       (add-box world)
       (sdl:with-events ()
 	(:idle ()
-          (let ((now (sdl:sdl-get-ticks)))
+          (let ((now (now)))
             (update (- now previous-tick) world)
             (setf previous-tick now))
           (render world))
