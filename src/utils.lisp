@@ -51,6 +51,12 @@ the result of calling DELETE with PREDICATE, place, and the REMOVE-KEYWORDS.")
   `(defconstant ,name (if (boundp ',name) (symbol-value ',name) ,value)
      ,@(when doc (list doc))))
 
+(defmacro define-print-object (((object class) &key (identity t) (type t)) &body body)
+  (with-gensyms (stream)
+    `(defmethod print-object ((,object ,class) ,stream)
+      (print-unreadable-object (,object ,stream :type ,type :identity ,identity)
+        (let ((*standard-output* ,stream)) ,@body)))))
+
 (defun maybe/ (a b)
   (if (zerop b) 0 (/ a b)))
 
