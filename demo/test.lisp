@@ -27,8 +27,11 @@
 (defreply init ((demo =squirl-demo=))
   (setf (world demo) (make-world :gravity (vec 0 -100)))
   (let ((body (make-body))
-        (floor (make-segment (vec 0 10) (vec 500 10) :elasticity 1 :friction 0.001)))
-    (attach-shape floor body)
+        (floor (make-segment (vec 0 10) (vec 500 10) :elasticity 1 :friction 0.001))
+        (left-wall (make-segment (vec 10 0) (vec 10 200) :elasticity 1 :friction 0.001))
+        (right-wall (make-segment (vec 490 0) (vec 490 200) :elasticity 1 :friction 0.001)))
+    (mapc (lambda (_) (attach-shape _ body))
+          (list floor left-wall right-wall))
     (world-add-body (world demo) body)))
 
 (defgeneric draw-shape (shape)
