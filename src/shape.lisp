@@ -22,7 +22,7 @@
 (defgeneric print-shape (shape)
   (:method-combination progn :most-specific-last))
 
-(define-print-object ((shape shape))
+(define-print-object (shape)
   (print-shape shape))
 
 (defun shared-shape-init (shape)
