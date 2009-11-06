@@ -56,10 +56,10 @@
 ;; This means the physics -should- run at the same perceived speed no matter
 ;; how fast your computer's calculating :)
 (defreply update ((demo =squirl-demo=) dt &key)
-  (update-world demo)
+  (update-world-state demo dt)
   (empty-out-bottomless-pit (world demo)))
 
-(defun update-world-state (demo)
+(defun update-world-state (demo dt)
   (incf (accumulator demo) (if (> dt 0.5) 0.5 dt))
   (loop while (>= (accumulator demo) (physics-timestep demo))
      do (world-step (world demo) (physics-timestep demo))
