@@ -65,7 +65,7 @@
   ;; Right now, static bodies should not be added to world-bodies, or they'll start simulating.
   (unless (staticp body)
     (vector-push-extend body (world-bodies world)))
-  (map nil (fun (if (staticp body) (world-add-static-shape world _) (world-add-shape world _)))
+  (map nil (fun (world-add-shape world _))
        (body-shapes body))
   body)
 
@@ -86,7 +86,7 @@
   (shape-removal-arbiter-reject world shape))
 
 (defun world-remove-body (world body)
-  (map nil (fun (if (staticp body) (world-remove-static-shape world _) (world-remove-shape world _)))
+  (map nil (fun (world-remove-shape world _))
        (body-shapes body))
   (deletef (world-bodies world) body))
 
