@@ -10,8 +10,10 @@
   (declaim (ftype (function (real real) vec) vec)
            (inline vec))
   (defun vec (x y)
-    (make-array 2 :element-type 'double-float
-                :initial-contents (list (float x 1d0) (float y 1d0))))
+    (let ((v (make-array 2 :element-type 'double-float)))
+      (setf (aref v 0) (float x 1d0)
+            (aref v 1) (float y 1d0))
+      v))
 
   (declaim (ftype (function (vec) double-float) vec-x vec-y)
            (inline vec-x vec-y) )

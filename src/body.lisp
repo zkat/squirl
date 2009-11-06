@@ -3,9 +3,11 @@
 
 (declaim (optimize safety debug))
 
+(define-constant +initial-rotation+ (vec 1d0 0d0))
+
 (defstruct (body
              (:constructor
-              make-body (%mass %inertia x y 
+              make-body (%mass %inertia x y
                                &optional actor &aux
                                (position (if (and (zerop x) (zerop y))
                                              +zero-vector+ (vec x y)))
@@ -15,7 +17,7 @@
   actor
 
   shapes ; shapes associated with this body.
-  
+
   ;; Mass properties, and cached inverses
   %mass inverse-mass %inertia inverse-inertia
 
@@ -25,7 +27,7 @@
   (force    +zero-vector+ :type vec)
 
   ;; Angular components of motion, and cached rotation vector
-  (%angle 0) (rotation (load-time-value (vec 1.0 0.0)))
+  (%angle 0) (rotation +initial-rotation+)
   (angular-velocity 0) (torque 0)
 
   ;; Velocity bias values used when solving penetrations and correcting constraints.
