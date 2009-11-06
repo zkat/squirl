@@ -3,15 +3,12 @@
 
 (declaim (optimize safety debug))
 
-(define-constant +initial-rotation+ (vec 1d0 0d0))
-
 (defstruct (body
              (:constructor
-              %make-body (%mass %inertia position velocity force actor (%angle 0d0 angle-p)
+              %make-body (%mass %inertia position velocity force actor %angle
                                 &aux (inverse-mass (/ %mass))
                                      (inverse-inertia (/ %inertia))
-                                     (rotation (if angle-p (angle->vec angle)
-                                                   +initial-rotation+)))))
+                                     (rotation (angle->vec %angle)))))
   world ; world that this body is attached to, if any.
   actor ; Actor used for the COLLIDE "callback"
   %shapes ; shapes associated with this body.
