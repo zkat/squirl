@@ -113,17 +113,13 @@
                                              (poly-axis-normal (svref axes 0))
                                              (poly-axis-distance (svref axes 0)))))
         (unless (or (plusp poly-min)
-                    (not (loop
-                            for i from 0
-                            for axis across axes
-                            for distance = (segment-value-on-axis segment
-                                                                  (poly-axis-normal axis)
-                                                                  (poly-axis-distance axis))
-                            when (> distance 0) return nil
-                            when (> distance poly-min)
-                            do (setf poly-min distance
-                                     min-i i)
-                            finally (return t))))
+                    (do-vector ((i axis) axes)
+                      (with-place (axis. poly-axis-) (normal distance) axis
+                       (let ((distance (segment-value-on-axis segment axis.normal axis.distance)))
+                         (when (> distance 0) (return t))
+                         (when (> distance poly-min)
+                           (setf poly-min distance
+                                 min-i i))))))
           (let* ((poly-normal (vec-neg (poly-axis-normal (svref axes min-i))))
                  (vertex-a (vec+ (segment-trans-a segment)
                                  (vec* poly-normal (segment-radius segment))))
