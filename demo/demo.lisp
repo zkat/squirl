@@ -10,26 +10,22 @@
   (let ((shape (make-segment static-body a1 b1 1.0)))
     (setf (shape-elasticity shape) 1.0)
     (setf (shape-friction shape) 1.0)
-    (setf (shape-layers shape) 1)
 
     (world-add-static-shape space shape)
 
     (setf shape (make-segment static-body a2 b2 1.0))
     (setf (shape-elasticity shape) 1.0)
     (setf (shape-friction shape) 1.0)
-    (setf (shape-layers shape) 1)
     (world-add-static-shape space shape)
 
     (setf shape ( make-segment static-body a3 b3 1.0))
     (setf (shape-elasticity shape) 1.0)
     (setf (shape-friction shape) 1.0)
-    (setf (shape-layers shape) 1)
     (world-add-static-shape space shape)
 
     (setf shape (make-segment static-body a4 b4 1.0))
     (setf (shape-elasticity shape) 1.0)
     (setf (shape-friction shape) 1.0)
-    (setf (shape-layers shape) 1)
     (world-add-static-shape space shape)))
 
 (defun init-world ()
