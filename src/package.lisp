@@ -65,6 +65,34 @@
    :resize-world-active-hash
    :world-step
 
+   ;; constraints
+   :breakable-joint
+   :make-breakable-joint
+   :pivot-joint
+   :make-pivot-joint
+   :damped-rotary-spring
+   :make-damped-rotary-spring
+   :damped-spring
+   :make-damped-spring
+   :gear-joint
+   :make-gear-joint
+   :groove-joint
+   :make-groove-joint
+   :pin-joint
+   :make-pin-join
+   :pivot-joint
+   :make-pivot-joint
+   :ratchet-joint
+   :make-ratchet-joint
+   :rotary-limit-joint
+   :make-rotary-limit-joint
+   :simple-motor
+   :make-simple-motor
+   :slide-joint
+   :make-slide-joint
+   :spring
+   :make-spring
+
    ;; callbacks
    :collide
    ))
