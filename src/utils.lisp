@@ -67,6 +67,17 @@ single symbol, which will be used for both the variable and the class name."
          (print-unreadable-object (,object ,stream :type ,type :identity ,identity)
            (let ((*standard-output* ,stream)) ,@body))))))
 
+(defmacro do-vector ((var vector-form &optional result) &body body)
+  "See `dolist'. If VAR is a list of the form (INDEX VAR), then INDEX is used
+as the index vector. Note that this macro doesn't handle declarations properly."
+  (let ((var-name (if (listp var) (cadr var) var))
+        (idx-name (if (listp var) (car var) (gensym "INDEX"))))
+    (with-gensyms (vector)
+      `(let ((,vector ,vector-form) ,var-name)
+         (declare (ignorable ,var-name))
+         (dotimes (,idx-name (length ,vector) ,result)
+           (let ((,var-name (aref ,vector ,idx-name))) ,@body))))))
+
 (defun maybe/ (a b)
   (if (zerop b) 0 (/ a b)))
 
