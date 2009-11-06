@@ -56,14 +56,20 @@
 ;; This means the physics -should- run at the same perceived speed no matter
 ;; how fast your computer's calculating :)
 (defreply update ((demo =squirl-demo=) dt &key)
-  ;; update the physics world
+  (update-world demo)
+  (empty-out-bottomless-pit (world demo)))
+
+(defun update-world-state (demo)
   (incf (accumulator demo) (if (> dt 0.5) 0.5 dt))
   (loop while (>= (accumulator demo) (physics-timestep demo))
      do (world-step (world demo) (physics-timestep demo))
-       (decf (accumulator demo) (physics-timestep demo)))
-  ;; remove bodies that are long gone
-  (map nil (lambda (c) (world-remove-body (world demo) c))
-       (remove-if (lambda (c) (> (vec-y (body-position c)) -100)) (world-bodies (world demo)))))
+     (decf (accumulator demo) (physics-timestep demo))))
+
+(defun empty-out-bottomless-pit (world)
+  "Get rid of any bodies that have fallen into the bottomless pit."
+  (map nil (lambda (c) (world-remove-body world c))
+       (remove-if (lambda (c) (> (vec-y (body-position c)) -100))
+                  (world-bodies world))))
 
 (defun add-circle (demo x y)
   (let* ((mass 1)
