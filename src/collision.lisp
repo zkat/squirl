@@ -151,13 +151,10 @@
             (decf poly-min +collision-slop+)
             (when (or (>= min-norm poly-min)
                       (>= min-neg poly-min))
-              (if (> min-norm min-neg)
-                  (setf contacts
-                        (append contacts
-                                (find-points-behind-segment segment poly min-norm 1)))
-                  (setf contacts
-                        (append contacts
-                                (find-points-behind-segment segment poly min-neg -1)))))
+              (push (if (> min-norm min-neg)
+                        (find-points-behind-segment segment poly min-norm 1)
+                        (find-points-behind-segment segment poly min-neg -1))
+                    contacts))
             ;; If no other collision points were found, try colliding endpoints.
             (unless contacts
               (loop
@@ -174,7 +171,7 @@
                                      vert-b vert-b)
                  for collision = (circle-to-circle-query point vertex
                                                          (segment-radius segment) 0)
-                 when collision return (push collision contacts)))))))))
+                 when collision return (list collision)))))))))
 
 (defun circle-to-poly (circle poly)
   (let* ((axes (poly-transformed-axes poly))
@@ -207,20 +204,20 @@
            (circle-to-circle-query (circle-transformed-center circle)
                                    b (circle-radius circle) 0))
           ((< dt dta)
-           (list (make-contact (vec- (circle-transformed-center circle)
-                                     (vec* normal
-                                           (+ (circle-radius circle)
-                                              (/ min 2))))
-                               (vec-neg normal) min 0)))
+           (make-contact (vec- (circle-transformed-center circle)
+                               (vec* normal
+                                     (+ (circle-radius circle)
+                                        (/ min 2))))
+                         (vec-neg normal) min 0))
           (t (circle-to-circle-query (circle-transformed-center circle)
                                      a (circle-radius circle) 0)))))))
 (defun poly-to-poly (poly1 poly2)
   (multiple-value-bind (msa1 min1) (find-min-separating-axis poly2 poly1)
     (multiple-value-bind (msa2 min2) (find-min-separating-axis poly1 poly2)
-      (cond ((not (and msa1 msa2)) nil)
-            ((> min1 min2)
-             (find-vertices poly1 poly2 (poly-axis-normal msa1) min1))
-            (t (find-vertices poly1 poly2 (vec-neg (poly-axis-normal msa2)) min2))))))
+      (when (and msa1 msa2)
+        (if (> min1 min2)
+            (find-vertices poly1 poly2 (poly-axis-normal msa1) min1)
+            (find-vertices poly1 poly2 (vec-neg (poly-axis-normal msa2)) min2))))))
 
 ;;;
 ;;; Generic function
@@ -228,23 +225,24 @@
 (defgeneric collide-shapes (a b)
   (:documentation "Collide shapes A and B together!")
   ;; Note that we don't handle segment-to-segment (yet?)
+  ;; This method always returns a list.
   (:method ((shape-1 circle) (shape-2 circle))
-    (circle-to-circle-query (circle-transformed-center shape-1)
-                            (circle-transformed-center shape-2)
-                            (circle-radius shape-1)
-                            (circle-radius shape-2)))
+    (ensure-list (circle-to-circle-query (circle-transformed-center shape-1)
+                                         (circle-transformed-center shape-2)
+                                         (circle-radius shape-1)
+                                         (circle-radius shape-2))))
   (:method ((segment segment) (circle circle))
-    (circle-to-segment circle segment))
+    (ensure-list (circle-to-segment circle segment)))
   (:method ((circle circle) (segment segment))
-    (circle-to-segment circle segment))
+    (ensure-list (circle-to-segment circle segment)))
   (:method ((segment segment) (poly poly))
     (segment-to-poly segment poly))
   (:method ((poly poly) (segment segment))
     (segment-to-poly segment poly))
   (:method ((circle circle) (poly poly))
-    (circle-to-poly circle poly))
+    (ensure-list (circle-to-poly circle poly)))
   (:method ((poly poly) (circle circle))
-    (circle-to-poly circle poly))
+    (ensure-list (circle-to-poly circle poly)))
   (:method ((poly1 poly) (poly2 poly))
     (poly-to-poly poly1 poly2)))
 
