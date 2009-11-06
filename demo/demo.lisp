@@ -4,7 +4,7 @@
 
 (defparameter *world-x-offset* 0)
 (defparameter *world-y-offset* 0)
-(defparameter *body-radius* 2) ;;for visualisation
+(defparameter *body-radius* 1) ;;for visualisation
 
 (defun world-box (a1 b1 a2 b2 a3 b3 a4 b4 space static-body)
   (let ((shape (make-segment static-body a1 b1 1.0)))
@@ -47,7 +47,7 @@
 
 (defun update (ticks world)
   (let* ((steps 3)
-	(dt (/ 1.0 60.0 steps)))
+         (dt (/ 1.0 60.0 steps)))
     (dotimes (count steps)
       (world-step world dt))))
 
@@ -133,19 +133,25 @@
 
 (defun quick-and-dirty ()
   (sdl:with-init ()
-    (sdl:window 800 600 :title-caption "SQIRL PHYSICS" :icon-caption "SQUIRL-DEMO")
+    (sdl:window 800 600 :title-caption "SqirL SDL Demo" :icon-caption "SquirL")
     (setf *world-x-offset* (/ 800 2))
     (setf *world-y-offset* (/ 600 2))
-    (let ((world (init-world)))
+    (let ((world (init-world))
+          (previous-tick (sdl:sdl-get-ticks)))
       (add-box world)
       (sdl:with-events ()
-	(:idle () (update (sdl:sdl-get-ticks) world)  (render world))
+	(:idle ()
+          (let ((now (sdl:sdl-get-ticks)))
+            (update (- now previous-tick) world)
+            (setf previous-tick now))
+          (render world))
 	(:quit-event () t)
-	(:video-expose-event () (sdl:update-display))
+	(:video-expose-event ()
+          (sdl:update-display))
 	(:key-down-event ()
-			 (when (sdl:key-down-p :sdl-key-escape)
-			   (sdl:push-quit-event))
-			 (when (sdl:key-down-p :sdl-key-b)
-			   (add-box world))
-			 (when (sdl:key-down-p :sdl-key-c)
-			   (add-circle world)))))))
+          (when (sdl:key-down-p :sdl-key-escape)
+            (sdl:push-quit-event))
+          (when (sdl:key-down-p :sdl-key-b)
+            (add-box world))
+          (when (sdl:key-down-p :sdl-key-c)
+            (add-circle world)))))))
