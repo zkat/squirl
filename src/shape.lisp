@@ -19,6 +19,14 @@
   ;; Unique ID, used internally for hashing
   (id (prog1 *shape-id-counter* (incf *shape-id-counter*))))
 
+(defgeneric print-shape (shape) (:method-combination progn))
+
+(define-print-object ((shape shape))
+  (print-shape shape))
+
+(defmethod print-shape progn ((shape shape))
+  (format t "Body: ~a" (shape-body shape)))
+
 (defun shared-shape-init (shape)
   (pushnew shape (body-shapes (shape-body shape)))
   (shape-cache-bbox shape)
@@ -54,6 +62,10 @@
   radius
   ;; Center, in body-relative and world coordinates
   center transformed-center)
+
+(defmethod print-shape progn ((circle circle))
+  (format t "Center: ~a; Radius: ~a"
+          (circle-center circle) (circle-radius circle)))
 
 (defun make-circle (body radius &optional (offset +zero-vector+))
   (shared-shape-init (%make-circle body radius offset)))
@@ -103,6 +115,11 @@
   a b normal
   ;; World-relative endpoints & normal
   trans-a trans-b trans-normal)
+
+(defmethod print-shape progn ((segment segment))
+  (format t "Point A: ~a; Point B: ~a; Radius: ~a"
+          (segment-a segment) (segment-b segment)
+          (segment-radius segment)))
 
 (defun make-segment (body a b radius)
   (shared-shape-init (%make-segment body a b radius)))
