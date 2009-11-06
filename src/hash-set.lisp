@@ -20,7 +20,7 @@
                                                      :initial-element nil)))))
   (count 0) test (default-value nil) table)
 
-(define-print-object ((hash-set hash-set))
+(define-print-object (hash-set)
   (format t "Count: ~D" (hash-set-count hash-set)))
 
 (defun hash-set-size (set)

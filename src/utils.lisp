@@ -51,11 +51,21 @@ the result of calling DELETE with PREDICATE, place, and the REMOVE-KEYWORDS.")
   `(defconstant ,name (if (boundp ',name) (symbol-value ',name) ,value)
      ,@(when doc (list doc))))
 
-(defmacro define-print-object (((object class) &key (identity t) (type t)) &body body)
-  (with-gensyms (stream)
-    `(defmethod print-object ((,object ,class) ,stream)
-      (print-unreadable-object (,object ,stream :type ,type :identity ,identity)
-        (let ((*standard-output* ,stream)) ,@body)))))
+(defmacro define-print-object ((class &key (identity t) (type t)) &body body)
+  "Defines a `print-object' method on class CLASS, using the standard macro
+`print-unreadable-object'. The IDENTITY and TYPE keyword arguments are passed
+through to `print-unreadable-object', although they default to T if not supplied.
+
+CLASS can be a list of the form (VARIABLE CLASS-NAME), in which case
+the `print-object' method will be specialized on class CLASS-NAME and VARIABLE
+will be used as the parameter name. Alternatively, as shorthand, CLASS can be a
+single symbol, which will be used for both the variable and the class name."
+  (let ((object (if (listp class) (car class) class))
+        (class-name (if (listp class) (cadr class) class)))
+    (with-gensyms (stream)
+      `(defmethod print-object ((,object ,class-name) ,stream)
+         (print-unreadable-object (,object ,stream :type ,type :identity ,identity)
+           (let ((*standard-output* ,stream)) ,@body))))))
 
 (defun maybe/ (a b)
   (if (zerop b) 0 (/ a b)))
