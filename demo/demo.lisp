@@ -1,5 +1,5 @@
 (defpackage #:squirl-demo-2
-  (:use :cl :uid :squirl :sheeple))
+  (:use :cl :squirl))
 (in-package :squirl-demo-2)
 
 (defparameter *world-x-offset* 0)
@@ -152,5 +152,4 @@
 			 (when (sdl:key-down-p :sdl-key-b)
 			   (add-box world))
 			 (when (sdl:key-down-p :sdl-key-c)
-			   (add-circle world))))
-      (sdl:quit-sdl :force t))))
+			   (add-circle world)))))))
