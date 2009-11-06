@@ -7,7 +7,7 @@
 
 (defstruct (body
              (:constructor
-              %make-body (%mass %inertia position velocity force actor angle
+              %make-body (%mass %inertia position velocity force actor %angle
                                 &aux (inverse-mass (/ %mass)) (inverse-inertia (/ %inertia)))))
   world ; world that this body is attached to, if any.
   actor ; Actor used for the COLLIDE "callback"
