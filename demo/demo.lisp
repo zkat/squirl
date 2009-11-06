@@ -1,4 +1,6 @@
-(in-package squirl)
+(defpackage #:squirl-demo-2
+  (:use :cl :uid :squirl :sheeple))
+(in-package :squirl-demo-2)
 
 (defparameter *world-x-offset* 0)
 (defparameter *world-y-offset* 0)
