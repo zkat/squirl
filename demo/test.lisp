@@ -27,7 +27,7 @@
 (defreply init ((demo =squirl-demo=))
   (setf (world demo) (make-world :gravity (vec 0 -100)))
   (let ((body (make-body))
-        (floor (make-segment (vec 0 10) (vec 500 10))))
+        (floor (make-segment (vec 0 10) (vec 500 10) :elasticity 1 :friction 0.001)))
     (attach-shape floor body)
     (world-add-body (world demo) body)))
 
@@ -76,7 +76,7 @@
          (radius 15)
          (inertia (moment-for-circle mass 0 radius (vec 0 0)))
          (body (make-body :mass mass :inertia inertia :position (vec x y))))
-    (attach-shape (make-circle radius) body)
+    (attach-shape (make-circle radius :elasticity 0.5 :friction 0.01) body)
     (world-add-body (world demo) body)))
 
 (defreply mouse-down ((engine =squirl-demo=) button)
