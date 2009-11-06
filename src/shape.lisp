@@ -34,6 +34,7 @@
 
 (defun attach-shape (shape body)
   "Attaches SHAPE to BODY. All shapes must be attached to a body before they're used."
+  (setf (shape-body shape) body)
   (pushnew shape (body-%shapes (shape-body shape)))
   (shape-cache-bbox shape)
   (when (body-world body)
@@ -43,6 +44,7 @@
 (defun detach-shape (shape body)
   "Detaches SHAPE from BODY. If BODY is already attached to a world, the shape is removed from there."
   (setf (body-%shapes body) (delete shape (body-%shapes body)))
+  (setf (shape-body shape) nil)
   (when (body-world body)
     (world-remove-shape (body-world body) shape))
   shape)

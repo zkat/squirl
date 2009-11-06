@@ -21,6 +21,7 @@
    :make-body
    :body-position
    :body-velocity
+   :body-shapes
 
    ;; Shapes
    :reset-shape-id-counter
