@@ -9,7 +9,8 @@
    (world nil)
    (accumulator 0)
    (physics-timestep 1/100)
-   (shape-dimension 30)))
+   (shape-dimension 30)
+   (shape-dimension-increment 10)))
 
 (defun draw-a-circle (circle)
   (let* ((position (body-position circle))
@@ -115,4 +116,11 @@
 (defreply mouse-down ((engine =squirl-demo=) button)
   (case button
     (0 (add-circle engine (mouse-x engine) (mouse-y engine)))
-    (1 (add-poly engine (mouse-x engine) (mouse-y engine)))))
+    (1 (add-poly engine (mouse-x engine) (mouse-y engine)))
+    (3 (incf (shape-dimension engine) (shape-dimension-increment engine)))
+    (4 (decf (shape-dimension engine) (shape-dimension-increment engine)))))
+
+(defreply key-down ((engine =squirl-demo=) key)
+  (case key
+    (#\] (incf (shape-dimension engine) (shape-dimension-increment engine)))
+    (#\[ (decf (shape-dimension engine) (shape-dimension-increment engine)))))
