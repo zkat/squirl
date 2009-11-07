@@ -126,13 +126,13 @@
                                  (vec* poly-normal (segment-radius segment))))
                  (vertex-b (vec+ (segment-trans-b segment)
                                  (vec* poly-normal (segment-radius segment)))))
-            (loop
-               for i from 0
-               for vertex in (list vertex-a vertex-b)
-               when (poly-contains-vertex-p poly vertex)
-               do (push (make-contact vertex-a poly-normal poly-min
-                                      (hash-pair (shape-id segment) i))
-                        contacts))
+            (macrolet ((try-vertex (vertex i)
+                         `(when (poly-contains-vertex-p poly ,vertex)
+                            (push (make-contact ,v poly-normal poly-min
+                                                (hash-pair (shape-id segment) ,i))
+                                  contacts))))
+              (try-vertex vertex-a 0)
+              (try-vertex vertex-b 1))
             ;; "Floating point precision problems here.
             ;;  This will have to do for now."
             (decf poly-min +collision-slop+)
