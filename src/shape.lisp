@@ -1,11 +1,6 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
-(defparameter *shape-id-counter* 0)
-
-(defun reset-shape-id-counter ()
-  (setf *shape-id-counter* 0))
-
 ;;;
 ;;; Shape
 ;;;
@@ -17,7 +12,7 @@
   (friction 0)                          ; Coefficient of friction.
   (surface-velocity +zero-vector+)      ; Surface velocity used when solving for friction
   ;; Unique ID, used internally for hashing
-  (id (prog1 *shape-id-counter* (incf *shape-id-counter*))))
+  id)
 
 (defgeneric print-shape (shape)
   (:method-combination progn :most-specific-last))
