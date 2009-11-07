@@ -191,7 +191,7 @@
              (unless (collision-impossible-p shape1 shape2)
                (let ((contacts (ensure-list (collide-shapes shape1 shape2))))
                  (when contacts
-                   (let* ((hash (hash-pair (shape-id shape1) (shape-id shape2)))
+                   (let* ((hash (hash (shape-id shape1) (shape-id shape2) (hash-set-size (world-contact-set world))))
                           (arbiter (hash-set-find-if (fun (arbiter-has-shapes-p _ shape1 shape2))
                                                      (world-contact-set world) hash)))
                      (when arbiter (return-from detector (arbiter-inject arbiter contacts)))
