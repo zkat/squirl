@@ -19,12 +19,15 @@
    ;; Bodies
    :body
    :make-body
+   :body-rotation
+   :body-angle
    :body-position
    :body-velocity
    :body-shapes
 
    ;; Shapes
    :reset-shape-id-counter
+   :shape-body
    :shape-elasticity
    :shape-friction
    :shape-layers
