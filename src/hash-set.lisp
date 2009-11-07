@@ -6,8 +6,12 @@
 (define-constant +primes+
   (loop for x upfrom 2
      and offset in (list 1 3 1 5 3 3 1 9 7 5 3 17 27 3 1 29
-                         3 21 7 17 15 9 43 35 15 29 3 11 3)
+                         3 21 7 17 15 9 43 35 15 29 3 -3)
      collect (+ (expt 2 x) offset)))
+
+(define-constant +last-prime+ (car (last +primes+))
+  "A large prime, (- (expt 2 29) 3), which should fit within a fixnum on
+any Lisp worth using for a physics sim.")
 
 (defun next-prime (n)
   (loop for prime in +primes+ when (>= prime n) return prime
