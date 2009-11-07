@@ -178,7 +178,7 @@
 (defun world-step (world dt &aux (dt-inv (/ dt))) ; This is our assertion
   (with-place (|| world-) (bodies constraints static-shapes active-shapes arbiters) world
     ;; Flush outdated arbiters
-    (hash-set-delete-if (fun (> (- (arbiter-stamp _) (world-stamp world)) *contact-persistence*))
+    (hash-set-delete-if (fun (> (- (world-stamp world) (arbiter-stamp _)) *contact-persistence*))
                         (world-contact-set world))
     (setf (fill-pointer arbiters) 0)
     ;; Integrate positions
