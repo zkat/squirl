@@ -58,15 +58,16 @@
           (t nil))))))
 
 ;;; This function has VERY HAIRY control flow. Frob with EXTREME caution.
-(defun find-min-separating-axis (poly1 poly2 &aux msa min-distance)
+(defun find-min-separating-axis (poly1 poly2 &aux msa)
   (loop
      for axis across (poly-transformed-axes poly2)
      for distance = (poly-value-on-axis poly1 (poly-axis-normal axis) (poly-axis-distance axis))
+     minimizing distance into min-distance
      if (plusp distance)
      return nil
      else if (or (null min-distance) (> distance min-distance))
-     do (setf min-distance distance msa axis))
-  (values msa min-distance))
+     do (setf msa axis)
+     finally (return (values msa min-distance))))
 
 (defun find-vertices (poly1 poly2 normal distance &aux contacts)
   "Add contacts for penetrating vertices"
@@ -75,7 +76,8 @@
       (push (make-contact vertex normal distance (hash-pair (shape-id poly1) i)) contacts)))
   (do-vector ((i vertex) (poly-vertices poly2) contacts)
     (when (partial-poly-contains-vertex-p poly1 vertex (vec-neg normal))
-      (push (make-contact vertex normal distance (hash-pair (shape-id poly2) i)) contacts))))
+      (push (make-contact vertex normal distance (hash-pair (shape-id poly2) i)) contacts)))
+  contacts)
 
 (defun segment-value-on-axis (segment normal distance)
   (- (min (- (vec. normal (segment-trans-a segment)) (segment-radius segment))
@@ -101,6 +103,7 @@
 ;;; This is complicated. Not gross, but just complicated. It needs to be simpler
 ;;; and/or commented, preferably both.
 (defun segment-to-poly (segment poly &aux contacts)
+  ;; The problem here is that this isn't actually returning any contacts at all.
   (let* ((axes (poly-transformed-axes poly))
          (segD (vec. (segment-trans-normal segment)
                      (segment-trans-a segment)))
@@ -195,7 +198,10 @@
                          (vec-neg normal) min 0))
           (t (circle-to-circle-query (circle-transformed-center circle)
                                      a (circle-radius circle) 0)))))))
+
 (defun poly-to-poly (poly1 poly2)
+  ;; This is definitely returning contacts, and they look correct.
+  ;; The problem is elsewhere.
   (multiple-value-bind (msa1 min1) (find-min-separating-axis poly2 poly1)
     (multiple-value-bind (msa2 min2) (find-min-separating-axis poly1 poly2)
       (when (and msa1 msa2)
