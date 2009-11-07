@@ -128,7 +128,7 @@
                                  (vec* poly-normal (segment-radius segment)))))
             (macrolet ((try-vertex (vertex i)
                          `(when (poly-contains-vertex-p poly ,vertex)
-                            (push (make-contact ,v poly-normal poly-min
+                            (push (make-contact ,vertex poly-normal poly-min
                                                 (hash-pair (shape-id segment) ,i))
                                   contacts))))
               (try-vertex vertex-a 0)
@@ -144,25 +144,22 @@
                                (find-points-behind-segment segment poly min-norm 1)
                                (find-points-behind-segment segment poly min-neg -1)))))
             ;; If no other collision points were found, try colliding endpoints.
-            (unless contacts
-              (loop
-                 with seg-t-a = (segment-trans-a segment)
-                 with seg-t-b = (segment-trans-b segment)
-                 with poly-t-v = (poly-transformed-vertices poly)
-                 with vert-a = (svref poly-t-v min-i)
-                 with vert-b = (svref poly-t-v
-                                      (rem (1+ min-i)
-                                           (length poly-t-v)))
-                 for point in (list seg-t-a seg-t-b
-                                    seg-t-a seg-t-b)
-                 for vertex in (list vert-a vert-a
-                                     vert-b vert-b)
-                 for collision = (circle-to-circle-query point vertex
-                                                         (segment-radius segment) 0)
-                 when collision do
-                   (push collision contacts)
-                   (return))))))))
-  contacts)
+            (if contacts contacts
+                (loop
+                   with seg-t-a = (segment-trans-a segment)
+                   with seg-t-b = (segment-trans-b segment)
+                   with poly-t-v = (poly-transformed-vertices poly)
+                   with vert-a = (svref poly-t-v min-i)
+                   with vert-b = (svref poly-t-v
+                                        (rem (1+ min-i)
+                                             (length poly-t-v)))
+                   for point in (list seg-t-a seg-t-b
+                                      seg-t-a seg-t-b)
+                   for vertex in (list vert-a vert-a
+                                       vert-b vert-b)
+                   for collision = (circle-to-circle-query point vertex
+                                                           (segment-radius segment) 0)
+                   when collision return (list collision)))))))))
 
 (defun circle-to-poly (circle poly)
   (let* ((axes (poly-transformed-axes poly))
