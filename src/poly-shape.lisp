@@ -85,6 +85,14 @@
              (> (vec. (poly-axis-normal axis) vertex)
                 (poly-axis-distance axis)))))
 
+(defmethod compute-shape-bbox ((poly poly))
+  (loop for vert across (poly-transformed-vertices poly)
+     minimize (vec-x vert) into minx
+     maximize (vec-x vert) into maxx
+     minimize (vec-y vert) into miny
+     maximize (vec-y vert) into maxy
+     finally (return (make-bbox minx miny maxx maxy))))
+
 (defun poly-transform-vertices (poly position rotation)
   (map-into (poly-transformed-vertices poly)
             (fun (vec+ position (vec-rotate _ rotation)))
@@ -96,20 +104,10 @@
              (make-poly-axis normal (+ (vec. position normal) (poly-axis-distance axis))))))
     (map-into (poly-transformed-axes poly) #'transformed-axis (poly-axes poly))))
 
-(defmethod shape-cache-data ((poly poly) position rotation)
-  (poly-transform-vertices poly position rotation)
-  (poly-transform-axes poly position rotation)
-  (let* ((verts (poly-transformed-vertices poly))
-         (left (vec-x (svref verts 0)))
-         (right (vec-x (svref verts 0)))
-         (top (vec-y (svref verts 0)))
-         (bottom (vec-y (svref verts 0))))
-    (loop for vert across verts
-       do (setf left (min left (vec-x vert))
-                right (max right (vec-x vert))
-                top (max top (vec-y vert))
-                bottom (min bottom (vec-y vert))))
-    (make-bbox left bottom right top)))
+(defmethod shape-cache-data ((poly poly))
+  (with-place (body. body-) (position rotation) (poly-body poly)
+    (poly-transform-vertices poly body.position body.rotation)
+    (poly-transform-axes poly body.position body.rotation)))
 
 (defmethod shape-point-query ((poly poly) point)
   (and (bbox-containts-vec-p (poly-bbox poly) point)

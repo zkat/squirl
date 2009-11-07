@@ -57,7 +57,7 @@
     (assert shape.body)
     (if (staticp (shape-body shape))
         (progn
-          (shape-cache-bbox shape)
+          (shape-cache-data shape)
           (world-hash-insert (world-static-shapes world) shape shape.id shape.bbox))
         (world-hash-insert (world-active-shapes world) shape shape.id shape.bbox))))
 
@@ -152,7 +152,7 @@
   (resize-world-hash (world-active-shapes world) dimension count))
 
 (defun rehash-world-static-data (world)
-  (map-world-hash #'shape-cache-bbox (world-static-shapes world))
+  (map-world-hash #'shape-cache-data (world-static-shapes world))
   (rehash-world-hash (world-static-shapes world)))
 
 ;;;
@@ -185,7 +185,7 @@
     (loop for body across bodies
        do (body-update-position body dt))
     ;; Pre-cache BBoxen
-    (map-world-hash #'shape-cache-bbox active-shapes)
+    (map-world-hash #'shape-cache-data active-shapes)
     ;; Collide!
     (flet ((detector (shape1 shape2)
              (unless (collision-impossible-p shape1 shape2)
