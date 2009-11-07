@@ -91,7 +91,9 @@
   (incf (accumulator demo) (if (> dt 0.5) 0.5 dt))
   (loop while (>= (accumulator demo) (physics-timestep demo))
      do (world-step (world demo) (physics-timestep demo))
-     (decf (accumulator demo) (physics-timestep demo))))
+     (decf (accumulator demo) (physics-timestep demo)))
+  (when (key-down-p #\s)
+    (add-circle demo 250 250)))
 
 (defun empty-out-bottomless-pit (world)
   "Get rid of any bodies that have fallen into the bottomless pit."
