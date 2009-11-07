@@ -100,7 +100,7 @@
                   (world-bodies world))))
 
 (defun add-circle (demo x y)
-  (let* ((mass 1)
+  (let* ((mass (shape-dimension demo))
          (radius (/ (shape-dimension demo) 2))
          (inertia (moment-for-circle mass 0 radius (vec 0 0)))
          (body (make-body :mass mass :inertia inertia :position (vec x y))))
@@ -108,7 +108,7 @@
     (world-add-body (world demo) body)))
 
 (defun add-poly (demo x y)
-  (let* ((mass 1)
+  (let* ((mass (shape-dimension demo))
          (size (/ (shape-dimension demo) 2))
          (verts (list (vec (- size) (- size))
                       (vec (- size) size)
