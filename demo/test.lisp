@@ -93,7 +93,7 @@
      do (world-step (world demo) (physics-timestep demo))
      (decf (accumulator demo) (physics-timestep demo)))
   (when (key-down-p #\s)
-    (add-circle demo 250 250)))
+    (add-circle demo (mouse-x demo) (mouse-y demo))))
 
 (defun empty-out-bottomless-pit (world)
   "Get rid of any bodies that have fallen into the bottomless pit."
