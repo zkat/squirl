@@ -195,7 +195,7 @@
                           (arbiter (hash-set-find-if (fun (arbiter-has-shapes-p _ shape1 shape2))
                                                      (world-contact-set world) hash)))
                      (when arbiter (return-from detector (arbiter-inject arbiter contacts)))
-                     (setf arbiter (make-arbiter contacts shape1 shape2 hash))
+                     (setf arbiter (make-arbiter contacts shape1 shape2 (world-stamp world)))
                      (vector-push-extend arbiter arbiters)
                      (hash-set-insert (world-contact-set world) hash arbiter)))))))
       (map-world-hash (fun (world-hash-query #'detector static-shapes _ (shape-bbox _))) active-shapes)
