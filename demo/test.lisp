@@ -136,3 +136,6 @@
            (decf (shape-dimension engine)
                  (shape-dimension-increment engine)))))
   (call-next-reply))
+
+(defun run-demo ()
+  (run =squirl-demo=))
