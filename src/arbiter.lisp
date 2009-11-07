@@ -103,10 +103,10 @@
             (contact-bias contact)
             (* (- +bias-coefficient+)
                dt-inverse
-               (min 0 (+ (contact-distance contact)
-                         +collision-slop+)))
+               (min 0.0d0 (+ (contact-distance contact)
+                             +collision-slop+)))
             (contact-j-bias contact)
-            0
+            0.0d0
             (contact-bounce contact)
             (* (shape-elasticity shape-a)
                (shape-elasticity shape-b)
