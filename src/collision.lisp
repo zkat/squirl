@@ -161,8 +161,7 @@
                                                          (segment-radius segment) 0)
                  when collision do
                    (push collision contacts)
-                   (return)))
-            )))))
+                   (return))))))))
   contacts)
 
 (defun circle-to-poly (circle poly)
