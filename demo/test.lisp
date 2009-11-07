@@ -129,4 +129,5 @@
 (defreply key-down ((engine =squirl-demo=) key)
   (case key
     (#\] (incf (shape-dimension engine) (shape-dimension-increment engine)))
-    (#\[ (decf (shape-dimension engine) (shape-dimension-increment engine)))))
+    (#\[ (decf (shape-dimension engine) (shape-dimension-increment engine))))
+  (call-next-reply))
