@@ -1,5 +1,6 @@
 (defpackage #:squirl-demo
-  (:use :cl :uid :squirl :sheeple))
+  (:use :cl :uid :squirl :sheeple)
+  (:export :run-demo))
 (in-package :squirl-demo)
 
 (defproto =squirl-demo= (=engine=)
