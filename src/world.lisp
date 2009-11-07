@@ -34,9 +34,7 @@
   (arbiters (make-adjustable-vector *initial-array-length*))
   (contact-set (make-hash-set 0 #'arbiter-shapes-equal)) ; Persistent contact set.
   ;; Constraints in the system.
-  (constraints (make-adjustable-vector *initial-array-length*))
-  ;; Tracks shape IDs to ensure uniqueness.
-  (last-shape-id 0))
+  (constraints (make-adjustable-vector *initial-array-length*)))
 
 (define-print-object (world)
   (format t "Iterations: ~a; Elastic iterations: ~a; Gravity: ~a; Body count: ~a"
@@ -56,7 +54,6 @@
 
 (defun world-add-shape (world shape)
   (with-place (shape. shape-) (id bbox body) shape
-    (setf shape.id (incf (world-last-shape-id world)))
     (assert shape.body)
     (if (staticp (shape-body shape))
         (progn
