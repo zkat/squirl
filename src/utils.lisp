@@ -91,11 +91,3 @@ as the index vector. Note that this macro doesn't handle declarations properly."
                       slots)
            ,form
          ,@body))))
-
-;;;
-;;; Hashing
-;;;
-
-(defun hash-pair (x y &aux (pair (cons x y)))
-  (declare (dynamic-extent pair))
-  (sxhash pair))

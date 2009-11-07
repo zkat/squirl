@@ -13,6 +13,14 @@
   "A large prime, (- (expt 2 29) 3), which should fit within a fixnum on
 any Lisp worth using for a physics sim.")
 
+;;; I'm just sticking this bit here for now. Move it if you find a better place.
+(define-constant +chipmunk-hash-constant+ 3344921057)
+
+(defun hash-pair (x y)
+  (expt-mod (* x +chipmunk-hash-constant+)
+            (* y +chipmunk-hash-constant+)
+            +last-prime+))
+
 (defun next-prime (n)
   (loop for prime in +primes+ when (>= prime n) return prime
      finally (error "Time to switch to native hashtables!")))
