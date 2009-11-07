@@ -159,7 +159,11 @@
                                      vert-b vert-b)
                  for collision = (circle-to-circle-query point vertex
                                                          (segment-radius segment) 0)
-                 when collision return (list collision)))))))))
+                 when collision do
+                   (push collision contacts)
+                   (return)))
+            )))))
+  contacts)
 
 (defun circle-to-poly (circle poly)
   (let* ((axes (poly-transformed-axes poly))
