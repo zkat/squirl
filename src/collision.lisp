@@ -145,21 +145,17 @@
                                (find-points-behind-segment segment poly min-neg -1)))))
             ;; If no other collision points were found, try colliding endpoints.
             (if contacts contacts
-                (loop
-                   with seg-t-a = (segment-trans-a segment)
-                   with seg-t-b = (segment-trans-b segment)
-                   with poly-t-v = (poly-transformed-vertices poly)
-                   with vert-a = (svref poly-t-v min-i)
-                   with vert-b = (svref poly-t-v
-                                        (rem (1+ min-i)
-                                             (length poly-t-v)))
-                   for point in (list seg-t-a seg-t-b
-                                      seg-t-a seg-t-b)
-                   for vertex in (list vert-a vert-a
-                                       vert-b vert-b)
-                   for collision = (circle-to-circle-query point vertex
-                                                           (segment-radius segment) 0)
-                   when collision return (list collision)))))))))
+                (macrolet ((try-endpoints (point vertex)
+                             `(let ((collision (circle-to-circle-query ,point ,vertex
+                                                                       (segment-radius segment) 0)))
+                                (when collision (return-from segment-to-poly (list collision))))))
+                  (let ((vert-a (svref (poly-transformed-vertices poly) min-i))
+                        (vert-b (svref (poly-transformed-vertices poly)
+                                       (rem (1+ min-i) (length (poly-transformed-vertices poly))))))
+                    (try-endpoints (segment-trans-a segment) vert-a)
+                    (try-endpoints (segment-trans-b segment) vert-a)
+                    (try-endpoints (segment-trans-a segment) vert-b)
+                    (try-endpoints (segment-trans-b segment) vert-b))))))))))
 
 (defun circle-to-poly (circle poly)
   (let* ((axes (poly-transformed-axes poly))
