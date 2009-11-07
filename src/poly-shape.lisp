@@ -68,7 +68,7 @@
 
 (defun poly-value-on-axis (poly normal distance)
   "Returns the minimum distance of the polygon to the axis."
-  (- (loop for vertex across (poly-vertices poly)
+  (- (loop for vertex across (poly-transformed-vertices poly)
         minimizing (vec. normal vertex))
      distance))
 
