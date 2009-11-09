@@ -148,17 +148,17 @@
                                (find-points-behind-segment segment poly min-neg -1)))))
             ;; If no other collision points were found, try colliding endpoints.
             (if contacts contacts
-                (macrolet ((try-endpoints (point vertex)
-                             `(let ((collision (circle-to-circle-query ,point ,vertex
-                                                                       (segment-radius segment) 0)))
-                                (when collision (return-from segment-to-poly (list collision))))))
+                (flet ((try-endpoint (point vertex)
+                         (let ((collision (circle-to-circle-query
+                                           point vertex (segment-radius segment) 0)))
+                           (when collision (return-from segment-to-poly (list collision))))))
                   (let ((vert-a (svref (poly-transformed-vertices poly) min-i))
                         (vert-b (svref (poly-transformed-vertices poly)
                                        (rem (1+ min-i) (length (poly-transformed-vertices poly))))))
-                    (try-endpoints (segment-trans-a segment) vert-a)
-                    (try-endpoints (segment-trans-b segment) vert-a)
-                    (try-endpoints (segment-trans-a segment) vert-b)
-                    (try-endpoints (segment-trans-b segment) vert-b))))))))))
+                    (try-endpoint (segment-trans-a segment) vert-a)
+                    (try-endpoint (segment-trans-b segment) vert-a)
+                    (try-endpoint (segment-trans-a segment) vert-b)
+                    (try-endpoint (segment-trans-b segment) vert-b))))))))))
 
 (defun circle-to-poly (circle poly)
   (let* ((axes (poly-transformed-axes poly))
