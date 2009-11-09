@@ -58,8 +58,8 @@
           (t nil))))))
 
 ;;; This function has VERY HAIRY control flow. Frob with EXTREME caution.
-(defun find-min-separating-axis (poly1 poly2 &aux msa)
-  (loop
+(defun find-min-separating-axis (poly1 poly2)
+  (loop with msa
      for axis across (poly-transformed-axes poly2)
      for distance = (poly-value-on-axis poly1 (poly-axis-normal axis) (poly-axis-distance axis))
      minimizing distance into min-distance
