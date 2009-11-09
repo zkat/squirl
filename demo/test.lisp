@@ -27,7 +27,7 @@
      (map nil #'draw-shape (body-shapes body)))
     (draw-circle (make-point x y) 2 :resolution 30 :color *red*)))
 
-(defreply init ((demo =squirl-demo=))
+(defreply init :after ((demo =squirl-demo=))
   (setf (world demo) (make-world :gravity (vec 0 -100)))
   (let ((body (make-body :position (vec 250 60)))
         (floor (make-segment (vec -200 0) (vec 200 0) :elasticity 1 :friction 1))
