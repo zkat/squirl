@@ -67,8 +67,14 @@
     (world-hash-insert (world-active-shapes world) shape shape.id shape.bbox)))
 
 (defun world-add-body (world body)
-  (vector-push-extend body (world-bodies world))
-  (map nil (fun (world-add-shape world _)) (body-shapes body))
+  ;; FLET or MACROLET this up please
+  (cond ((staticp body)
+         (vector-push-extend body (world-static-bodies world))
+         (dolist (shape (body-shapes body))
+           (world-add-static-shape world shape)))
+        (t (vector-push-extend body (world-active-bodies world))
+           (dolist (shape (body-shapes body))
+             (world-add-active-shape world shape))))
   body)
 
 (defun world-add-constraint (world constraint)
@@ -89,7 +95,9 @@
 
 (defun world-remove-body (world body)
   (map nil (fun (world-remove-shape world _))  (body-shapes body))
-  (deletef (world-bodies world) body))
+  (if (staticp body) ; Needs more macrolet
+      (deletef (world-static-bodies world) body)
+      (deletef (world-active-bodies world) body)))
 
 (defun world-remove-constraint (world constraint)
   (deletef (world-constraints world) constraint))
@@ -178,6 +186,7 @@
 ;;;
 ;;; All-Important WORLD-STEP Function
 ;;;
+
 (defun flush-arbiters (world)
   "Flush outdated arbiters."
   (with-place (|| world-) (timestamp contact-set arbiters) world
