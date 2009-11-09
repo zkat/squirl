@@ -198,12 +198,15 @@
       (world-hash-query-rehash #'detector active-shapes))))
 
 (defun prestep-world (world dt dt-inv)
-  (with-place (|| world-) (arbiters constraints elastic-iterations) world
+  (with-place (|| world-) (arbiters constraints) world
     ;; Prestep the arbiters
     (map nil (fun (arbiter-prestep _ dt-inv)) arbiters)
     ;; Prestep the constraints
-    (map nil (fun (pre-step _ dt dt-inv)) constraints)
-    (loop repeat (world-elastic-iterations world) do
+    (map nil (fun (pre-step _ dt dt-inv)) constraints)))
+
+(defun apply-elastic-impulses (world)
+  (with-place (|| world-) (arbiters constraints elastic-iterations) world
+    (loop repeat elastic-iterations do
          (map nil (fun (arbiter-apply-impulse _ 1.0)) arbiters)
          (map nil #'apply-impulse constraints))))
 
@@ -228,6 +231,7 @@
     (collide! world)
     (filter-world-arbiters world)
     (prestep-world world dt dt-inv)
+    (apply-elastic-impulses world)
     (integrate-velocities world dt)
     (solve-impulses world)
     (incf (world-stamp world))))
