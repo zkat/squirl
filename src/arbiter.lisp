@@ -116,8 +116,9 @@
                                          (contact-normal contact)))))))
 
 (defun arbiter-apply-cached-impulse (arbiter)
-  (let ((shape-a (arbiter-shape-a arbiter))
-        (shape-b (arbiter-shape-b arbiter)))
+  (with-accessors ((shape-a arbiter-shape-a)
+                   (shape-b arbiter-shape-b))
+      arbiter
     (setf (arbiter-u arbiter) (* (shape-friction shape-a)
                                  (shape-friction shape-b))
           (arbiter-target-v arbiter) (vec- (shape-surface-velocity shape-b)
