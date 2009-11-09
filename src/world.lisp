@@ -182,6 +182,7 @@
 
 (defun collide! (world)
   (with-place (|| world-) (contact-set active-shapes static-shapes stamp arbiters) world
+    (map-world-hash #'shape-cache-data active-shapes) ; Pre-cache BBoxen
     (flet ((detector (shape1 shape2)
              (unless (collision-impossible-p shape1 shape2)
                (let ((contacts (ensure-list (collide-shapes shape1 shape2))))
@@ -227,7 +228,6 @@
   (with-place (|| world-) (bodies active-shapes) world
     (flush-arbiters world)
     (map nil (fun (body-update-position _ dt)) bodies) ; Integrate positions
-    (map-world-hash #'shape-cache-data active-shapes) ; Pre-cache BBoxen
     (collide! world)
     (filter-world-arbiters world)
     (prestep-world world dt dt-inv)
