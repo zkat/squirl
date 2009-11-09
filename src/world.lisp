@@ -190,7 +190,9 @@
                  (let* ((hash (hash-pair (shape-id shape1) (shape-id shape2)))
                         (arbiter (hash-set-find-if (fun (arbiter-has-shapes-p _ shape1 shape2))
                                                    contact-set hash)))
-                   (if arbiter (arbiter-inject arbiter it)
+                   ;; Feel free to restructure. Just hacking shit together.
+                   (if arbiter
+                       (setf (arbiter-stamp (arbiter-inject arbiter it)) timestamp)
                        (progn
                          (setf arbiter (make-arbiter it shape1 shape2 timestamp))
                          (vector-push-extend arbiter arbiters)
