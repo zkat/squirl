@@ -121,9 +121,18 @@
   (world-point-query (fun (return-from world-point-query-first _))
                      world point))
 
-;;; Why is this here? Shouldn't it be in another section?
+;;;
+;;; Body Convenience Functions
+;;;
+
 (defun map-world (function world)
-  (map nil function (world-bodies world)))
+  "Calls FUNCTION on each body in WORLD"
+  (map nil function (world-static-bodies world))
+  (map nil function (world-active-bodies world)))
+
+(defun world-bodies (world)
+  (with-place (|| world-) (active-bodies static-bodies) world
+   (concatenate 'vector static-bodies active-bodies)))
 
 ;;;
 ;;; Segment Query Functions
