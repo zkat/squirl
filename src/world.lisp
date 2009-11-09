@@ -180,10 +180,11 @@
                         contact-set)
     (setf (fill-pointer arbiters) 0)))
 
-(defun collide! (world)
+(defun resolve-collisions (world)
+  "Resolves collisions between objects in WORLD."
   (with-place (|| world-) (contact-set active-shapes static-shapes stamp arbiters) world
     (map-world-hash #'shape-cache-data active-shapes) ; Pre-cache BBoxen
-    (flet ((detector (shape1 shape2)
+    (flet ((arbitrate (shape1 shape2)
              (unless (collision-impossible-p shape1 shape2)
                (let ((contacts (ensure-list (collide-shapes shape1 shape2))))
                  (when (ensure-list (collide-shapes shape1 shape2))
@@ -194,9 +195,13 @@
                          (progn
                            (setf arbiter (make-arbiter contacts shape1 shape2 stamp))
                            (vector-push-extend arbiter arbiters)
-                           (hash-set-insert (world-contact-set world) hash arbiter)))))))))
-      (map-world-hash (fun (world-hash-query #'detector static-shapes _ (shape-bbox _))) active-shapes)
-      (world-hash-query-rehash #'detector active-shapes))))
+                           (hash-set-insert contact-set hash arbiter)))))))))
+      ;; Detect collisions between active and static shapes.
+      (map-world-hash (fun (world-hash-query #'arbitrate static-shapes _ (shape-bbox _)))
+                      active-shapes)
+      ;; This seems to be detecting collisions between active shapes.
+      (world-hash-query-rehash #'arbitrate active-shapes)))
+  (filter-world-arbiters world))
 
 (defun prestep-world (world dt dt-inv)
   (with-place (|| world-) (arbiters constraints) world
@@ -213,23 +218,25 @@
 
 (defun integrate-velocities (world dt &aux (damping (expt (world-damping world) dt)))
   (with-place (|| world-) (bodies arbiters gravity) world
-    (map nil (fun (unless (staticp _) (body-update-velocity _ (world-gravity world) damping dt)))
-         bodies)
+    ;; Apply gravity forces.
+    (map nil (fun (unless (staticp _) (body-update-velocity _ gravity damping dt))) bodies)
+    ;; Apply cached arbiter impulses.
     (map nil #'arbiter-apply-cached-impulse arbiters)))
 
-(defun solve-impulses (world &aux (elastic-coef (if (zerop (world-elastic-iterations world)) 1.0 0.0)))
+(defun solve-impulses (world)
   "Run the impulse solver, using the old-style elastic solver if elastic iterations are disabled"
-  (with-place (|| world-) (iterations arbiters constraints) world
-    (loop repeat iterations do
-         (map nil (fun (arbiter-apply-impulse _ elastic-coef)) arbiters)
-         (map nil #'apply-impulse constraints))))
+  (with-place (|| world-) (iterations elastic-iterations arbiters constraints) world
+    (loop with elastic-coef = (if (zerop elastic-iterations) 1.0 0.0)
+       repeat iterations do
+       (map nil (fun (arbiter-apply-impulse _ elastic-coef)) arbiters)
+       (map nil #'apply-impulse constraints))))
 
 (defun world-step (world dt &aux (dt-inv (/ dt))) ; This is our assertion
+  "Step the physical state of WORLD by DT seconds."
   (with-place (|| world-) (bodies active-shapes) world
     (flush-arbiters world)
     (map nil (fun (body-update-position _ dt)) bodies) ; Integrate positions
-    (collide! world)
-    (filter-world-arbiters world)
+    (resolve-collisions world)
     (prestep-world world dt dt-inv)
     (apply-elastic-impulses world)
     (integrate-velocities world dt)
