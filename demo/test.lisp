@@ -107,7 +107,7 @@
          (radius (/ (shape-dimension demo) 2))
          (inertia (moment-for-circle mass 0 radius (vec 0 0)))
          (body (make-body :mass mass :inertia inertia :position (vec x y))))
-    (attach-shape (make-circle radius :elasticity 0.5 :friction 1) body)
+    (attach-shape (make-circle radius :elasticity 0.8 :friction 0.5) body)
     (world-add-body (world demo) body)))
 
 (defun add-poly (demo x y)
