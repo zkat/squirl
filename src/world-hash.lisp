@@ -24,11 +24,9 @@
 
 (defstruct (world-hash
              (:constructor make-world-hash
-                           (cell-size size bbox-function &aux
-                                      (table (make-world-hash-table size)))))
+                           (cell-size size &aux (table (make-world-hash-table size)))))
   "The spatial hash is SquirL's default (and currently only) spatial index"
   cell-size                             ; Size of the hash's cells
-  bbox-function                         ; Bounding box callback
   (handle-set (make-hash-set 0 #'handle-equal)) ; `hash-set' of all handles
   table                                         ; Bins in use
   ;;  (junk nil)                                    ; The "recycle bin"
@@ -112,16 +110,14 @@ list structure into the `world-hash-junk'."
       object)))
 
 (defun world-hash-rehash-object (hash object id)
-  (with-accessors ((bbox-function world-hash-bbox-function)
-                   (handle-set world-hash-handle-set)) hash
+  (with-accessors ((handle-set world-hash-handle-set)) hash
     (hash-handle hash (hash-set-find handle-set id object)
-                 (funcall bbox-function object))))
+                 (shape-bbox object))))
 
 (defun rehash-world-hash (hash)
   (clear-world-hash hash)
-  (let ((bbox-fn (world-hash-bbox-function hash)))
-    (map-hash-set (fun (hash-handle hash _ (funcall bbox-fn (handle-object _))))
-                  (world-hash-handle-set hash))))
+  (map-hash-set (fun (hash-handle hash _ (shape-bbox (handle-object _))))
+                (world-hash-handle-set hash)))
 
 (defun world-hash-remove (hash object id)
   (multiple-value-bind (handle foundp)
@@ -156,9 +152,8 @@ list structure into the `world-hash-junk'."
 (defun world-hash-query-rehash (function hash)
   (clear-world-hash hash)
   (map-hash-set (fun
-                  (let* ((object (handle-object _))
-                         (bbox (funcall (world-hash-bbox-function hash) object)))
-                    (do-bbox (chain-form hash bbox)
+                  (let* ((object (handle-object _)))
+                    (do-bbox (chain-form hash (shape-bbox object))
                       for chain = chain-form
                       unless (find _ chain) do
                         (query function hash chain object)
