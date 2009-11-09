@@ -28,8 +28,9 @@
   ;; Static and active shape spatial hashes
   (static-shapes (make-world-hash *initial-cell-size* *initial-count*))
   (active-shapes (make-world-hash *initial-cell-size* *initial-count*))
-  ;; Bodies in the system.
-  (bodies (make-adjustable-vector *initial-array-length*))
+  ;; Static and active bodies
+  (static-bodies (make-adjustable-vector *initial-array-length*))
+  (active-bodies (make-adjustable-vector *initial-array-length*))
   ;; Active arbiters for the impulse solver.
   (arbiters (make-adjustable-vector *initial-array-length*))
   (contact-set (make-hash-set 0 #'arbiter-shapes-equal)) ; Persistent contact set.
@@ -41,7 +42,8 @@
           (world-iterations world)
           (world-elastic-iterations world)
           (world-gravity world)
-          (length (world-bodies world))))
+          (+ (length (world-active-bodies world))
+             (length (world-static-bodies world)))))
 
 (defgeneric collide (actor1 actor2 contacts)
   (:method (actor1 actor2 contacts)
