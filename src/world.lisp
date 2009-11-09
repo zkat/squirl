@@ -186,16 +186,15 @@
     (map-world-hash #'shape-cache-data active-shapes) ; Pre-cache BBoxen
     (flet ((arbitrate (shape1 shape2)
              (when (collision-possible-p shape1 shape2)
-               (let ((contacts (ensure-list (collide-shapes shape1 shape2))))
-                 (when (ensure-list (collide-shapes shape1 shape2))
-                   (let* ((hash (hash-pair (shape-id shape1) (shape-id shape2)))
-                          (arbiter (hash-set-find-if (fun (arbiter-has-shapes-p _ shape1 shape2))
-                                                     contact-set hash)))
-                     (if arbiter (arbiter-inject arbiter contacts)
-                         (progn
-                           (setf arbiter (make-arbiter contacts shape1 shape2 timestamp))
-                           (vector-push-extend arbiter arbiters)
-                           (hash-set-insert contact-set hash arbiter)))))))))
+               (awhen (collide-shapes shape1 shape2)
+                 (let* ((hash (hash-pair (shape-id shape1) (shape-id shape2)))
+                        (arbiter (hash-set-find-if (fun (arbiter-has-shapes-p _ shape1 shape2))
+                                                   contact-set hash)))
+                   (if arbiter (arbiter-inject arbiter it)
+                       (progn
+                         (setf arbiter (make-arbiter it shape1 shape2 timestamp))
+                         (vector-push-extend arbiter arbiters)
+                         (hash-set-insert contact-set hash arbiter))))))))
       ;; Detect collisions between active and static shapes.
       (map-world-hash (fun (world-hash-query #'arbitrate static-shapes _ (shape-bbox _)))
                       active-shapes)
