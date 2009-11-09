@@ -81,7 +81,7 @@
                      (velocity body-velocity)
                      (angle body-angle)) body
       (setf position (vec+ position (vec* (vec+ velocity velocity-bias) dt)))
-      (setf angle (+ angle (* angular-velocity angular-velocity-bias dt)))
+      (incf angle (* angular-velocity angular-velocity-bias dt))
       (setf velocity-bias +zero-vector+)
       (setf angular-velocity-bias 0))))
 
