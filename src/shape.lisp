@@ -38,7 +38,9 @@
   (pushnew shape (body-%shapes (shape-body shape)))
   (shape-cache-data shape)
   (when (body-world body)
-    (world-add-shape (body-world body) shape))
+    (if (staticp body)
+        (world-add-static-shape (body-world body) shape)
+        (world-add-active-shape (body-world body) shape)))
   body)
 
 (defun detach-shape (shape body)
