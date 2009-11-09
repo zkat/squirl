@@ -190,13 +190,12 @@
                  (let* ((hash (hash-pair (shape-id shape1) (shape-id shape2)))
                         (arbiter (hash-set-find-if (fun (arbiter-has-shapes-p _ shape1 shape2))
                                                    contact-set hash)))
-                   ;; Feel free to restructure. Just hacking shit together.
-                   (if arbiter
-                       (setf (arbiter-stamp (arbiter-inject arbiter it)) timestamp)
-                       (progn
-                         (setf arbiter (make-arbiter it shape1 shape2 timestamp))
-                         (vector-push-extend arbiter arbiters)
-                         (hash-set-insert contact-set hash arbiter))))))))
+                   (if arbiter (progn (setf (arbiter-stamp arbiter) timestamp)
+                                      (arbiter-inject arbiter it))
+                       (let ((new-arbiter (make-arbiter it shape1 shape2 timestamp)))
+                         (hash-set-insert contact-set hash new-arbiter)
+                         (setf arbiter new-arbiter)))
+                   (vector-push-extend arbiter arbiters))))))
       ;; Detect collisions between active and static shapes.
       (map-world-hash (fun (world-hash-query #'arbitrate static-shapes _ (shape-bbox _)))
                       active-shapes)
