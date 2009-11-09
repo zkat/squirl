@@ -24,7 +24,7 @@
   (damping 1.0)
 
   ;; Internal slots
-  (stamp 0)      ; Time stamp, incremented on every call to WORLD-STEP
+  (timestamp 0)      ; Time stamp, incremented on every call to WORLD-STEP
   ;; Static and active shape spatial hashes
   (static-shapes (make-world-hash *initial-cell-size* *initial-count* #'shape-bbox))
   (active-shapes (make-world-hash *initial-cell-size* *initial-count* #'shape-bbox))
@@ -175,14 +175,14 @@
 ;;;
 (defun flush-arbiters (world)
   "Flush outdated arbiters."
-  (with-place (|| world-) (stamp contact-set arbiters) world
-    (hash-set-delete-if (fun (> (- stamp (arbiter-stamp _)) *contact-persistence*))
+  (with-place (|| world-) (timestamp contact-set arbiters) world
+    (hash-set-delete-if (fun (> (- timestamp (arbiter-stamp _)) *contact-persistence*))
                         contact-set)
     (setf (fill-pointer arbiters) 0)))
 
 (defun resolve-collisions (world)
   "Resolves collisions between objects in WORLD."
-  (with-place (|| world-) (contact-set active-shapes static-shapes stamp arbiters) world
+  (with-place (|| world-) (contact-set active-shapes static-shapes timestamp arbiters) world
     (map-world-hash #'shape-cache-data active-shapes) ; Pre-cache BBoxen
     (flet ((arbitrate (shape1 shape2)
              (when (collision-possible-p shape1 shape2)
@@ -193,7 +193,7 @@
                                                      contact-set hash)))
                      (if arbiter (arbiter-inject arbiter contacts)
                          (progn
-                           (setf arbiter (make-arbiter contacts shape1 shape2 stamp))
+                           (setf arbiter (make-arbiter contacts shape1 shape2 timestamp))
                            (vector-push-extend arbiter arbiters)
                            (hash-set-insert contact-set hash arbiter)))))))))
       ;; Detect collisions between active and static shapes.
@@ -241,5 +241,5 @@
     (apply-elastic-impulses world)
     (integrate-velocities world dt)
     (solve-impulses world)
-    (incf (world-stamp world))))
+    (incf (world-timestamp world))))
 
