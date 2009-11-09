@@ -102,7 +102,6 @@
 ;;; This is complicated. Not gross, but just complicated. It needs to be simpler
 ;;; and/or commented, preferably both.
 (defun segment-to-poly (segment poly &aux contacts)
-  ;; The problem here is that this isn't actually returning any contacts at all.
   (let* ((axes (poly-transformed-axes poly))
          (segD (vec. (segment-trans-normal segment)
                      (segment-trans-a segment)))
