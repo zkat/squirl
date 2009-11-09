@@ -157,11 +157,11 @@
 ;;; Collision Detection Functions
 ;;;
 
-(defun collision-impossible-p (shape1 shape2)
+(defun collision-possible-p (shape1 shape2)
   (with-place (a. shape-) ((bb bbox) body group layers) shape1
     (with-place (b. shape-) ((bb bbox) body group layers) shape2
-      (or (not (bbox-intersects-p a.bb b.bb))
-          (eq a.body b.body)))))
+      (and (not (eq a.body b.body))
+           (bbox-intersects-p a.bb b.bb)))))
 
 (defun filter-world-arbiters (world)
   "Filter arbiter list based on collisions."
@@ -185,7 +185,7 @@
   (with-place (|| world-) (contact-set active-shapes static-shapes stamp arbiters) world
     (map-world-hash #'shape-cache-data active-shapes) ; Pre-cache BBoxen
     (flet ((arbitrate (shape1 shape2)
-             (unless (collision-impossible-p shape1 shape2)
+             (when (collision-possible-p shape1 shape2)
                (let ((contacts (ensure-list (collide-shapes shape1 shape2))))
                  (when (ensure-list (collide-shapes shape1 shape2))
                    (let* ((hash (hash-pair (shape-id shape1) (shape-id shape2)))
