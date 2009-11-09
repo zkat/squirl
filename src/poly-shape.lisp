@@ -114,8 +114,8 @@
        (poly-contains-vertex-p poly point)))
 
 (defmethod shape-segment-query ((poly poly) a b)
-  (let ((axes (poly-axes poly))
-        (vertices (poly-vertices poly)))
+  (let ((axes (poly-transformed-axes poly))
+        (vertices (poly-transformed-vertices poly)))
     (loop for vert across vertices
        for axis across axes
        for i from 0
@@ -129,7 +129,7 @@
                   (let* ((point (vec-lerp a b ratio))
                          (dt (- (vec-cross normal point)))
                          (dt-min (- (vec-cross normal vert)))
-                         (dt-max (- (vec-cross normal (svref vertices (mod (1+ i)
+                         (dt-max (- (vec-cross normal (svref vertices (rem (1+ i)
                                                                            (length vertices)))))))
                     (when (<= dt-min dt dt-max)
                       (values poly ratio normal))))))))))
