@@ -54,14 +54,17 @@
 ;;; Body, Shape, and Joint Management
 ;;;
 
-(defun world-add-shape (world shape)
+(defun world-add-static-shape (world shape)
   (with-place (shape. shape-) (id bbox body) shape
     (assert shape.body)
-    (if (staticp (shape-body shape))
-        (progn
-          (shape-cache-data shape)
-          (world-hash-insert (world-static-shapes world) shape shape.id shape.bbox))
-        (world-hash-insert (world-active-shapes world) shape shape.id shape.bbox))))
+    (shape-cache-data shape)
+    (world-hash-insert (world-static-shapes world)
+                       shape shape.id shape.bbox)))
+
+(defun world-add-active-shape (world shape)
+  (with-place (shape. shape-) (id bbox body) shape
+    (assert shape.body)
+    (world-hash-insert (world-active-shapes world) shape shape.id shape.bbox)))
 
 (defun world-add-body (world body)
   (vector-push-extend body (world-bodies world))
