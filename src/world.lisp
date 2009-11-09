@@ -116,16 +116,15 @@
 ;;; Segment Query Functions
 ;;;
 
-(defun world-shape-segment-query (function world start end)
-  (let (collision-p)
-    (flet ((query-shape (shape)
-             (prog1 1.0
-               (when (segment-intersects-shape-p shape start end)
-                 (when function (funcall function shape 0.0 +zero-vector+))
-                 (setf collision-p t)))))
-      (world-hash-query-segment #'query-shape (world-static-shapes world) start end)
-      (world-hash-query-segment #'query-shape (world-active-shapes world) start end)
-      collision-p)))
+(defun world-shape-segment-query (function world start end &aux collisionp)
+  (flet ((query-shape (shape)
+           (prog1 1.0
+             (when (segment-intersects-shape-p shape start end)
+               (when function (funcall function shape 0.0 +zero-vector+))
+               (setf collisionp t)))))
+    (world-hash-query-segment #'query-shape (world-static-shapes world) start end)
+    (world-hash-query-segment #'query-shape (world-active-shapes world) start end)
+    collisionp))
 
 (defun world-shape-segment-query-first (world start end)
   (let (first-shape min-ratio first-normal)
