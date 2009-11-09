@@ -93,10 +93,10 @@
          (threshhold (+ (* (vec. segment-normal (segment-trans-a segment))
                            coefficient)
                         (segment-radius segment))))
-    (do-vector ((i vertex) (poly-vertices poly) contacts)
+    (do-vector ((i vertex) (poly-transformed-vertices poly) contacts)
       (when (< (vec. vertex normal) threshhold)
         (let ((dt (vec-cross segment-normal vertex)))
-          (when (and (>= dta dt) (>= dt dtb))
+          (when (>= dta dt dtb)
             (push (make-contact vertex normal p-dist (hash-pair (shape-id poly) i))
                   contacts)))))))
 
