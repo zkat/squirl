@@ -215,7 +215,7 @@
          (map nil (fun (arbiter-apply-impulse _ 1.0)) arbiters)
          (map nil #'apply-impulse constraints))))
 
-(defun integrate-velocities (world dt &aux (damping (expt (world-damping world) dt)))
+(defun integrate-velocities (world dt &aux (damping (expt (world-damping world) (- dt))))
   (with-place (|| world-) (bodies arbiters gravity) world
     ;; Apply gravity forces.
     (map nil (fun (unless (staticp _) (body-update-velocity _ gravity damping dt))) bodies)
