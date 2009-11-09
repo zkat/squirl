@@ -99,9 +99,8 @@
             (poly-vertices poly)))
 
 (defun poly-transform-axes (poly position rotation)
-  (flet ((transformed-axis (axis)
-           (let ((normal (vec-rotate (poly-axis-normal axis) rotation)))
-             (make-poly-axis normal (+ (vec. position normal) (poly-axis-distance axis))))))
+  (flet ((transformed-axis (axis &aux (normal (vec-rotate (poly-axis-normal axis) rotation)))
+           (make-poly-axis normal (+ (vec. position normal) (poly-axis-distance axis)))))
     (map-into (poly-transformed-axes poly) #'transformed-axis (poly-axes poly))))
 
 (defmethod shape-cache-data ((poly poly))
