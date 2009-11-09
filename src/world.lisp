@@ -164,6 +164,7 @@
           (eq a.body b.body)))))
 
 (defun filter-world-arbiters (world)
+  "Filter arbiter list based on collisions."
   (delete-iff (world-arbiters world)
               (fun (let ((a (body-actor (shape-body (arbiter-shape-a _))))
                          (b (body-actor (shape-body (arbiter-shape-b _)))))
@@ -172,51 +173,62 @@
 ;;;
 ;;; All-Important WORLD-STEP Function
 ;;;
+(defun flush-arbiters (world)
+  "Flush outdated arbiters."
+  (with-place (|| world-) (stamp contact-set arbiters) world
+    (hash-set-delete-if (fun (> (- stamp (arbiter-stamp _)) *contact-persistence*))
+                        contact-set)
+    (setf (fill-pointer arbiters) 0)))
 
-(defun world-step (world dt &aux (dt-inv (/ dt))) ; This is our assertion
-  (with-place (|| world-) (bodies constraints static-shapes active-shapes arbiters) world
-    ;; Flush outdated arbiters
-    (hash-set-delete-if (fun (> (- (world-stamp world) (arbiter-stamp _)) *contact-persistence*))
-                        (world-contact-set world))
-    (setf (fill-pointer arbiters) 0)
-    ;; Integrate positions
-    (map nil (fun (body-update-position _ dt)) bodies)
-    ;; Pre-cache BBoxen
-    (map-world-hash #'shape-cache-data active-shapes)
-    ;; Collide!
+(defun collide! (world)
+  (with-place (|| world-) (contact-set active-shapes static-shapes stamp arbiters) world
     (flet ((detector (shape1 shape2)
              (unless (collision-impossible-p shape1 shape2)
                (let ((contacts (ensure-list (collide-shapes shape1 shape2))))
                  (when (ensure-list (collide-shapes shape1 shape2))
                    (let* ((hash (hash-pair (shape-id shape1) (shape-id shape2)))
                           (arbiter (hash-set-find-if (fun (arbiter-has-shapes-p _ shape1 shape2))
-                                                     (world-contact-set world) hash)))
+                                                     contact-set hash)))
                      (if arbiter (arbiter-inject arbiter contacts)
                          (progn
-                           (setf arbiter (make-arbiter contacts shape1 shape2 (world-stamp world)))
+                           (setf arbiter (make-arbiter contacts shape1 shape2 stamp))
                            (vector-push-extend arbiter arbiters)
                            (hash-set-insert (world-contact-set world) hash arbiter)))))))))
       (map-world-hash (fun (world-hash-query #'detector static-shapes _ (shape-bbox _))) active-shapes)
-      (world-hash-query-rehash #'detector active-shapes))
-    ;; Filter arbiter list based on collisions
-    (filter-world-arbiters world)
+      (world-hash-query-rehash #'detector active-shapes))))
+
+(defun prestep-world (world dt dt-inv)
+  (with-place (|| world-) (arbiters constraints elastic-iterations) world
     ;; Prestep the arbiters
-    (map nil (fun (arbiter-prestep _ dt-inv)) (world-arbiters world))
+    (map nil (fun (arbiter-prestep _ dt-inv)) arbiters)
     ;; Prestep the constraints
     (map nil (fun (pre-step _ dt dt-inv)) constraints)
     (loop repeat (world-elastic-iterations world) do
          (map nil (fun (arbiter-apply-impulse _ 1.0)) arbiters)
-         (map nil #'apply-impulse constraints))
-    ;; Integrate velocities
-    (let ((damping (expt (world-damping world) dt)))
-      (map nil (fun (unless (staticp _)
-                      (body-update-velocity _ (world-gravity world) damping dt)))
-           bodies))
-    (map nil #'arbiter-apply-cached-impulse arbiters)
-    ;; Run the impulse solver, using the old-style elastic solver if
-    ;; elastic iterations are disabled
-    (loop repeat (world-iterations world)
-       with elastic-coef = (if (zerop (world-elastic-iterations world)) 1.0 0.0) do
+         (map nil #'apply-impulse constraints))))
+
+(defun integrate-velocities (world dt &aux (damping (expt (world-damping world) dt)))
+  (with-place (|| world-) (bodies arbiters gravity) world
+    (map nil (fun (unless (staticp _) (body-update-velocity _ (world-gravity world) damping dt)))
+         bodies)
+    (map nil #'arbiter-apply-cached-impulse arbiters)))
+
+(defun solve-impulses (world &aux (elastic-coef (if (zerop (world-elastic-iterations world)) 1.0 0.0)))
+  "Run the impulse solver, using the old-style elastic solver if elastic iterations are disabled"
+  (with-place (|| world-) (iterations arbiters constraints) world
+    (loop repeat iterations do
          (map nil (fun (arbiter-apply-impulse _ elastic-coef)) arbiters)
-         (map nil #'apply-impulse constraints))
+         (map nil #'apply-impulse constraints))))
+
+(defun world-step (world dt &aux (dt-inv (/ dt))) ; This is our assertion
+  (with-place (|| world-) (bodies constraints static-shapes active-shapes arbiters) world
+    (flush-arbiters world)
+    (map nil (fun (body-update-position _ dt)) bodies) ; Integrate positions
+    (map-world-hash #'shape-cache-data active-shapes) ; Pre-cache BBoxen
+    (collide! world)
+    (filter-world-arbiters world)
+    (prestep-world world dt dt-inv)
+    (integrate-velocities world dt)
+    (solve-impulses world)
     (incf (world-stamp world))))
+
