@@ -129,11 +129,11 @@
                                  (vec* poly-normal (segment-radius segment))))
                  (vertex-b (vec+ (segment-trans-b segment)
                                  (vec* poly-normal (segment-radius segment)))))
-            (macrolet ((try-vertex (vertex i)
-                         `(when (poly-contains-vertex-p poly ,vertex)
-                            (push (make-contact ,vertex poly-normal poly-min
-                                                (hash-pair (shape-id segment) ,i))
-                                  contacts))))
+            (flet ((try-vertex (vertex i)
+                     (when (poly-contains-vertex-p poly vertex)
+                       (push (make-contact vertex poly-normal poly-min
+                                           (hash-pair (shape-id segment) i))
+                             contacts))))
               (try-vertex vertex-a 0)
               (try-vertex vertex-b 1))
             ;; "Floating point precision problems here.
