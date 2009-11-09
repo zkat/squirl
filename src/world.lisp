@@ -221,7 +221,7 @@
          (map nil #'apply-impulse constraints))))
 
 (defun world-step (world dt &aux (dt-inv (/ dt))) ; This is our assertion
-  (with-place (|| world-) (bodies constraints static-shapes active-shapes arbiters) world
+  (with-place (|| world-) (bodies active-shapes) world
     (flush-arbiters world)
     (map nil (fun (body-update-position _ dt)) bodies) ; Integrate positions
     (map-world-hash #'shape-cache-data active-shapes) ; Pre-cache BBoxen
