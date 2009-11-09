@@ -78,7 +78,7 @@
                :color *blue*)))
 
 (defreply draw ((demo =squirl-demo=) &key)
-  (map nil #'draw-body (world-bodies (world demo)))
+  (map-world #'draw-body (world demo))
   (draw-scale (shape-dimension demo) (mouse-x demo) (mouse-y demo)))
 
 ;; This allows us to fix the physics timestep without fixing the framerate.
@@ -92,7 +92,7 @@
   (incf (accumulator demo) (if (> dt 0.5) 0.5 dt))
   (loop while (>= (accumulator demo) (physics-timestep demo))
      do (world-step (world demo) (physics-timestep demo))
-     (decf (accumulator demo) (physics-timestep demo)))
+        (decf (accumulator demo) (physics-timestep demo)))
   (when (key-down-p #\s)
     (add-circle demo (mouse-x demo) (mouse-y demo))))
 
