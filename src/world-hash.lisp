@@ -1,7 +1,7 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
-(declaim (optimize safety debug))
+(declaim (optimize speed))
 
 ;; Eventually, this should be (cons t fixnum)
 (deftype handle ()

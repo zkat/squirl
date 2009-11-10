@@ -1,7 +1,7 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
-(declaim (optimize safety debug))
+(declaim (optimize speed))
 
 (defstruct (bbox (:constructor make-bbox (left bottom right top)))
   "Bounding box used to simplify collision detection"

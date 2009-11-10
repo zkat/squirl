@@ -1,7 +1,7 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
-(declaim (optimize debug safety))
+(declaim (optimize speed))
 (defvar *contact-persistence* 3)
 
 ;;; These names can be better

@@ -1,6 +1,8 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
+(declaim (optimize speed))
+
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (deftype poly-axis ()
     '(cons vec real))
