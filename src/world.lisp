@@ -235,15 +235,18 @@
 (defun prestep-world (world dt dt-inv)
   (with-place (|| world-) (arbiters constraints) world
     ;; Prestep the arbiters
-    (map nil (fun (arbiter-prestep _ dt-inv)) arbiters)
+    (do-vector (arbiter arbiters)
+      (arbiter-prestep arbiter dt-inv))
     ;; Prestep the constraints
-    (map nil (fun (pre-step _ dt dt-inv)) constraints)))
+    (do-vector (constraint constraints)
+      (pre-step constraint dt dt-inv))))
 
 (defun apply-elastic-impulses (world)
   (with-place (|| world-) (arbiters constraints elastic-iterations) world
-    (loop repeat elastic-iterations do
-         (map nil (fun (arbiter-apply-impulse _ 1.0)) arbiters)
-         (map nil #'apply-impulse constraints))))
+    (loop repeat elastic-iterations
+       do (do-vector (arbiter arbiters)
+            (arbiter-apply-impulse arbiter 1.0))
+          (map nil #'apply-impulse constraints))))
 
 (defun integrate-velocities (world dt &aux (damping (expt (world-damping world) (- dt))))
   (with-place (|| world-) (active-bodies arbiters gravity) world
@@ -258,8 +261,9 @@
   (with-place (|| world-) (iterations elastic-iterations arbiters constraints) world
     (loop with elastic-coef = (if (zerop elastic-iterations) 1.0 0.0)
        repeat iterations do
-       (map nil (fun (arbiter-apply-impulse _ elastic-coef)) arbiters)
-       (map nil #'apply-impulse constraints))))
+         (do-vector (arbiter arbiters)
+           (arbiter-apply-impulse arbiter elastic-coef))
+         (map nil #'apply-impulse constraints))))
 
 (defun world-step (world dt &aux (dt-inv (/ dt))) ; This is our assertion
   "Step the physical state of WORLD by DT seconds."
