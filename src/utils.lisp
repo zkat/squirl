@@ -40,9 +40,11 @@ the result of calling DELETE with PREDICATE, place, and the REMOVE-KEYWORDS.")
              ,place ,cons-sym))))
 
 (defun expt-mod (b e m &aux (result 1))
+  (declare (optimize speed) (integer b e) (fixnum m result))
   (do ((expt (mod e m) (ash expt -1))
        (base (mod b m) (mod (* base base) m)))
       ((zerop expt) result)
+    (declare (fixnum base expt))
     (when (oddp expt)
       (setf result (mod (* result base) m)))))
 
