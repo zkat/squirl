@@ -60,13 +60,13 @@
 ;;; This function has VERY HAIRY control flow. Frob with EXTREME caution.
 (defun find-min-separating-axis (poly1 poly2)
   (loop with msa
+       with min-distance
      for axis across (poly-transformed-axes poly2)
      for distance = (poly-value-on-axis poly1 (poly-axis-normal axis) (poly-axis-distance axis))
-     minimizing distance into min-distance
-     if (plusp distance)
-     return nil
-     else if (or (null min-distance) (> distance min-distance))
-     do (setf msa axis)
+     never (plusp distance)
+     when (or (null min-distance) (> distance min-distance))
+     do (setf msa axis
+              min-distance distance)
      finally (return (values msa min-distance))))
 
 (defun find-vertices (poly1 poly2 normal distance &aux contacts)
