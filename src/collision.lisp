@@ -75,7 +75,7 @@
     (when (partial-poly-contains-vertex-p poly2 vertex (vec-neg normal))
       (push (make-contact vertex normal distance (hash-pair (shape-id poly1) i)) contacts)))
   (do-vector ((i vertex) (poly-transformed-vertices poly2) contacts)
-    (when (partial-poly-contains-vertex-p poly1 vertex (vec-neg normal))
+    (when (partial-poly-contains-vertex-p poly1 vertex normal)
       (push (make-contact vertex normal distance (hash-pair (shape-id poly2) i)) contacts)))
   contacts)
 
