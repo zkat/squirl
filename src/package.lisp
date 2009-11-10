@@ -85,7 +85,7 @@
    :groove-joint
    :make-groove-joint
    :pin-joint
-   :make-pin-join
+   :make-pin-joint
    :pivot-joint
    :make-pivot-joint
    :ratchet-joint

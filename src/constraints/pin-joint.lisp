@@ -15,7 +15,7 @@
   r1 r2
   normal
   n-mass
-  (jn-acc 0)
+  (jn-acc 0d0)
   jn-max
   bias)
 
