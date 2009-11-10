@@ -18,7 +18,7 @@
     (setf (damped-rotary-spring-i-sum spring) (/ (+ (body-inverse-inertia body-a)
                                                     (body-inverse-inertia body-b)))
           (damped-rotary-spring-dt spring) dt
-          (damped-rotary-spring-target-wrn spring) 0.0)
+          (damped-rotary-spring-target-wrn spring) 0d0)
 
     ;; Applying spring torque
     (let ((j-spring (* dt (spring-torque spring (- (body-angle body-a) (body-angle body-b))))))
@@ -32,7 +32,7 @@
          (wrn (- (body-angular-velocity body-a)
                  (body-angular-velocity body-b)))
          (angular-velocity-damp
-          (* wrn (- 1.0 (exp (- (/ (* (damped-rotary-spring-damping spring)
+          (* wrn (- 1d0 (exp (- (/ (* (damped-rotary-spring-damping spring)
                                       (damped-rotary-spring-dt spring))
                                    (damped-rotary-spring-i-sum spring))))))))
     (setf (damped-rotary-spring-target-wrn spring) (- wrn angular-velocity-damp))

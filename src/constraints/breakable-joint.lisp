@@ -9,7 +9,7 @@
 ;; we pass -this- object around.
 (defstruct (breakable-joint (:include constraint)
                             (:constructor make-breakable-joint (delegate space)))
-  delegate space (last-dt-inverse 0))
+  delegate space (last-dt-inverse 0d0))
 
 (defmethod pre-step ((joint breakable-joint) dt dt-inverse)
   (let ((delegate (breakable-joint-delegate joint)))

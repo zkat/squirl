@@ -29,7 +29,7 @@
                                                        (damped-spring-r2 spring)
                                                        (damped-spring-normal spring)))
             (spring-dt spring) dt
-            (damped-spring-target-vrn spring) 0.0)
+            (damped-spring-target-vrn spring) 0d0)
       ;; apply spring force.
       (apply-impulses body-a body-b (damped-spring-r1 spring) (damped-spring-r2 spring)
                       (vec* (damped-spring-normal spring)
@@ -48,7 +48,7 @@
                  (damped-spring-target-vrn spring)))
          ;; compute velocity loss from drag.
          ;; C source sez: "not 100% certain this is derived correctly, though it makes sense"
-         (v-damp (- (* vrn (- 1.0 (exp (- (/ (* (damped-spring-damping spring)
+         (v-damp (- (* vrn (- 1d0 (exp (- (/ (* (damped-spring-damping spring)
                                                 (damped-spring-dt spring))
                                              n-mass))))))))
     (setf (damped-spring-target-vrn spring) (+ vrn v-damp))

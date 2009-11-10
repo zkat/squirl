@@ -5,10 +5,10 @@
              (:constructor
               make-simple-motor
               (body-a body-b rate)))
-  (rate 0.0)
-  (i-sum 0.0)
-  (j-acc 0.0)
-  (j-max 0.0))
+  (rate 0d0)
+  (i-sum 0d0)
+  (j-acc 0d0)
+  (j-max 0d0))
 
 (defmethod pre-step ((motor simple-motor) dt dt-inv)
   (declare (ignore dt-inv))
@@ -18,7 +18,7 @@
 		   (j-max simple-motor-j-max)
 		   (j-acc simple-motor-j-acc)) motor
     ;; calculate moment of inertia coefficient.
-    (setf i-sum (/ 1.0 (+ (body-inverse-inertia body-b) (body-inverse-inertia body-b))))
+    (setf i-sum (/ 1d0 (+ (body-inverse-inertia body-b) (body-inverse-inertia body-b))))
     ;;  compute max impulse
     (setf j-max (impulse-max motor dt))
     ;; apply joint torque

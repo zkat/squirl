@@ -5,7 +5,7 @@
   stiffness dt)
 
 (defmethod get-impulse ((spring spring))
-  0.0)
+  0d0)
 
 (defgeneric spring-torque (spring relative-angle))
 (defgeneric spring-force (spring distance))

@@ -9,10 +9,10 @@
   phase
   ratio
   ratio-inverse
-  (i-sum 0.0)
-  (bias 0.0)
-  (j-acc 0.0)
-  (j-max 0.0))
+  (i-sum 0d0)
+  (bias 0d0)
+  (j-acc 0d0)
+  (j-max 0d0))
 
 (defmethod pre-step ((gear gear-joint) dt dt-inv)
   (with-accessors (
@@ -28,7 +28,7 @@
 		   (j-acc gear-joint-j-acc)
 		   (phase gear-joint-phase)) gear
     ;; calculate moment of inertia coefficient
-    (setf i-sum (/ 1.0 (+ (* (body-inverse-inertia body-a) ratio-inverse) (* ratio (body-inverse-inertia body-b)))))
+    (setf i-sum (/ 1d0 (+ (* (body-inverse-inertia body-a) ratio-inverse) (* ratio (body-inverse-inertia body-b)))))
     ;; calculate bias velocity
     (setf bias (clamp (- (* bias-coef dt-inv (- (* (body-angle body-b) ratio) (body-angle body-a) phase))) (- max-bias) max-bias))
     ;; compute max impulse

@@ -28,13 +28,13 @@
     (let ((td (vec-cross (vec+ (body-position body-b) (groove-joint-r2 joint)) normal)))
       ;; Calculate the clamping factor and r2
       (cond ((<= td (vec-cross trans-a normal))
-             (setf (groove-joint-clamp joint) 1.0
+             (setf (groove-joint-clamp joint) 1d0
                    (groove-joint-r1 joint) (vec- trans-a (body-position body-a))))
             ((>= td (vec-cross trans-b normal))
-             (setf (groove-joint-clamp joint) -1.0
+             (setf (groove-joint-clamp joint) -1d0
                    (groove-joint-r1 joint) (vec- trans-b (body-position body-a))))
             (t
-             (setf (groove-joint-clamp joint) 0.0
+             (setf (groove-joint-clamp joint) 0d0
                    (groove-joint-r1 joint) (vec- (vec+ (vec* (vec-perp normal) (- td))
                                                        (vec* normal d))
                                                  (body-position body-a))))))

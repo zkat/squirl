@@ -40,8 +40,8 @@
                       (body-inverse-mass body2)))
 
          ;; Start with I*mass-sum
-         (k11 mass-sum) (k12 0)
-         (k21 0)        (k22 mass-sum)
+         (k11 mass-sum) (k12 0d0)
+         (k21 0d0)        (k22 mass-sum)
 
          ;; influence from r1
          (b1-inverse-inertia (body-inverse-inertia body1))

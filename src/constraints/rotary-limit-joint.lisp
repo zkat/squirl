@@ -7,10 +7,10 @@
               (body-a body-b min max)))
   min 
   max
-  (i-sum 0.0)
-  (bias 0.0)
-  (j-acc 0.0)
-  (j-max 0.0))
+  (i-sum 0d0)
+  (bias 0d0)
+  (j-acc 0d0)
+  (j-max 0d0))
 
 (defmethod pre-step ((rotary-limit rotary-limit-joint) dt dt-inv)
   (with-accessors (
@@ -27,14 +27,14 @@
     (let* ((dist (- (body-angle body-b) (body-angle body-a)))
 	   (pdist (if (> dist max) (- max dist) (- min dist))))
       ;; calculate moment of inertia coefficient
-      (setf i-sum (/ 1.0 (+ (body-inverse-inertia body-a) (body-inverse-inertia body-b))))
+      (setf i-sum (/ 1d0 (+ (body-inverse-inertia body-a) (body-inverse-inertia body-b))))
       ;; calculate bias velocity
       (setf bias (clamp (- (* bias-coef dt-inv pdist)) (- max-bias) max-bias))
       ;; compute max impulse
       (setf j-max (impulse-max rotary-limit dt))
       ;; if the bias is zero, the joint is not at a limit, reset impulse
       (when (zerop bias)
-	(setf j-acc 0.0))
+	(setf j-acc 0d0))
       ;; apply joint torque
       (decf (body-angular-velocity body-a) (* j-acc (body-inverse-inertia body-a)))
       (incf (body-angular-velocity body-b) (* j-acc (body-inverse-inertia body-b))))))
@@ -54,9 +54,9 @@
 	     ;; compute normal impulse
 	     (j (* (- (+ bias wr)) i-sum))
 	     (j-old j-acc))
-	(if (< bias 0.0)
-	    (setf j-acc (clamp (+ j-old j) 0.0 j-max))
-	    (setf j-acc (clamp (+ j-old j) (- j-max) 0.0)))
+	(if (< bias 0d0)
+	    (setf j-acc (clamp (+ j-old j) 0d0 j-max))
+	    (setf j-acc (clamp (+ j-old j) (- j-max) 0d0)))
 	(setf j (- j-acc j-old))
 	;;  apply impulse
 	(decf (body-angular-velocity body-a) (* j (body-inverse-inertia body-a)))

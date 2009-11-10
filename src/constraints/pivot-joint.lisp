@@ -13,7 +13,7 @@
   (k1 +zero-vector+ :type vec)
   (k2 +zero-vector+ :type vec)
   
-  (j-max-length 0.0)
+  (j-max-length 0d0)
   (bias +zero-vector+ :type vec)
   (j-acc +zero-vector+ :type vec))
 

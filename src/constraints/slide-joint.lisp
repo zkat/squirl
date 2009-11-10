@@ -7,15 +7,15 @@
               (body-a body-b anchor1 anchor2)))
   (anchor1 +zero-vector+ :type vec)
   (anchor2 +zero-vector+ :type vec)
-  (min-slide 0)
-  (max-slide 0)
+  (min-slide 0d0)
+  (max-slide 0d0)
   (r1 +zero-vector+ :type vec)
   (r2 +zero-vector+ :type vec)
   (n +zero-vector+ :type vec)
-  (n-mass 0)
-  (jn-acc 0)
-  (jn-max 0)
-  (bias 0))
+  (n-mass 0d0)
+  (jn-acc 0d0)
+  (jn-max 0d0)
+  (bias 0d0))
 
 (defmethod pre-step ((joint slide-joint) dt dt-inv)
   (with-accessors (
@@ -37,7 +37,7 @@
 
     (let* ((delta (vec- (vec+ (body-position body-b) r2) (vec+ (body-position body-a) r1)))
            (dist (vec-length delta))
-           (pdist 0.0))
+           (pdist 0d0))
       (setf r1 (vec-rotate anchor1 body-a))
       (setf r2 (vec-rotate anchor2 body-b))
       (if (>  dist max-slide)
@@ -45,9 +45,9 @@
           (progn
             (setf pdist (- min-slide dist))
             (setf dist (- dist))))
-      (setf n (vec* delta (maybe/ 1.0 dist)))
+      (setf n (vec* delta (maybe/ 1d0 dist)))
       ;; calculate mass normal
-      (setf n-mass (/ 1.0 (k-scalar body-a body-b r1 r2  n )))
+      (setf n-mass (/ 1d0 (k-scalar body-a body-b r1 r2  n )))
       ;; calculate bias velocity
       (setf bias (clamp (- (* bias-coef dt-inv pdist)) (- max-bias) max-bias))
       ;; compute max impulse
@@ -55,7 +55,7 @@
       ;;apply accumulated impulse
       (when (zerop bias)
         ;; if bias is 0, then the joint is not at a limit
-        (setf jn-acc 0.0))
+        (setf jn-acc 0d0))
       (apply-impulses body-a body-b r1 r2 (vec* n jn-acc)))))
 
 (defmethod apply-impulse (joint)
@@ -77,7 +77,7 @@
            ;; compute normal impulse
            (jn (* (- bias vrn) n-mass))
            (jn-old jn-acc))
-      (setf jn-acc (clamp (+ jn-old jn) (- jn-max) 0.0))
+      (setf jn-acc (clamp (+ jn-old jn) (- jn-max) 0d0))
       (setf jn (- jn-acc jn-old))
       ;; apply impulse
       (apply-impulses body-a body-b  r1 r2 (vec* n jn)))))
