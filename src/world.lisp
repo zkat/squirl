@@ -44,6 +44,9 @@
     (with-place (|| world-) (contact-set timestamp arbiters) world
       (setf (world-arbitrator world)
             (lambda (shape1 shape2)
+              (when (or (and (poly-p shape1) (circle-p shape2))
+                        (and (poly-p shape1) (segment-p shape2)))
+                (rotatef shape1 shape2))
               (when (collision-possible-p shape1 shape2)
                 (awhen (collide-shapes shape1 shape2)
                   (let ((arbiter (ensure-arbiter shape1 shape2 contact-set timestamp)))
