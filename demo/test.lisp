@@ -113,7 +113,7 @@
     (world-add-body (world demo) body)))
 
 (defun add-poly (demo x y)
-  (let* ((mass (* 5000 (shape-dimension demo)))
+  (let* ((mass (* 50 (shape-dimension demo)))
          (size (/ (shape-dimension demo) 2))
          (verts (list (vec size size)
                       (vec size (- size))
