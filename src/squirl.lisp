@@ -27,7 +27,9 @@ A solid circle has an inner diameter of 0."
      (* mass length (/ length 12))
      (* mass (vec. offset offset)))))
 
-(defun moment-for-poly (m verts &optional (offset +zero-vector+) &aux (num-verts (length verts)))
+(defun moment-for-poly (m verts &optional (offset +zero-vector+)
+                        &aux (num-verts (length verts))
+                             (t-verts (make-array num-verts)))
   "Calculate the moment of inertia for a solid convex polygon."
   ;; C version:
   ;; cpVect *tVerts = (cpVect *)calloc(numVerts, sizeof(cpVect));
@@ -49,16 +51,15 @@ A solid circle has an inner diameter of 0."
 
   ;; free(tVerts);
   ;; return (m*sum1)/(6.0f*sum2);
-  (let ((t-verts (make-array num-verts)))
-    (loop for i below num-verts
-       do (setf (svref t-verts i) (vec+ (elt verts i) offset)))
-    (loop with sum1 = 0 with sum2 = 0
-       for i below num-verts
-       for v1 across t-verts
-       for v2 = (elt t-verts (mod (1+ i) num-verts))
-       for a = (vec-cross v1 v2)
-       for b = (+ (vec. v1 v1) (vec. v1 v2) (vec. v2 v2))
-       do (incf sum1 (* a b))
-         (incf sum2 a)
-       finally (return (/ (* m sum1)
-                          (* 6 sum2))))))
+  (dotimes (i num-verts)
+    (setf (svref t-verts i) (vec+ (elt verts i) offset)))
+  (loop
+     for i below num-verts
+     for v1 across t-verts
+     for v2 = (elt t-verts (mod (1+ i) num-verts))
+     for a = (vec-cross v1 v2)
+     for b = (+ (vec. v1 v1) (vec. v1 v2) (vec. v2 v2))
+     sum (* a b) into sum1
+     sum a into sum2
+     finally (return (/ (* m sum1)
+                        (* 6 sum2)))))
