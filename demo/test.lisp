@@ -117,7 +117,7 @@
                       (vec size (- size))
                       (vec (- size) (- size))
                       (vec (- size) size)))
-         (body (make-body :mass mass :inertia (squirl:moment-for-poly mass 4 verts)
+         (body (make-body :mass mass :inertia (squirl:moment-for-poly mass verts)
                           :position (vec x y))))
     (attach-shape (make-poly verts) body)
     (world-add-body (world demo) body)))
