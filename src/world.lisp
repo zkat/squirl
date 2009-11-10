@@ -185,6 +185,10 @@
       (and (not (eq a.body b.body))
            (bbox-intersects-p a.bb b.bb)))))
 
+;;;
+;;; Arbiter Frobbing Functions
+;;;
+
 (defun filter-world-arbiters (world)
   "Filter arbiter list based on collisions."
   (delete-iff (world-arbiters world)
@@ -192,16 +196,24 @@
                          (b (body-actor (shape-body (arbiter-shape-b _)))))
                      (when (or a b) (not (collide a b (arbiter-contacts _))))))))
 
-;;;
-;;; All-Important WORLD-STEP Function
-;;;
-
 (defun flush-arbiters (world)
   "Flush outdated arbiters."
   (with-place (|| world-) (timestamp contact-set arbiters) world
     (hash-set-delete-if (fun (> (- timestamp (arbiter-stamp _)) *contact-persistence*))
                         contact-set)
     (setf (fill-pointer arbiters) 0)))
+
+(defun ensure-arbiter (shape1 shape2 hash-set timestamp)
+  (let* ((hash (hash-pair (shape-id shape1) (shape-id shape2)))
+         (arbiter (hash-set-find-if (fun (arbiter-has-shapes-p _ shape1 shape2))
+                                    hash-set hash)))
+    (if arbiter
+        (prog1 arbiter (setf (arbiter-stamp arbiter) timestamp))
+        (hash-set-insert hash-set hash (make-arbiter nil shape1 shape2 timestamp)))))
+
+;;;
+;;; All-Important WORLD-STEP Function
+;;;
 
 (defun resolve-collisions (world)
   "Resolves collisions between objects in WORLD."
