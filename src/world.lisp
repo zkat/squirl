@@ -12,7 +12,7 @@
 (defparameter *initial-array-length* 4)
 
 (defstruct (world
-             (:constructor make-world
+             (:constructor %make-world
                            (&key iterations elastic-iterations gravity damping)))
   ;; Number of iterations to use in the impulse solver to solve contacts.
   (iterations *default-iterations* :type fixnum)
@@ -24,7 +24,7 @@
   (damping 1.0)
 
   ;; Internal slots
-  (timestamp 0)      ; Time stamp, incremented on every call to WORLD-STEP
+  (timestamp 0)  ; Time stamp, incremented on every call to WORLD-STEP
   ;; Static and active shape spatial hashes
   (static-shapes (make-world-hash *initial-cell-size* *initial-count*))
   (active-shapes (make-world-hash *initial-cell-size* *initial-count*))
@@ -35,7 +35,21 @@
   (arbiters (make-adjustable-vector *initial-array-length*))
   (contact-set (make-hash-set 0 #'arbiter-shapes-equal)) ; Persistent contact set.
   ;; Constraints in the system.
-  (constraints (make-adjustable-vector *initial-array-length*)))
+  (constraints (make-adjustable-vector *initial-array-length*))
+  arbitrator)
+
+(defun make-world (&rest keys)
+  (declare (dynamic-extent keys))
+  (let ((world (apply #'%make-world keys)))
+    (with-place (|| world-) (contact-set timestamp arbiters) world
+      (setf (world-arbitrator world)
+            (lambda (shape1 shape2)
+              (when (collision-possible-p shape1 shape2)
+                (awhen (collide-shapes shape1 shape2)
+                  (let ((arbiter (ensure-arbiter shape1 shape2 contact-set timestamp)))
+                    (vector-push-extend arbiter arbiters)
+                    (arbiter-inject arbiter it)))))))
+    world))
 
 (define-print-object (world)
   (format t "Iterations: ~a; Elastic iterations: ~a; Gravity: ~a; Body count: ~a"
@@ -217,19 +231,13 @@
 
 (defun resolve-collisions (world)
   "Resolves collisions between objects in WORLD."
-  (with-place (|| world-) (contact-set active-shapes static-shapes timestamp arbiters) world
+  (with-place (|| world-) (active-shapes static-shapes arbiters arbitrator) world
     (map-world-hash #'shape-cache-data active-shapes) ; Pre-cache BBoxen
-    (flet ((arbitrate (shape1 shape2)
-             (when (collision-possible-p shape1 shape2)
-               (awhen (collide-shapes shape1 shape2)
-                 (let ((arbiter (ensure-arbiter shape1 shape2 contact-set timestamp)))
-                   (vector-push-extend arbiter arbiters)
-                   (arbiter-inject arbiter it))))))
-      ;; Detect collisions between active and static shapes.
-      (map-world-hash (fun (world-hash-query #'arbitrate static-shapes _ (shape-bbox _)))
-                      active-shapes)
-      ;; This seems to be detecting collisions between active shapes.
-      (world-hash-query-rehash #'arbitrate active-shapes)))
+    ;; Detect collisions between active and static shapes.
+    (map-world-hash (fun (world-hash-query arbitrator static-shapes _ (shape-bbox _)))
+                    active-shapes)
+    ;; This seems to be detecting collisions between active shapes.
+    (world-hash-query-rehash arbitrator active-shapes))
   (filter-world-arbiters world))
 
 (defun prestep-world (world dt dt-inv)
