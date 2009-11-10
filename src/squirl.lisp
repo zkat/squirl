@@ -56,7 +56,7 @@ A solid circle has an inner diameter of 0."
   (loop
      for i below num-verts
      for v1 across t-verts
-     for v2 = (elt t-verts (mod (1+ i) num-verts))
+     for v2 = (svref t-verts (mod (1+ i) num-verts))
      for a = (vec-cross v1 v2)
      for b = (+ (vec. v1 v1) (vec. v1 v2) (vec. v2 v2))
      sum (* a b) into sum1
