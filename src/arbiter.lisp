@@ -6,7 +6,7 @@
 (define-constant +bias-coefficient+ 0.1
   "Determines how fast penetrations resolve themselves.")
 
-(defstruct (contact (:constructor make-contact (point normal distance hash)))
+(defstruct (contact (:constructor make-contact (point normal distance &optional hash)))
   ;; Contact point and normal
   point normal
   ;; Penetration distance
@@ -18,7 +18,7 @@
   (jn-acc 0) (jt-acc 0) (j-bias 0)
   bias
   ;; Hash value used as a (mostly) unique ID
-  hash)
+  (hash 0))
 
 (defun contacts-sum-impulses (&rest contacts)
   (reduce #'vec+ contacts :initial-value +zero-vector+

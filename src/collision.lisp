@@ -19,8 +19,7 @@
                                     (+ 0.5 (maybe/ (- r1 (/ mindist 2))
                                                    dist))))
                      (vec* delta (maybe/ 1 dist)) ; Same as (vec-normalize delta)
-                     (- dist mindist)
-                     0)))))
+                     (- dist mindist))))))
 
 (defun circle-to-segment (circle segment)
   (let* ((radius-sum (+ (circle-radius circle) (segment-radius segment)))
@@ -49,7 +48,7 @@
                              (vec- (segment-trans-normal segment)))))
              (make-contact (vec+ (circle-transformed-center circle)
                                  (vec* normal (+ (circle-radius circle) (/ distance 2))))
-                           normal distance 0)))
+                           normal distance)))
           ((< tangent-distance (+ tangent-distance-max radius-sum))
            (circle-to-circle-query (circle-transformed-center circle)
                                    (segment-trans-b segment)
@@ -195,7 +194,7 @@
                                (vec* normal
                                      (+ (circle-radius circle)
                                         (/ min 2))))
-                         (vec-neg normal) min 0))
+                         (vec-neg normal) min))
           (t (circle-to-circle-query (circle-transformed-center circle)
                                      a (circle-radius circle) 0)))))))
 
