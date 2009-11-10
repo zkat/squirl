@@ -83,6 +83,7 @@ list structure into the `world-hash-junk'."
 
 (defun hash (x y n)
   "Hash X, Y, and N to generate a hash code"
+  (declare (integer x y))
   (expt-mod (* x 2185031351) (* y 4232417593) n))
 
 (defmacro do-bbox ((chain-macro hash-form bbox-form) &body body)

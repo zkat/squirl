@@ -17,6 +17,7 @@ any Lisp worth using for a physics sim.")
 (define-constant +chipmunk-hash-constant+ 3344921057)
 
 (defun hash-pair (x y)
+  (declare (integer x y))
   (expt-mod (* x +chipmunk-hash-constant+)
             (* y +chipmunk-hash-constant+)
             +last-prime+))
