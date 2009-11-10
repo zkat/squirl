@@ -246,9 +246,10 @@
          (map nil #'apply-impulse constraints))))
 
 (defun integrate-velocities (world dt &aux (damping (expt (world-damping world) (- dt))))
-  (with-place (|| world-) (bodies arbiters gravity) world
+  (with-place (|| world-) (active-bodies arbiters gravity) world
     ;; Apply gravity forces.
-    (map nil (fun (unless (staticp _) (body-update-velocity _ gravity damping dt))) bodies)
+    (do-vector (body active-bodies)
+      (body-update-velocity body gravity damping dt))
     ;; Apply cached arbiter impulses.
     (map nil #'arbiter-apply-cached-impulse arbiters)))
 
@@ -262,9 +263,10 @@
 
 (defun world-step (world dt &aux (dt-inv (/ dt))) ; This is our assertion
   "Step the physical state of WORLD by DT seconds."
-  (with-place (|| world-) (bodies active-shapes) world
+  (with-place (|| world-) (active-bodies active-shapes) world
     (flush-arbiters world)
-    (map nil (fun (body-update-position _ dt)) bodies) ; Integrate positions
+    (do-vector (body active-bodies)
+      (body-update-position body dt)) ; Integrate positions
     (resolve-collisions world)
     (prestep-world world dt dt-inv)
     (apply-elastic-impulses world)
