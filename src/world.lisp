@@ -276,7 +276,7 @@
            (arbiter-apply-impulse arbiter elastic-coef))
          (map nil #'apply-impulse constraints))))
 
-(defun world-step (world dt &aux (dt-inv (/ dt))) ; This is our assertion
+(defun world-step (world timestep &aux (dt (float timestep 0d0)) (dt-inv (/ dt)))
   "Step the physical state of WORLD by DT seconds."
   (with-place (|| world-) (active-bodies active-shapes) world
     (flush-arbiters world)
@@ -288,4 +288,3 @@
     (integrate-velocities world dt)
     (solve-impulses world)
     (incf (world-timestamp world))))
-
