@@ -62,12 +62,13 @@
   (:method ((body body) gravity damping dt)
     (with-accessors ((angular-velocity body-angular-velocity)
                      (inv-inertia body-inverse-inertia)
+                     (inv-mass body-inverse-mass)
                      (velocity body-velocity)
                      (torque body-torque)
                      (force body-force)) body
       (setf velocity
             (vec+ (vec* velocity damping)
-                  (vec* (vec+ gravity (vec* force inv-inertia)) dt)))
+                  (vec* (vec+ gravity (vec* force inv-mass)) dt)))
       (setf angular-velocity
             (+ (* angular-velocity damping)
                (* torque inv-inertia dt))))))
@@ -81,7 +82,7 @@
                      (velocity body-velocity)
                      (angle body-angle)) body
       (setf position (vec+ position (vec* (vec+ velocity velocity-bias) dt)))
-      (incf angle (* angular-velocity angular-velocity-bias dt))
+      (incf angle (* (+ angular-velocity angular-velocity-bias) dt))
       (setf velocity-bias +zero-vector+)
       (setf angular-velocity-bias 0))))
 
