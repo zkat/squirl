@@ -28,7 +28,7 @@
     (draw-circle (make-point x y) 2 :resolution 30 :color *red*)))
 
 (defreply init :after ((demo =squirl-demo=))
-  (setf (world demo) (make-world :gravity (vec 0 -100)))
+  (setf (world demo) (make-world :gravity (vec 0 -300)))
   (let ((body (make-body :position (vec 250 60)))
         (floor (make-segment (vec -200 0) (vec 200 0) :elasticity 1d0 :friction 1d0))
         (left-wall (make-segment (vec -200 0) (vec -200 200) :elasticity 1d0 :friction 1d0))
