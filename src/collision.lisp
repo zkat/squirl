@@ -143,8 +143,8 @@
               (setf contacts
                     (nconc contacts
                            (if (> min-norm min-neg)
-                               (find-points-behind-segment segment poly min-norm 1)
-                               (find-points-behind-segment segment poly min-neg -1)))))
+                               (find-points-behind-segment segment poly min-norm 1d0)
+                               (find-points-behind-segment segment poly min-neg -1d0)))))
             ;; If no other collision points were found, try colliding endpoints.
             (if contacts contacts
                 (flet ((try-endpoint (point vertex)

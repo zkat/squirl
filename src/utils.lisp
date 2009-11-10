@@ -81,7 +81,7 @@ as the index vector. Note that this macro doesn't handle declarations properly."
            (let ((,var-name (aref ,vector ,idx-name))) ,@body))))))
 
 (defun maybe/ (a b)
-  (if (zerop b) 0 (/ a b)))
+  (if (zerop b) 0d0 (/ a b)))
 
 (defmacro with-place (conc-name (&rest slots) form &body body)
   (flet ((conc (a b) (intern (format nil "~A~A" a b))))

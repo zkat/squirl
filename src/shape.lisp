@@ -10,12 +10,12 @@
 ;;; Shape
 ;;;
 (defstruct shape
-  body                                  ; Body to which the shape is attached
-  bbox                                  ; Cached BBox for the shape
+  body                           ; Body to which the shape is attached
+  bbox                           ; Cached BBox for the shape
   ;; Surface Properties
-  (elasticity 0)                        ; Coefficient of restitution.
-  (friction 0)                          ; Coefficient of friction.
-  (surface-velocity +zero-vector+)      ; Surface velocity used when solving for friction
+  (elasticity 0d0)                 ; Coefficient of restitution.
+  (friction 0d0)                   ; Coefficient of friction.
+  (surface-velocity +zero-vector+) ; Surface velocity used when solving for friction
   ;; Unique ID, used internally for hashing
   (id (prog1 *shape-id-counter* (incf *shape-id-counter*))))
 
@@ -76,8 +76,8 @@
 ;;;
 (defstruct (circle (:constructor make-circle (radius
                                               &key (center +zero-vector+)
-                                              (elasticity 0)
-                                              (friction 0)))
+                                              (elasticity 0d0)
+                                              (friction 0d0)))
                    (:include shape))
   radius
   ;; Center, in body-relative and world coordinates
@@ -123,7 +123,7 @@
 ;;; Segments
 ;;;
 (defstruct (segment (:constructor make-segment
-                                  (a b  &key (friction 0) (elasticity 0) (radius 1)
+                                  (a b  &key (friction 0d0) (elasticity 0d0) (radius 1d0)
                                      &aux (normal (vec-perp
                                                    (vec-normalize (vec- b a))))))
                     (:include shape))

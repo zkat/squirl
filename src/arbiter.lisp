@@ -8,17 +8,23 @@
 
 (defstruct (contact (:constructor make-contact (point normal distance &optional hash)))
   ;; Contact point and normal
-  point normal
+  (point +zero-vector+ :type vec)
+  (normal +zero-vector+ :type vec)
   ;; Penetration distance
-  distance
+  (distance 0d0 :type double-float)
   ;; Calculated by arbiter-prestep
-  r1 r2
-  normal-mass tangent-mass bounce
+  (r1 +zero-vector+ :type vec)
+  (r2 +zero-vector+ :type vec)
+  (normal-mass 0d0 :type double-float)
+  (tangent-mass 0d0 :type double-float)
+  (bounce 0d0 :type double-float)
   ;; Persistant contact information
-  (jn-acc 0) (jt-acc 0) (j-bias 0)
-  bias
+  (jn-acc 0d0 :type double-float)
+  (jt-acc 0d0 :type double-float)
+  (j-bias 0d0 :type double-float)
+  (bias 0d0 :type double-float)
   ;; Hash value used as a (mostly) unique ID
-  (hash 0))
+  (hash 0 :type fixnum))
 
 (defun contacts-sum-impulses (&rest contacts)
   (reduce #'vec+ contacts :initial-value +zero-vector+
@@ -133,6 +139,7 @@
                                          (contact-jt-acc contact))))))))
 
 (defun arbiter-apply-impulse (arbiter e-coefficient)
+  (declare (optimize speed))
   (let ((body-a (shape-body (arbiter-shape-a arbiter)))
         (body-b (shape-body (arbiter-shape-b arbiter))))
     (dolist (contact (arbiter-contacts arbiter))
@@ -151,7 +158,7 @@
         (let ((jbn (* (- (contact-bias contact) vbn)
                       (contact-normal-mass contact)))
               (jbn-old (contact-j-bias contact)))
-          (setf (contact-j-bias contact) (max 0 (+ jbn-old jbn))
+          (setf (contact-j-bias contact) (max 0d0 (+ jbn-old jbn))
                 jbn (- (contact-j-bias contact) jbn-old))
           ;; Apply bias impulse
           (apply-bias-impulses body-a body-b r1 r2 (vec* n jbn)))
@@ -164,7 +171,7 @@
                              vrn))
                        (contact-normal-mass contact)))
                 (jn-old (contact-jn-acc contact)))
-            (setf (contact-jn-acc contact) (max 0 (+ jn-old jn))
+            (setf (contact-jn-acc contact) (max 0d0 (+ jn-old jn))
                   jn (- (contact-jn-acc contact) jn-old))
             (let*
                 ;; Calculate relative tangent velocity

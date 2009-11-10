@@ -23,7 +23,7 @@
   (rotation +initial-rotation+ :type vec)
   (angular-velocity 0d0) (torque 0d0)
   ;; Velocity bias values used when solving penetrations and correcting constraints.
-  (velocity-bias +zero-vector+) (angular-velocity-bias 0))
+  (velocity-bias +zero-vector+) (angular-velocity-bias 0d0))
 
 (defun make-body (&key (mass most-positive-double-float) (inertia most-positive-double-float)
                   (position +zero-vector+) (velocity +zero-vector+) (force +zero-vector+) actor
@@ -84,7 +84,7 @@
       (setf position (vec+ position (vec* (vec+ velocity velocity-bias) dt)))
       (incf angle (* (+ angular-velocity angular-velocity-bias) dt))
       (setf velocity-bias +zero-vector+)
-      (setf angular-velocity-bias 0))))
+      (setf angular-velocity-bias 0d0))))
 
 (defun body-slew (body pos dt)
   "Modify the velocity of the body so that it will move to the specified absolute coordinates in

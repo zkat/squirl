@@ -21,7 +21,7 @@ A solid circle has an inner diameter of 0."
   ;; return m*length*length/12.0f + m*cpvdot(offset, offset);
   (let ((length (vec-length (vec- point-b point-a))))
     (+ (* mass length (/ length 12))
-       (* mass (vec-length-sq (vec* (vec+ point-a point-b) 1/2))))))
+       (* mass (vec-length-sq (vec* (vec+ point-a point-b) 0.5d0))))))
 
 (defun moment-for-poly (m verts &optional (offset +zero-vector+)
                         &aux (num-verts (length verts))

@@ -115,6 +115,7 @@ WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
              (reduce #'- subtrahends :key #'vec-y
                      :initial-value minuend.y)))))
 
+(declaim (ftype (function (vec double-float) vec) vec*))
 (defun vec* (vec scalar)
   "Multiplies VEC by SCALAR"
   (declare (vec vec))
@@ -123,6 +124,7 @@ WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
       (vec (* vec.x scalar)
            (* vec.y scalar)))))
 
+(declaim (ftype (function (vec vec) double-float) vec. vec-cross))
 (defun vec. (v1 v2)
   "Dot product of two vectors"
   (declare (vec v1 v2))
