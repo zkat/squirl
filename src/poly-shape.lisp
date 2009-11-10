@@ -45,6 +45,7 @@
         (t (vector obj))))
 
 (defun make-poly (vertices &optional (offset +zero-vector+))
+  (assert (validate-vertices (ensure-vector vertices)))
   (let ((poly (%make-poly (length vertices))))
     (set-up-vertices poly (ensure-vector vertices) offset)
     poly))
