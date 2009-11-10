@@ -10,10 +10,8 @@
   "Calculate the moment of inertia for a circle.
 A solid circle has an inner diameter of 0."
   ;; c version: return (1.0f/2.0f)*m*(inner*inner + outer*outer) + m*cpvdot(offset, offset);
-  (+
-   (* mass 1/2 (+ (expt inner-diameter 2)
-               (expt outer-diameter 2)))
-   (* mass (vec. offset offset))))
+  (+ (* mass 1/2 (+ (expt inner-diameter 2) (expt outer-diameter 2)))
+     (* mass (vec-length-sq offset))))
 
 (defun moment-for-segment (mass point-a point-b)
   "Calculate the moment of inertia for a line segment connecting POINT-A to POINT-B."
