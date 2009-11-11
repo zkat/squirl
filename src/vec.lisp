@@ -1,7 +1,7 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
-(declaim (optimize debug safety))
+(declaim (optimize speed))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (deftype vec ()
@@ -11,16 +11,18 @@
            (inline vec))
   (defun vec (x y)
     (let ((v (make-array 2 :element-type 'double-float)))
+      ;; Ignore these warnings; we'll be using complexes soon anyways
       (setf (aref v 0) (float x 1d0)
             (aref v 1) (float y 1d0))
       v))
 
   (declaim (ftype (function (vec) double-float) vec-x vec-y)
            (inline vec-x vec-y) )
-  (defun vec-x (vec)
-    (aref vec 0))
-  (defun vec-y (vec)
-    (aref vec 1)))
+  (locally (declare (optimize (speed 1))) ; For SBCL float returns
+    (defun vec-x (vec)
+      (aref vec 0))
+    (defun vec-y (vec)
+      (aref vec 1))))
 
 ;; this doesn't work very well, since with-place interns things into
 ;; wrong package...
@@ -53,7 +55,6 @@ WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
     (or (eq vec +zero-vector+)          ; Optimization!
         (and (zerop vec.x) (zerop vec.y)))))
 
-;; TODO - Am I sure C uses radians, like lisp?
 (defun angle->vec (angle)
   "Convert radians to a normalized vector"
   (let ((angle (float angle 1d0)))
@@ -115,7 +116,8 @@ WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
              (reduce #'- subtrahends :key #'vec-y
                      :initial-value minuend.y)))))
 
-(declaim (ftype (function (vec double-float) vec) vec*))
+(declaim (ftype (function (vec double-float) vec) vec*)
+         (inline vec*))
 (defun vec* (vec scalar)
   "Multiplies VEC by SCALAR"
   (declare (vec vec))
