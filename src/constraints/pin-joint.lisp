@@ -70,4 +70,3 @@
 
 (defmethod get-impulse ((joint pin-joint))
   (abs (pin-joint-jn-acc joint)))
-

@@ -26,4 +26,3 @@
 
 (defmethod get-impulse ((joint breakable-joint))
   (get-impulse (breakable-joint-delegate joint)))
-

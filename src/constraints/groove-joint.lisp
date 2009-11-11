@@ -83,4 +83,3 @@
 
 (defmethod get-impulse ((joint groove-joint))
   (vec-length (groove-joint-j-acc joint)))
-

@@ -9,4 +9,3 @@
 
 (defgeneric spring-torque (spring relative-angle))
 (defgeneric spring-force (spring distance))
-

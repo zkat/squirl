@@ -74,4 +74,3 @@
 
 (defun impulse-max (constraint dt)
   (* (constraint-max-force constraint) dt))
-

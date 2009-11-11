@@ -13,4 +13,3 @@
   (bias-coefficient *constraint-bias-coefficient*)
   (max-bias most-positive-double-float)
   data)
-

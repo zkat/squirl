@@ -231,4 +231,3 @@
     (ensure-list (circle-to-poly circle poly)))
   (:method ((poly1 poly) (poly2 poly))
     (poly-to-poly poly1 poly2)))
-

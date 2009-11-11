@@ -16,17 +16,17 @@
 
 (defmethod pre-step ((gear gear-joint) dt dt-inv)
   (with-accessors (
-		   (body-a gear-joint-body-a)
-		   (body-b gear-joint-body-b)
-		   (i-sum gear-joint-i-sum)
-		   (j-max gear-joint-j-max)
-		   (bias gear-joint-bias)
-		   (ratio gear-joint-ratio)
-		   (max-bias gear-joint-max-bias)
-		   (bias-coef gear-joint-bias-coefficient)
-		   (ratio-inverse gear-joint-ratio-inverse)
-		   (j-acc gear-joint-j-acc)
-		   (phase gear-joint-phase)) gear
+                   (body-a gear-joint-body-a)
+                   (body-b gear-joint-body-b)
+                   (i-sum gear-joint-i-sum)
+                   (j-max gear-joint-j-max)
+                   (bias gear-joint-bias)
+                   (ratio gear-joint-ratio)
+                   (max-bias gear-joint-max-bias)
+                   (bias-coef gear-joint-bias-coefficient)
+                   (ratio-inverse gear-joint-ratio-inverse)
+                   (j-acc gear-joint-j-acc)
+                   (phase gear-joint-phase)) gear
     ;; calculate moment of inertia coefficient
     (setf i-sum (/ 1d0 (+ (* (body-inverse-inertia body-a) ratio-inverse) (* ratio (body-inverse-inertia body-b)))))
     ;; calculate bias velocity
@@ -39,24 +39,24 @@
 
 (defmethod apply-impulse ((gear gear-joint))
     (with-accessors (
-		   (body-a gear-joint-body-a)
-		   (body-b gear-joint-body-b)
-		   (ratio-inverse gear-joint-ratio-inverse)
-		   (ratio gear-joint-ratio)
-		   (j-max gear-joint-j-max)
-		   (i-sum gear-joint-i-sum)
-		   (j-acc gear-joint-j-acc)
-		   (bias gear-joint-bias)) gear
+                   (body-a gear-joint-body-a)
+                   (body-b gear-joint-body-b)
+                   (ratio-inverse gear-joint-ratio-inverse)
+                   (ratio gear-joint-ratio)
+                   (j-max gear-joint-j-max)
+                   (i-sum gear-joint-i-sum)
+                   (j-acc gear-joint-j-acc)
+                   (bias gear-joint-bias)) gear
       ;; compute relative rotational velocity
       (let* ((wr (- (* (body-angular-velocity body-b) ratio) (body-angular-velocity body-a)))
-	     ;; compute normal impulse
-	     (j (* (- bias wr) i-sum))
-	     (j-old j-acc))
-	(setf j-acc (clamp (+ j-old j) (- j-max) j-max))
-	(setf j (- j-acc j-old))
-	;;  apply impulse
-	(decf (body-angular-velocity body-a) (* j (body-inverse-inertia body-a) ratio-inverse))
-	(incf (body-angular-velocity body-b) (* j (body-inverse-inertia body-b))))))
+             ;; compute normal impulse
+             (j (* (- bias wr) i-sum))
+             (j-old j-acc))
+        (setf j-acc (clamp (+ j-old j) (- j-max) j-max))
+        (setf j (- j-acc j-old))
+        ;;  apply impulse
+        (decf (body-angular-velocity body-a) (* j (body-inverse-inertia body-a) ratio-inverse))
+        (incf (body-angular-velocity body-b) (* j (body-inverse-inertia body-b))))))
 
 (defmethod get-impulse ((gear gear-joint))
   (abs (gear-joint-j-acc gear)))
