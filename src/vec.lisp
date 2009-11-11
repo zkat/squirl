@@ -5,24 +5,20 @@
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (deftype vec ()
-    '(simple-array double-float (2)))
+    '(complex double-float))
 
   (declaim (ftype (function (real real) vec) vec)
            (inline vec))
   (defun vec (x y)
-    (let ((v (make-array 2 :element-type 'double-float)))
-      ;; Ignore these warnings; we'll be using complexes soon anyways
-      (setf (aref v 0) (float x 1d0)
-            (aref v 1) (float y 1d0))
-      v))
+    (complex (float x 1d0) (float y 1d0)))
 
   (declaim (ftype (function (vec) double-float) vec-x vec-y)
            (inline vec-x vec-y) )
   (locally (declare (optimize (speed 1))) ; For SBCL float returns
     (defun vec-x (vec)
-      (aref vec 0))
+      (realpart vec))
     (defun vec-y (vec)
-      (aref vec 1))))
+      (imagpart vec))))
 
 ;; this doesn't work very well, since with-place interns things into
 ;; wrong package...
@@ -48,19 +44,20 @@ WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
   "Convenience macro for nesting WITH-VEC forms"
   `(with-vec ,form ,@(if forms `((with-vecs ,forms ,@body)) body)))
 
+(declaim (ftype (function (vec) boolean) vec-zerop)
+         (inline vec-zerop))
 (defun vec-zerop (vec)
   "Checks whether VEC is a zero vector"
-  (declare (vec vec))
-  (with-vec vec
-    (or (eq vec +zero-vector+)          ; Optimization!
-        (and (zerop vec.x) (zerop vec.y)))))
+  (zerop vec))
 
+(declaim (ftype (function (real) vec) angle->vec)
+         (inline angle->vec))
 (defun angle->vec (angle)
   "Convert radians to a normalized vector"
-  (let ((angle (float angle 1d0)))
-    (vec (cos angle) (sin angle))))
+  (cis angle))
 
-
+(declaim (ftype (function (vec) real) vec->angle)
+         (inline vec->angle))
 (defun vec->angle (vec)
   "Convert a vector to radians."
   (declare (vec vec))
