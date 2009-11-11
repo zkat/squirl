@@ -44,7 +44,7 @@
   (body-%shapes body))
 
 (define-print-object (body)
-  (format t "~@[Actor: ~a; ~]Mass: ~a; Inertia: ~a"
+  (format t "~@[Actor: ~a, ~]Mass: ~a, Inertia: ~a"
           (body-actor body) (body-mass body) (body-inertia body)))
 
 ;;; Wraps the mass, inertia, and angle slots so that setting them updates

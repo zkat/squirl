@@ -55,7 +55,7 @@
     world))
 
 (define-print-object (world)
-  (format t "Iterations: ~a; Elastic iterations: ~a; Gravity: ~a; Body count: ~a"
+  (format t "Iterations: ~a, Elastic iterations: ~a, Gravity: ~a, Body count: ~a"
           (world-iterations world)
           (world-elastic-iterations world)
           (world-gravity world)

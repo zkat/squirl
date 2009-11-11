@@ -28,7 +28,7 @@
   (print-shape shape))
 
 (defmethod print-shape progn ((shape shape))
-  (format t "Body: ~a; "
+  (format t "Body: ~a, "
           (remove #\Space
                   (with-output-to-string (*standard-output*)
                     (print-unreadable-object ((shape-body shape)
@@ -86,7 +86,7 @@
   center transformed-center)
 
 (defmethod print-shape progn ((circle circle))
-  (format t "Center: ~a; Radius: ~a"
+  (format t "Center: ~a, Radius: ~a"
           (circle-center circle) (circle-radius circle)))
 
 (defmethod compute-shape-bbox ((circle circle))
@@ -136,7 +136,7 @@
   trans-a trans-b trans-normal)
 
 (defmethod print-shape progn ((segment segment))
-  (format t "Point A: ~a; Point B: ~a; Radius: ~a"
+  (format t "Point A: ~a, Point B: ~a, Radius: ~a"
           (segment-a segment) (segment-b segment)
           (segment-radius segment)))
 
