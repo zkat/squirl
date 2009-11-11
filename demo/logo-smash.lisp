@@ -37,6 +37,7 @@
 (defparameter *image-width* 188)
 (defparameter *image-height* 35)
 (defparameter *image-row-length* 24)
+(defvar *bullet*)
 
 (defun get-pixel (x y)
   (logand (ash (svref *logo* (+ (ash x -3) (* y *image-row-length*)))
@@ -49,6 +50,14 @@
    (clear-color *white*)
    (world nil)))
 
+(defun ortho-projection (demo)
+  (with-properties (window-width window-height) demo
+    (gl:matrix-mode :projection)
+    (gl:load-identity)
+    (gl:viewport 0 0 window-width window-height)
+    (gl:ortho (- (/ window-width 2)) (/ window-width 2) (- (/ window-height 2)) (/ window-height 2) 10 0)
+    (gl:matrix-mode :modelview)))
+
 (defreply update ((engine =logo-smash=) dt &key)
   (world-step (world engine) (* 1d0 dt)))
 
@@ -56,7 +65,9 @@
   (let* ((position (body-position body))
          (x (vec-x position))
          (y (vec-y position)))
-    (draw-circle (make-point x y) 1 :resolution 50 :color *green*)))
+    (if (eq body *bullet*)
+        (draw-circle (make-point x y) 8 :resolution 50 :color *red*)
+        (draw-circle (make-point x y) 1 :resolution 50 :color *black*))))
 
 (defreply draw ((engine =logo-smash=) &key)
   (map-world #'draw-pixel (world engine)))
@@ -68,14 +79,17 @@
 
 (defreply init :after ((engine =logo-smash=) &key)
   "foo"
+  (ortho-projection engine)
   (setf (world engine) (make-world :iterations 1))
   (loop for y below *image-height*
      do (loop for x below *image-width*
            for x-jitter = (random 0.05) for y-jitter = (random 0.05)
            unless (zerop (get-pixel x y))
-           do (let ((ball (make-ball x y)))
+           do (let ((ball (make-ball (* 2 (- x (/ *image-width* 2) (- x-jitter)))
+                                     (* 2 (- (/ *image-height* 2) y (- y-jitter))))))
                 (world-add-body (world engine) ball))))
   (let ((bullet (make-body :position (vec -1000 -10)
                            :velocity (vec 400 0))))
     (attach-shape (make-circle 8) bullet)
-    (world-add-body (world engine) bullet)))
+    (world-add-body (world engine) bullet)
+    (setf *bullet* bullet)))
