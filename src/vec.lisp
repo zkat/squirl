@@ -183,14 +183,14 @@ This function is symmetric between VEC and ROT."
          (- (* vec.y rot.x)
             (* vec.x rot.y)))))
 
+(declaim (ftype (function (vec) (double-float 0d0)) vec-length vec-length-sq)
+         (inline vec-length vec-length-sq))
 (defun vec-length-sq (vec)
   "Returns the square of a vector's length"
-  (declare (vec vec))
   (vec. vec vec))
 
 (defun vec-length (vec)
   "Returns the vector's length"
-  (declare (vec vec))
   (sqrt (vec-length-sq vec)))
 
 (defun vec-lerp (v1 v2 ratio)
