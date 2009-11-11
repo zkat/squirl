@@ -108,6 +108,9 @@ as the index vector. Note that this macro doesn't handle declarations properly."
            ,form
          ,@body))))
 
+(defmacro aprog1 (result &body body)
+  `(let ((it ,result)) ,@body it))
+
 (defmacro aif (test-form then-form &optional else-form)
   `(let ((it ,test-form))
      (if it ,then-form ,else-form)))

@@ -48,10 +48,9 @@
 
 (defun make-poly (vertices &key (restitution 0d0) (friction 0d0) (offset +zero-vector+))
   (assert (validate-vertices vertices))
-  (let ((poly (%make-poly (length vertices) (float restitution 1d0) (float friction 1d0))))
-    (setf (values (poly-vertices poly) (poly-axes poly))
-          (compute-new-vertices vertices offset))
-    poly))
+  (aprog1 (%make-poly (length vertices) (float restitution 1d0) (float friction 1d0))
+    (setf (values (poly-vertices it) (poly-axes it))
+          (compute-new-vertices vertices offset))))
 
 (defun num-vertices (poly)
   (length (poly-vertices poly)))
