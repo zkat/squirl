@@ -1,7 +1,7 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
-(declaim (optimize speed))
+(declaim (optimize debug safety))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (deftype vec ()

@@ -1,7 +1,7 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
-(declaim (optimize speed))
+(declaim (optimize safety debug))
 
 (defun clamp (n min max)
   (min (max n min) max))

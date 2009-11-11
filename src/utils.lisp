@@ -1,7 +1,7 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
-(declaim (optimize speed))
+(declaim (optimize safety debug))
 
 (defun make-adjustable-vector (length)
   (make-array length :adjustable t :fill-pointer 0))
