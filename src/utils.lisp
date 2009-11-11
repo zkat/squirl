@@ -18,9 +18,9 @@
     (min (max n min) max))
 
   (defun expt-mod (b e m &aux (result 1))
-    (declare (integer b e) (fixnum m result))
-    (do ((expt (mod e m) (ash expt -1))
-         (base (mod b m) (mod (* base base) m)))
+    (declare (fixnum b e m result) (optimize (safety 0)))
+    (do ((expt e (ash expt -1))
+         (base b (mod (* base base) m)))
         ((zerop expt) result)
       (declare (fixnum base expt))
       (when (oddp expt)
