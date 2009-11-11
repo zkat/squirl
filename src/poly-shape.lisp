@@ -20,24 +20,12 @@
 (defstruct (poly (:include shape)
                  (:constructor
                   %make-poly (length restitution friction &aux
-                                     (vertices (make-array length))
-                                     (axes (make-array length))
                                      (transformed-vertices (make-array length))
                                      (transformed-axes (make-array length)))))
   vertices axes transformed-vertices transformed-axes)
 
 (defmethod print-shape progn ((poly poly))
   (format t "Vertex count: ~a" (length (poly-vertices poly))))
-
-(defun set-up-vertices (poly vertices offset &aux (limit (1- (length vertices))))
-  (with-place (poly. poly-) (vertices axes) poly
-    (loop with i = 0 until (> i limit)
-       for b = (vec+ offset (svref vertices i))
-       and a = (vec+ offset (svref vertices limit)) then b
-       for normal = (vec-normalize (vec-perp (vec- b a)))
-       do (setf (svref poly.vertices i) a
-                (svref poly.axes i) (make-poly-axis normal (vec. normal a)))
-          (incf i))))
 
 (defun ensure-vector (obj)
   (cond ((vectorp obj)
@@ -46,10 +34,22 @@
          (make-array (length obj) :initial-contents obj))
         (t (vector obj))))
 
+(defun compute-new-vertices (vertices offset &aux (limit (1- (length vertices))))
+  (loop
+     with new-vertices = (make-adjustable-vector (1+ limit))
+     and  new-axes     = (make-adjustable-vector (1+ limit))
+     for v in vertices for b = (vec+ offset v)
+     and a = (vec+ offset (car (last vertices))) then b
+     for normal = (vec-normalize (vec-perp (vec- b a)))
+     do (vector-push a new-vertices)
+        (vector-push (make-poly-axis normal (vec. normal a)) new-axes)
+     finally (return (values new-vertices new-axes))))
+
 (defun make-poly (vertices &key (restitution 0d0) (friction 0d0) (offset +zero-vector+))
   (assert (validate-vertices (ensure-vector vertices)))
   (let ((poly (%make-poly (length vertices) (float restitution 1d0) (float friction 1d0))))
-    (set-up-vertices poly (ensure-vector vertices) offset)
+    (setf (values (poly-vertices poly) (poly-axes poly))
+          (compute-new-vertices vertices offset))
     poly))
 
 (defun validate-vertices (vertices)
