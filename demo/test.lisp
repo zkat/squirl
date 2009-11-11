@@ -105,8 +105,8 @@
                   (world-bodies world))))
 
 (defun add-circle (demo x y)
-  (let* ((mass (shape-dimension demo))
-         (radius (/ (shape-dimension demo) 2))
+  (let* ((radius (/ (shape-dimension demo) 2))
+         (mass (* pi radius radius))
          (inertia (moment-for-circle mass 0 radius (vec 0 0)))
          (body (make-body :mass mass :inertia inertia :position (vec x y))))
     (attach-shape (make-circle radius :restitution 0.8 :friction 0.5) body)
