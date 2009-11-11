@@ -1,8 +1,6 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
-(declaim (optimize safety debug))
-
 ;; Eventually, this should be (cons t fixnum)
 (deftype handle ()
   "Used internally to track objects added to the hash"

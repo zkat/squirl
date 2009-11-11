@@ -1,8 +1,6 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
-(declaim (optimize safety debug))
-
 (define-constant +primes+
   (loop for x upfrom 2
      and offset in (list 1 3 1 5 3 3 1 9 7 5 3 17 27 3 1 29

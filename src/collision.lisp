@@ -1,8 +1,6 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
-(declaim (optimize safety debug))
-
 (define-constant +collision-slop+ 0.1
   "Amount of allowed penetration.  Used to reduce vibrating contacts.")
 

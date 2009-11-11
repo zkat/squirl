@@ -1,8 +1,6 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
-(declaim (optimize safety debug))
-
 (defstruct (body
              (:constructor
               %make-body (%mass %inertia position velocity force actor %angle

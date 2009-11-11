@@ -1,8 +1,6 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
-(declaim (optimize safety debug))
-
 (defun moment-for-circle (mass inner-diameter outer-diameter &optional (offset +zero-vector+))
   "Calculate the moment of inertia for a circle.
 A solid circle has an inner diameter of 0."

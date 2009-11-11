@@ -1,9 +1,7 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
-(declaim (optimize safety debug))
-
-(locally (declare (optimize speed (debug 1) (safety 1)))
+(locally (declare (optimize speed))
 
   (declaim (inline make-adjustable-vector clamp ensure-list)
            (ftype (function (fixnum) vector) make-adjustable-vector)
