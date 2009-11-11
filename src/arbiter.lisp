@@ -3,7 +3,7 @@
 
 (declaim (optimize speed))
 
-(define-constant +bias-coefficient+ 0.1
+(define-constant +bias-coefficient+ 0.1d0
   "Determines how fast penetrations resolve themselves.")
 
 (defstruct (contact (:constructor make-contact (point normal distance &optional hash)))
@@ -109,10 +109,10 @@
             (contact-bias contact)
             (* (- +bias-coefficient+)
                dt-inverse
-               (min 0.0d0 (+ (contact-distance contact)
+               (min 0d0 (+ (contact-distance contact)
                              +collision-slop+)))
             (contact-j-bias contact)
-            0.0d0
+            0d0
             (contact-bounce contact)
             (* (shape-elasticity shape-a)
                (shape-elasticity shape-b)

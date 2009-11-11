@@ -7,7 +7,7 @@
 ;;; These names can be better
 (defparameter *default-iterations* 10)
 (defparameter *default-elastic-iterations* 0)
-(defparameter *initial-cell-size* 100.0)
+(defparameter *initial-cell-size* 100d0)
 (defparameter *initial-count* 1000)
 (defparameter *initial-array-length* 4)
 
@@ -159,7 +159,7 @@
   (flet ((query-shape (shape)
            (prog1 1.0
              (when (segment-intersects-shape-p shape start end)
-               (when function (funcall function shape 0.0 +zero-vector+))
+               (when function (funcall function shape 0d0 +zero-vector+))
                (setf collisionp t)))))
     (world-hash-query-segment #'query-shape (world-static-shapes world) start end)
     (world-hash-query-segment #'query-shape (world-active-shapes world) start end)
@@ -270,7 +270,7 @@
 (defun solve-impulses (world)
   "Run the impulse solver, using the old-style elastic solver if elastic iterations are disabled"
   (with-place (|| world-) (iterations elastic-iterations arbiters constraints) world
-    (loop with elastic-coef = (if (zerop elastic-iterations) 1.0 0.0)
+    (loop with elastic-coef = (if (zerop elastic-iterations) 1d0 0d0)
        repeat iterations do
          (do-vector (arbiter arbiters)
            (arbiter-apply-impulse arbiter elastic-coef))
