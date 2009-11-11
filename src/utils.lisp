@@ -93,7 +93,7 @@ as the index vector. Note that this macro doesn't handle declarations properly."
         (idx-name (if (listp var) (car var) (gensym "INDEX"))))
     (with-gensyms (vector)
       `(let ((,vector ,vector-form) ,var-name)
-         (declare (ignorable ,var-name))
+         (declare (ignorable ,var-name) (vector ,vector))
          (dotimes (,idx-name (length ,vector) ,result)
            (let ((,var-name (aref ,vector ,idx-name))) ,@body))))))
 

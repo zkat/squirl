@@ -1,6 +1,8 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
+(declaim (ftype (function (body body vec vec) vec) relative-velocity)
+         (inline relative-velocity))
 (defun relative-velocity (body1 body2 r1 r2)
   (vec- (vec+ (body-velocity body2)
               (vec* (vec-perp r2)
@@ -9,6 +11,8 @@
               (vec* (vec-perp r1)
                     (body-angular-velocity body1)))))
 
+(declaim (ftype (function (body body vec vec vec) double-float) normal-relative-velocity)
+         (inline normal-relative-velocity))
 (defun normal-relative-velocity (body1 body2 r1 r2 normal)
   (vec. (relative-velocity body1 body2 r1 r2) normal))
 
@@ -22,6 +26,8 @@
   (body-apply-bias-impulse body2 j r2)
   (values))
 
+(declaim (ftype (function (body body vec vec vec) double-float) k-scalar)
+         (inline k-scalar))
 (defun k-scalar (body1 body2 r1 r2 normal)
   (let ((mass-sum (+ (body-inverse-mass body1)
                      (body-inverse-mass body2)))

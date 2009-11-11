@@ -81,6 +81,7 @@
   arbiter)
 
 (defun arbiter-prestep (arbiter dt-inverse)
+  (declare (optimize speed) (double-float dt-inverse))
   (let* ((shape-a (arbiter-shape-a arbiter))
          (shape-b (arbiter-shape-b arbiter))
          (body-a (shape-body shape-a))

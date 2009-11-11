@@ -13,11 +13,12 @@
   body                           ; Body to which the shape is attached
   bbox                           ; Cached BBox for the shape
   ;; Surface Properties
-  (restitution 0d0)                 ; Coefficient of restitution.
-  (friction 0d0)                   ; Coefficient of friction.
-  (surface-velocity +zero-vector+) ; Surface velocity used when solving for friction
+  (restitution 0d0 :type double-float)                 ; Coefficient of restitution.
+  (friction 0d0 :type double-float)                   ; Coefficient of friction.
+  (surface-velocity +zero-vector+ :type vec) ; Surface velocity used when solving for friction
   ;; Unique ID, used internally for hashing
-  (id (prog1 *shape-id-counter* (incf *shape-id-counter*))))
+  (id (prog1 *shape-id-counter* (incf *shape-id-counter*))
+      :type (unsigned-byte #. (integer-length most-positive-fixnum))))
 
 (defgeneric print-shape (shape)
   (:method-combination progn :most-specific-last))

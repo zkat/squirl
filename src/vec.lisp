@@ -146,6 +146,8 @@ WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
     (- (* v1.x v2.y)
        (* v1.y v2.x))))
 
+(declaim (ftype (function (vec) vec) vec-perp vec-rperp)
+         (inline vec-perp vec-rperp))
 (defun vec-perp (vec)
   "Returns a new vector rotated PI/2 counterclockwise from VEC"
   (declare (vec vec))
