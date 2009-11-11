@@ -3,10 +3,33 @@
 
 (declaim (optimize safety debug))
 
-(defun make-adjustable-vector (length)
-  (make-array length :adjustable t :fill-pointer 0))
+(locally (declare (optimize speed (debug 1) (safety 1)))
 
-(defun ensure-list (x) (if (listp x) x (list x)))
+  (declaim (inline make-adjustable-vector ensure-list)
+           (ftype (function (fixnum) vector) make-adjustable-vector)
+           (ftype (function (t) list) ensure-list)
+           (ftype (function (integer integer fixnum) fixnum) expt-mod))
+  (defun make-adjustable-vector (length)
+    (make-array length :adjustable t :fill-pointer 0))
+
+  (defun ensure-list (x) (if (listp x) x (list x)))
+
+  (defun expt-mod (b e m &aux (result 1))
+    (declare (integer b e) (fixnum m result))
+    (do ((expt (mod e m) (ash expt -1))
+         (base (mod b m) (mod (* base base) m)))
+        ((zerop expt) result)
+      (declare (fixnum base expt))
+      (when (oddp expt)
+        (setf result (mod (* result base) m)))))
+
+)                                     ; LOCALLY
+
+(declaim (inline maybe/)
+         (ftype (function (double-float double-float) double-float) maybe/))
+(defun maybe/ (a b)
+  ;; Don't declare me (optimize speed), because that chokes SBCL
+  (if (zerop b) 0d0 (/ a b)))
 
 (defmacro fun (&body body)
   `(lambda (&optional _) (declare (ignorable _)) ,@body))
@@ -39,15 +62,6 @@ the result of calling DELETE with PREDICATE, place, and the REMOVE-KEYWORDS.")
        (setf (cdr ,cons-sym) ,place
              ,place ,cons-sym))))
 
-(defun expt-mod (b e m &aux (result 1))
-  (declare (optimize speed) (integer b e) (fixnum m result))
-  (do ((expt (mod e m) (ash expt -1))
-       (base (mod b m) (mod (* base base) m)))
-      ((zerop expt) result)
-    (declare (fixnum base expt))
-    (when (oddp expt)
-      (setf result (mod (* result base) m)))))
-
 (defmacro define-constant (name value &optional doc)
   "ANSI-compliant replacement for `defconstant'. cf SBCL Manual 2.3.4."
   `(defconstant ,name (if (boundp ',name) (symbol-value ',name) ,value)
@@ -79,9 +93,6 @@ as the index vector. Note that this macro doesn't handle declarations properly."
          (declare (ignorable ,var-name))
          (dotimes (,idx-name (length ,vector) ,result)
            (let ((,var-name (aref ,vector ,idx-name))) ,@body))))))
-
-(defun maybe/ (a b)
-  (if (zerop b) 0d0 (/ a b)))
 
 (defmacro with-place (conc-name (&rest slots) form &body body)
   (flet ((conc (a b) (intern (format nil "~A~A" a b))))
