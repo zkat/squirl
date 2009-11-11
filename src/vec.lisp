@@ -68,6 +68,7 @@ WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
     (atan vec.y vec.x)))
 
 (define-compiler-macro vec+ (&whole whole &rest rest)
+  (declare (list rest))
   (cond
     ((null rest)
      +zero-vector+)
@@ -94,6 +95,7 @@ WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
 
 
 (define-compiler-macro vec- (&whole whole &rest rest)
+  (declare (list rest))
   (cond
     ((= 1 (length rest))
      `(vec-neg ,(car rest)))

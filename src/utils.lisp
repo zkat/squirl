@@ -5,14 +5,19 @@
 
 (locally (declare (optimize speed (debug 1) (safety 1)))
 
-  (declaim (inline make-adjustable-vector ensure-list)
+  (declaim (inline make-adjustable-vector clamp ensure-list)
            (ftype (function (fixnum) vector) make-adjustable-vector)
+           (ftype (function (double-float double-float double-float) double-float))
            (ftype (function (t) list) ensure-list)
            (ftype (function (integer integer fixnum) fixnum) expt-mod))
   (defun make-adjustable-vector (length)
     (make-array length :adjustable t :fill-pointer 0))
 
   (defun ensure-list (x) (if (listp x) x (list x)))
+
+  (defun clamp (n min max)
+    (declare (double-float n min max))
+    (min (max n min) max))
 
   (defun expt-mod (b e m &aux (result 1))
     (declare (integer b e) (fixnum m result))

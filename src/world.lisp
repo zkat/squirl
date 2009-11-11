@@ -256,7 +256,7 @@
   (with-place (|| world-) (arbiters constraints elastic-iterations) world
     (loop repeat elastic-iterations
        do (do-vector (arbiter arbiters)
-            (arbiter-apply-impulse arbiter 1.0))
+            (arbiter-apply-impulse arbiter 1d0))
           (map nil #'apply-impulse constraints))))
 
 (defun integrate-velocities (world dt &aux (damping (expt (world-damping world) (- dt))))

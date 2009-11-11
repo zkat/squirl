@@ -3,9 +3,6 @@
 
 (declaim (optimize safety debug))
 
-(defun clamp (n min max)
-  (min (max n min) max))
-
 (defun moment-for-circle (mass inner-diameter outer-diameter &optional (offset +zero-vector+))
   "Calculate the moment of inertia for a circle.
 A solid circle has an inner diameter of 0."
