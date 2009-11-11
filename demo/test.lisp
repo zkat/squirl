@@ -147,8 +147,9 @@
 
 (defreply mouse-down ((engine =squirl-demo=) button)
   (case button
-    (0 (add-car engine (mouse-x engine) (mouse-y engine)))
+    (0 (add-circle engine (mouse-x engine) (mouse-y engine)))
     (1 (add-poly engine (mouse-x engine) (mouse-y engine)))
+    (2 (add-car engine (mouse-x engine) (mouse-y engine)))
     (3 (incf (shape-dimension engine) (shape-dimension-increment engine)))
     (4 (decf (shape-dimension engine) (shape-dimension-increment engine)))))
 
