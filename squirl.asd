@@ -41,7 +41,7 @@
   :version "0.1 (unreleased)"
   :maintainer "Kat Marchán <kzm@sykosomatic.org>"
   :licence "MIT"
-  :depends-on (:squirl :until-it-dies)
+  :depends-on (:squirl :until-it-dies.base)
   :components
   ((:module "demo"
             :components
