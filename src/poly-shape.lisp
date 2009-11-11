@@ -29,13 +29,15 @@
 (defmethod print-shape progn ((poly poly))
   (format t "Vertex count: ~a" (length (poly-vertices poly))))
 
-(defun set-up-vertices (poly vertices offset)
-  (loop for vert across vertices for i from 0
-     for a = (vec+ offset vert)
-     for b = (vec+ offset (aref vertices (mod (1+ i) (length vertices))))
-     for normal = (vec-normalize (vec-perp (vec- b a)))
-     do (setf (svref (poly-vertices poly) i) a
-              (svref (poly-axes poly) i) (make-poly-axis normal (vec. normal a)))))
+(defun set-up-vertices (poly vertices offset &aux (limit (1- (length vertices))))
+  (with-place (poly. poly-) (vertices axes) poly
+    (loop with i = 0 until (> i limit)
+       for b = (vec+ offset (svref vertices i))
+       and a = (vec+ offset (svref vertices limit)) then b
+       for normal = (vec-normalize (vec-perp (vec- b a)))
+       do (setf (svref poly.vertices i) a
+                (svref poly.axes i) (make-poly-axis normal (vec. normal a)))
+          (incf i))))
 
 (defun ensure-vector (obj)
   (cond ((vectorp obj)
