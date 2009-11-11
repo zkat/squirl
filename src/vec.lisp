@@ -124,9 +124,8 @@ WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
   "Multiplies VEC by SCALAR"
   (declare (vec vec))
   (let ((scalar (float scalar 1d0)))
-    (with-vec vec
-      (vec (* vec.x scalar)
-           (* vec.y scalar)))))
+    (with-accessors ((vec.x vec-x) (vec.y vec-y)) vec
+      (vec (* vec.x scalar) (* vec.y scalar)))))
 
 (declaim (ftype (function (vec vec) double-float) vec. vec-cross))
 (defun vec. (v1 v2)

@@ -76,10 +76,9 @@
 ;;;
 ;;; Circles
 ;;;
-(defstruct (circle (:constructor make-circle (radius
-                                              &key (center +zero-vector+)
-                                              (elasticity 0d0)
-                                              (friction 0d0)))
+(defstruct (circle (:constructor make-circle
+                                 (radius &key (center +zero-vector+)
+                                         (elasticity 0d0) (friction 0d0)))
                    (:include shape))
   radius
   ;; Center, in body-relative and world coordinates
