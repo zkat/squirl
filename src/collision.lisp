@@ -18,7 +18,7 @@
        (make-contact (vec+ p1 (vec* delta
                                     (+ 0.5 (maybe/ (- r1 (/ mindist 2))
                                                    dist))))
-                     (vec* delta (maybe/ 1 dist)) ; Same as (vec-normalize delta)
+                     (vec* delta (maybe/ 1d0 dist)) ; Same as (vec-normalize delta)
                      (- dist mindist))))))
 
 (defun circle-to-segment (circle segment)
