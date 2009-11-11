@@ -127,7 +127,8 @@ WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
     (with-accessors ((vec.x vec-x) (vec.y vec-y)) vec
       (vec (* vec.x scalar) (* vec.y scalar)))))
 
-(declaim (ftype (function (vec vec) double-float) vec. vec-cross))
+(declaim (ftype (function (vec vec) double-float) vec. vec-cross)
+         (inline vec. vec-cross))
 (defun vec. (v1 v2)
   "Dot product of two vectors"
   (declare (vec v1 v2))

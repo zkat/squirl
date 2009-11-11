@@ -110,12 +110,14 @@ Intended for objects that are moved manually with a custom velocity integration 
 (defun body-apply-impulse (body impulse relative)
   "Apply an impulse (in world coordinates) to the body at a point relative to the center of
 gravity (also in world coordinates)."
+  (declare (optimize speed))
   (with-accessors ((angular-velocity body-angular-velocity)
                    (inverse-inertia body-inverse-inertia)
                    (inverse-mass body-inverse-mass)
                    (velocity body-velocity)) body
     (setf velocity (vec+ velocity (vec* impulse inverse-mass)))
-    (incf angular-velocity (* inverse-inertia (vec-cross relative impulse)))))
+    (incf angular-velocity (* inverse-inertia (vec-cross relative impulse)))
+    (values)))
 
 (defun body-apply-bias-impulse (body impulse relative)
   ;; From C: "Not intended for external use. Used by cpArbiter.c and cpConstraint.c."
