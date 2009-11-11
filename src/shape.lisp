@@ -134,7 +134,7 @@
   ;; World-relative endpoints & normal
   trans-a trans-b trans-normal)
 
-(defun make-segment (a b &key (friction 0d0) (elasticity 0d0) (radius 0d0))
+(defun make-segment (a b &key (friction 0d0) (elasticity 0d0) (radius 1d0))
   (%make-segment a b (float friction 1d0) (float elasticity 1d0) (float radius 1d0)))
 
 (defmethod print-shape progn ((segment segment))
