@@ -20,22 +20,29 @@
        (world-step *world* *step*)
        (decf *elapsed* *step*)))
 
+(defun ortho-projection (demo)
+  (with-properties (window-width window-height) demo
+    (gl:matrix-mode :projection)
+    (gl:load-identity)
+    (gl:viewport 0 0 window-width window-height)
+    (gl:ortho (- window-width) window-width (- window-height) window-height 10 0)
+    (gl:matrix-mode :modelview)))
+
 (defreply init :after ((demo =squirl-demo-pyramid=))
   (reset-shape-id-counter)
+  (ortho-projection demo)
   (setf *world* (make-world :iterations 20
                             :gravity (vec 0 -300)))
   (resize-world-active-hash *world* 40.0 2999)
   (resize-world-static-hash *world* 40.0 999)
-  
   (setf *floor* (make-body))
   (attach-shape (make-segment (vec -600 -240)
                               (vec 600 -240)
                               :radius 0d0
                               :elasticity 1
                               :friction 1)
-                  *floor*)
+                *floor*)
   (world-add-body *world* *floor*)
-  
   (let ((friction 0.6)
         (verts (list (vec -3 -20)
                      (vec -3 20)
@@ -48,46 +55,46 @@
                          (* (- n i) 52))
        do (loop
              for j from 0 to i do
-               (mapc (lambda (body)
-                       (attach-shape (make-poly verts
-                                                :friction friction
-                                                :elasticity 0)
-                                     body)
-                       (world-add-body *world* body))
-                     (nconc
+             (mapc (lambda (body)
+                     (attach-shape (make-poly verts
+                                              :friction friction
+                                              :elasticity 0)
+                                   body)
+                     (world-add-body *world* body))
+                   (nconc
+                    (list (make-body
+                           :mass 1
+                           :inertia (moment-for-poly 1 verts)
+                           :position (vec+ (vec (* j 60) -220)
+                                           offset))
+                          (make-body
+                           :mass 1
+                           :inertia (moment-for-poly 1 verts)
+                           :position (vec+ (vec (* j 60) -197)
+                                           offset)
+                           :angle (/ pi 2)))
+                    (unless (= j (1- i))
                       (list (make-body
                              :mass 1
                              :inertia (moment-for-poly 1 verts)
-                             :position (vec+ (vec (* j 60) -220)
-                                             offset))
-                            (make-body
-                             :mass 1
-                             :inertia (moment-for-poly 1 verts)
-                             :position (vec+ (vec (* j 60) -197)
+                             :position (vec+ (vec (+ (* j 60) 30)
+                                                  -191)
                                              offset)
-                             :angle (/ pi 2)))
-                      (unless (= j (1- i))
-                        (list (make-body
-                               :mass 1
-                               :inertia (moment-for-poly 1 verts)
-                               :position (vec+ (vec (+ (* j 60) 30)
-                                                    -191)
-                                               offset)
-                               :angle (/ pi 2)))))))
-         (mapc (lambda (body)
-                 (attach-shape (make-poly verts
-                                          :friction friction
-                                          :elasticity 0)
-                               body)
-                 (world-add-body *world* body))
-               (list (make-body
-                      :mass 1
-                      :inertia (moment-for-poly 1 verts)
-                      :position (vec+ (vec (+ (* (1- i) 60) 17)
-                                           -174)
-                                      offset)))))))
+                             :angle (/ pi 2)))))))
+       (mapc (lambda (body)
+               (attach-shape (make-poly verts
+                                        :friction friction
+                                        :elasticity 0)
+                             body)
+               (world-add-body *world* body))
+             (list (make-body
+                    :mass 1
+                    :inertia (moment-for-poly 1 verts)
+                    :position (vec+ (vec (+ (* (1- i) 60) 17)
+                                         -174)
+                                    offset)))))))
 
-(defreply draw ((demo =squirl-demo-pyramid=))
+(defreply draw ((demo =squirl-demo-pyramid=) &key)
   (map-world #'draw-body *world*))
 
 (defun draw-body (body)
