@@ -113,10 +113,13 @@ WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
   (declare (vec minuend))
   (with-vec minuend
     (if (null subtrahends) (vec-neg minuend)
-        (vec (reduce #'- subtrahends :key #'vec-x
-                     :initial-value minuend.x)
-             (reduce #'- subtrahends :key #'vec-y
-                     :initial-value minuend.y)))))
+        (loop
+           with x double-float = minuend.x
+           and  y double-float = minuend.y
+           for vec in subtrahends do
+             (decf x (vec-x vec))
+             (decf y (vec-y vec))
+           finally (return (vec x y))))))
 
 (declaim (ftype (function (vec double-float) vec) vec*)
          (inline vec*))
