@@ -148,42 +148,42 @@
          (avb-a (body-angular-velocity-bias body-a))
          (avb-b (body-angular-velocity-bias body-b)))
     (dolist (contact (arbiter-contacts arbiter))
-      (let* ((n (contact-normal contact))
-             (r1 (contact-r1 contact))
-             (r2 (contact-r2 contact))
-             ;; Relative bias velocities
-             (vb1 (vec+ vb-a (vec* (vec-perp r1) avb-a)))
-             (vb2 (vec+ vb-b (vec* (vec-perp r2) avb-b)))
-             (vbn (vec. (vec- vb2 vb1) n)))
-        ;; Calculate and clamp bias impulse
-        (let ((jbn (* (- (contact-bias contact) vbn)
-                      (contact-normal-mass contact)))
-              (jbn-old (contact-j-bias contact)))
-          (setf (contact-j-bias contact) (max 0d0 (+ jbn-old jbn))
-                jbn (- (contact-j-bias contact) jbn-old))
-          ;; Apply bias impulse
-          (apply-bias-impulses body-a body-b r1 r2 (vec* n jbn)))
-        ;; Calculate relative velocity
-        (let* ((vr (relative-velocity body-a body-b r1 r2))
-               (vrn (vec. vr n)))
-          ;; Calculate and clamp the normal impulse
-          (let ((jn (* (- (+ (* (contact-bounce contact)
-                                e-coefficient)
-                             vrn))
-                       (contact-normal-mass contact)))
-                (jn-old (contact-jn-acc contact)))
-            (setf (contact-jn-acc contact) (max 0d0 (+ jn-old jn))
-                  jn (- (contact-jn-acc contact) jn-old))
-            (let*
-                ;; Calculate relative tangent velocity
-                ((vrt (vec. (vec+ vr (arbiter-target-v arbiter))
-                            (vec-perp n)))
-                 ;; Calculate and clamp friction impulse
-                 (jt-max (* (arbiter-u arbiter)
-                            (contact-jn-acc contact)))
-                 (jt (* (- vrt) (contact-tangent-mass contact)))
-                 (jt-old (contact-jt-acc contact)))
-              (setf (contact-jt-acc contact) (clamp (+ jt-old jt) (- jt-max) jt-max)
-                    jt (- (contact-jt-acc contact) jt-old))
-              (apply-impulses body-a body-b r1 r2
-                              (vec-rotate n (vec jn jt))))))))))
+      (flet ((relative-bias-velocity (vb r avb)
+               (vec+ vb (vec* (vec-perp r) avb))))
+        (let* ((n (contact-normal contact))
+               (r1 (contact-r1 contact))
+               (r2 (contact-r2 contact))
+               ;; Relative bias velocities
+               (vb1 (relative-bias-velocity vb-a r1 avb-a))
+               (vb2 (relative-bias-velocity vb-b r2 avb-b))
+               (vbn (vec. (vec- vb2 vb1) n)))
+          ;; Calculate and clamp bias impulse
+          (let ((jbn (* (- (contact-bias contact) vbn)
+                        (contact-normal-mass contact)))
+                (jbn-old (contact-j-bias contact)))
+            (setf (contact-j-bias contact) (max 0d0 (+ jbn-old jbn))
+                  jbn (- (contact-j-bias contact) jbn-old))
+            ;; Apply bias impulse
+            (apply-bias-impulses body-a body-b r1 r2 (vec* n jbn)))
+          ;; Calculate relative velocity
+          (let* ((relative-velocity (relative-velocity body-a body-b r1 r2))
+                 (n-relative-velocity (vec. relative-velocity n)))
+            (flet ((calculate-normal-impulse (contact e-coef nrv)
+                     (* (- (+ (* (contact-bounce contact) e-coef) nrv))
+                        (contact-normal-mass contact))))
+              (let ((jn (calculate-normal-impulse contact e-coefficient n-relative-velocity))
+                    (jn-old (contact-jn-acc contact)))
+                (setf (contact-jn-acc contact) (max 0d0 (+ jn-old jn))
+                      jn (- (contact-jn-acc contact) jn-old))
+                (let* ((relative-tangent-velocity (vec. (vec+ relative-velocity
+                                                              (arbiter-target-v arbiter))
+                                                        (vec-perp n)))
+                       ;; Calculate and clamp friction impulse
+                       (jt-max (* (arbiter-u arbiter)
+                                  (contact-jn-acc contact)))
+                       (jt (* (- relative-tangent-velocity) (contact-tangent-mass contact)))
+                       (jt-old (contact-jt-acc contact)))
+                  (setf (contact-jt-acc contact) (clamp (+ jt-old jt) (- jt-max) jt-max)
+                        jt (- (contact-jt-acc contact) jt-old))
+                  (apply-impulses body-a body-b r1 r2
+                                  (vec-rotate n (vec jn jt))))))))))))
