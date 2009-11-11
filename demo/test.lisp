@@ -3,6 +3,33 @@
   (:export :run-demo))
 (in-package :squirl-demo)
 
+(defparameter *fps-sample-size* 5)
+(let (last-frame
+      (fps-stack)
+      (frames 0)
+      (cumulative-mean 0))
+  (defun notify-frame ()
+    (when (> (length fps-stack) *fps-sample-size*)
+      (setf (cdr (last fps-stack 2)) nil))
+    (let ((now (/ (get-internal-real-time)
+                  internal-time-units-per-second)))
+      (when last-frame
+        (push (/ (- now last-frame))
+              fps-stack)
+        (setf cumulative-mean (/ (+ (last-fps)
+                                    (* frames cumulative-mean))
+                                 (1+ frames)))
+        (incf frames))
+      (setf last-frame now)))
+  (defun last-fps ()
+    (first fps-stack))
+  (defun mean-fps ()
+    (/ (apply #'+ fps-stack) (length fps-stack)))
+  (defun cumulative-mean-fps ()
+    cumulative-mean)
+  (defun get-fps-stack ()
+    fps-stack))
+
 (defproto =squirl-demo= (=engine=)
   ((title "Demo for SquirL")
    (window-width 500)
@@ -78,6 +105,10 @@
                :color *blue*)))
 
 (defreply draw ((demo =squirl-demo=) &key)
+  (format t "FPS: ~7,2f/~7,2f/~7,2f~%"
+          (last-fps)
+          (mean-fps)
+          (cumulative-mean-fps))
   (map-world #'draw-body (world demo))
   (draw-scale (shape-dimension demo) (mouse-x demo) (mouse-y demo)))
 
@@ -85,6 +116,7 @@
 ;; This means the physics -should- run at the same perceived speed no matter
 ;; how fast your computer's calculating :)
 (defreply update ((demo =squirl-demo=) dt &key)
+  (notify-frame)
   (update-world-state demo dt)
   (empty-out-bottomless-pit (world demo)))
 
