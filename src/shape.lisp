@@ -1,7 +1,7 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
-(declare (optimize safety debug))
+(declaim (optimize safety debug))
 
 (defparameter *shape-id-counter* 0)
 
