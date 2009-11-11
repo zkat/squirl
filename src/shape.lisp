@@ -76,13 +76,14 @@
 ;;;
 ;;; Circles
 ;;;
-(defstruct (circle (:constructor make-circle
-                                 (radius &key (center +zero-vector+)
-                                         (elasticity 0d0) (friction 0d0)))
+(defstruct (circle (:constructor %make-circle (radius center elasticity friction))
                    (:include shape))
   radius
   ;; Center, in body-relative and world coordinates
   center transformed-center)
+
+(defun make-circle (radius &key (center +zero-vector+) (elasticity 0d0) (friction 0d0))
+  (%make-circle (float radius 1d0) center (float elasticity 1d0) (float friction 1d0)))
 
 (defmethod print-shape progn ((circle circle))
   (format t "Center: ~a, Radius: ~a"
@@ -123,16 +124,18 @@
 ;;;
 ;;; Segments
 ;;;
-(defstruct (segment (:constructor make-segment
-                                  (a b  &key (friction 0d0) (elasticity 0d0) (radius 1d0)
-                                     &aux (normal (vec-perp
-                                                   (vec-normalize (vec- b a))))))
+(defstruct (segment (:constructor %make-segment
+                                  (a b friction elasticity radius
+                                     &aux (normal (vec-perp (vec-normalize (vec- b a))))))
                     (:include shape))
   radius                                ; Thickness
   ;; Body-relative endpoints & normal
   a b normal
   ;; World-relative endpoints & normal
   trans-a trans-b trans-normal)
+
+(defun make-segment (a b &key (friction 0d0) (elasticity 0d0) (radius 0d0))
+  (%make-segment a b (float friction 1d0) (float elasticity 1d0) (float radius 1d0)))
 
 (defmethod print-shape progn ((segment segment))
   (format t "Point A: ~a, Point B: ~a, Radius: ~a"

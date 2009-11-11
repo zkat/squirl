@@ -48,7 +48,7 @@
 
 (defun make-poly (vertices &key (elasticity 0d0) (friction 0d0) (offset +zero-vector+))
   (assert (validate-vertices (ensure-vector vertices)))
-  (let ((poly (%make-poly (length vertices) elasticity friction)))
+  (let ((poly (%make-poly (length vertices) (float elasticity 1d0) (float friction 1d0))))
     (set-up-vertices poly (ensure-vector vertices) offset)
     poly))
 
