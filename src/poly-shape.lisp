@@ -27,13 +27,6 @@
 (defmethod print-shape progn ((poly poly))
   (format t "Vertex count: ~a" (length (poly-vertices poly))))
 
-(defun ensure-vector (obj)
-  (cond ((vectorp obj)
-         obj)
-        ((listp obj)
-         (make-array (length obj) :initial-contents obj))
-        (t (vector obj))))
-
 (defun compute-new-vertices (vertices offset &aux (limit (1- (length vertices))))
   (loop
      with new-vertices = (make-adjustable-vector (1+ limit))
@@ -45,23 +38,20 @@
         (vector-push (make-poly-axis normal (vec. normal a)) new-axes)
      finally (return (values new-vertices new-axes))))
 
+(defun validate-vertices (vertices)
+  "Check that a set of vertices has a correct winding, and that they form a convex polygon."
+  (loop with tail = (last vertices 2)
+     for c in vertices
+     and a = (pop tail) then b
+     and b = (pop tail) then c
+     always (minusp (vec-cross (vec- b a) (vec- c b)))))
+
 (defun make-poly (vertices &key (restitution 0d0) (friction 0d0) (offset +zero-vector+))
-  (assert (validate-vertices (ensure-vector vertices)))
+  (assert (validate-vertices vertices))
   (let ((poly (%make-poly (length vertices) (float restitution 1d0) (float friction 1d0))))
     (setf (values (poly-vertices poly) (poly-axes poly))
           (compute-new-vertices vertices offset))
     poly))
-
-(defun validate-vertices (vertices)
-  "Check that a set of vertices has a correct winding, and that they form a convex polygon."
-  (loop with length = (length vertices)
-     for i from 0
-     for vert-a across vertices
-     for vert-b = (svref vertices (mod (1+ i) length))
-     for vert-c = (svref vertices (mod (+ i 2) length))
-     unless (minusp (vec-cross (vec- vert-b vert-a) (vec- vert-c vert-b)))
-     return nil
-     finally (return t)))
 
 (defun num-vertices (poly)
   (length (poly-vertices poly)))
