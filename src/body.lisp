@@ -9,11 +9,14 @@
                                 &aux (inverse-mass (/ %mass))
                                      (inverse-inertia (/ %inertia))
                                      (rotation (angle->vec %angle)))))
-  world ; world that this body is attached to, if any.
-  actor ; Actor used for the COLLIDE "callback"
-  %shapes ; shapes associated with this body.
+  world                 ; world that this body is attached to, if any.
+  actor                 ; Actor used for the COLLIDE "callback"
+  %shapes               ; shapes associated with this body.
   ;; Mass properties, and cached inverses
-  %mass inverse-mass %inertia inverse-inertia
+  (%mass (assert nil) :type double-float)
+  (inverse-mass (assert nil) :type double-float)
+  (%inertia (assert nil) :type double-float)
+  (inverse-inertia (assert nil) :type double-float)
   ;; Linear components of motion
   (position +zero-vector+ :type vec)
   (velocity +zero-vector+ :type vec)
@@ -21,9 +24,11 @@
   ;; Angular components of motion, and cached rotation vector
   (%angle 0d0 :type double-float)
   (rotation +initial-rotation+ :type vec)
-  (angular-velocity 0d0) (torque 0d0)
+  (angular-velocity 0d0 :type double-float)
+  (torque 0d0 :type double-float)
   ;; Velocity bias values used when solving penetrations and correcting constraints.
-  (velocity-bias +zero-vector+) (angular-velocity-bias 0d0))
+  (velocity-bias +zero-vector+ :type vec)
+  (angular-velocity-bias 0d0 :type double-float))
 
 (defun make-body (&key (mass most-positive-double-float) (inertia most-positive-double-float)
                   (position +zero-vector+) (velocity +zero-vector+) (force +zero-vector+) actor
@@ -126,7 +131,7 @@ gravity (also in world coordinates)."
 (defun body-reset-forces (body)
   "Zero the forces on a body."
   (setf (body-force body) +zero-vector+
-        (body-torque body) 0))
+        (body-torque body) 0d0))
 
 (defun body-apply-force (body force r)
   "Apply a force (in world coordinates) to a body at a point relative to the center
