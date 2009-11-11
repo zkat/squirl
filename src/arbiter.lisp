@@ -49,13 +49,15 @@
 
 (defstruct (arbiter (:constructor make-arbiter (contacts shape-a shape-b stamp)))
   ;; Information on the contact points between the objects
-  contacts
+  (contacts (assert nil) :type list)
   ;; The two shapes involved in the collision
-  shape-a shape-b
+  (shape-a (assert nil) :type shape)
+  (shape-b (assert nil) :type shape)
   ;; Calculated by arbiter-prestep
-  u target-v ; todo - give these better names. -- zkat
+  (u 0d0 :type double-float)
+  (target-v +zero-vector+ :type vec)
   ;; Timestamp of the arbiter (from world)
-  stamp)
+  (stamp (assert nil) :type fixnum))
 
 (defun arbiter-shapes-equal (arbiter1 arbiter2)
   (or (and (eq (arbiter-shape-a arbiter1) (arbiter-shape-a arbiter2))
@@ -138,8 +140,9 @@
                                     (vec (contact-jn-acc contact)
                                          (contact-jt-acc contact))))))))
 
+(declaim (ftype (function (arbiter double-float)) arbiter-apply-impulse))
 (defun arbiter-apply-impulse (arbiter e-coefficient)
-  (declare (optimize speed))
+  (declare (arbiter arbiter) (double-float e-coefficient) (optimize speed))
   (let ((body-a (shape-body (arbiter-shape-a arbiter)))
         (body-b (shape-body (arbiter-shape-b arbiter))))
     (dolist (contact (arbiter-contacts arbiter))
@@ -179,12 +182,10 @@
                             (vec-perp n)))
                  ;; Calculate and clamp friction impulse
                  (jt-max (* (arbiter-u arbiter)
-                           (contact-jn-acc contact)))
+                            (contact-jn-acc contact)))
                  (jt (* (- vrt) (contact-tangent-mass contact)))
                  (jt-old (contact-jt-acc contact)))
-              (setf (contact-jt-acc contact) (clamp (+ jt-old jt)
-                                                    (- jt-max)
-                                                    jt-max)
+              (setf (contact-jt-acc contact) (clamp (+ jt-old jt) (- jt-max) jt-max)
                     jt (- (contact-jt-acc contact) jt-old))
               (apply-impulses body-a body-b r1 r2
                               (vec-rotate n (vec jn jt))))))))))

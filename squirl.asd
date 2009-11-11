@@ -7,7 +7,7 @@
   :components
   ((:module "src"
             :components
-            ((:file "arbiter"        :depends-on ("vec" "constraints"))
+            ((:file "arbiter"        :depends-on ("vec" "shape" "constraints"))
              (:file "body"           :depends-on ("vec"))
              (:file "bounding-box"   :depends-on ("vec"))
              (:file "collision"      :depends-on ("shape" "poly-shape"))
