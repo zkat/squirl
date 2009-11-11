@@ -39,7 +39,7 @@
   (attach-shape (make-segment (vec -600 -240)
                               (vec 600 -240)
                               :radius 0d0
-                              :elasticity 1
+                              :restitution 1
                               :friction 1)
                 *floor*)
   (world-add-body *world* *floor*)
@@ -58,7 +58,7 @@
              (mapc (lambda (body)
                      (attach-shape (make-poly verts
                                               :friction friction
-                                              :elasticity 0)
+                                              :restitution 0)
                                    body)
                      (world-add-body *world* body))
                    (nconc
@@ -84,7 +84,7 @@
        (mapc (lambda (body)
                (attach-shape (make-poly verts
                                         :friction friction
-                                        :elasticity 0)
+                                        :restitution 0)
                              body)
                (world-add-body *world* body))
              (list (make-body

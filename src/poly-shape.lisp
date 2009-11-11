@@ -21,7 +21,7 @@
 
 (defstruct (poly (:include shape)
                  (:constructor
-                  %make-poly (length elasticity friction &aux
+                  %make-poly (length restitution friction &aux
                                      (vertices (make-array length))
                                      (axes (make-array length))
                                      (transformed-vertices (make-array length))
@@ -46,9 +46,9 @@
          (make-array (length obj) :initial-contents obj))
         (t (vector obj))))
 
-(defun make-poly (vertices &key (elasticity 0d0) (friction 0d0) (offset +zero-vector+))
+(defun make-poly (vertices &key (restitution 0d0) (friction 0d0) (offset +zero-vector+))
   (assert (validate-vertices (ensure-vector vertices)))
-  (let ((poly (%make-poly (length vertices) (float elasticity 1d0) (float friction 1d0))))
+  (let ((poly (%make-poly (length vertices) (float restitution 1d0) (float friction 1d0))))
     (set-up-vertices poly (ensure-vector vertices) offset)
     poly))
 

@@ -15,7 +15,7 @@
   body                           ; Body to which the shape is attached
   bbox                           ; Cached BBox for the shape
   ;; Surface Properties
-  (elasticity 0d0)                 ; Coefficient of restitution.
+  (restitution 0d0)                 ; Coefficient of restitution.
   (friction 0d0)                   ; Coefficient of friction.
   (surface-velocity +zero-vector+) ; Surface velocity used when solving for friction
   ;; Unique ID, used internally for hashing
@@ -76,14 +76,14 @@
 ;;;
 ;;; Circles
 ;;;
-(defstruct (circle (:constructor %make-circle (radius center elasticity friction))
+(defstruct (circle (:constructor %make-circle (radius center restitution friction))
                    (:include shape))
   radius
   ;; Center, in body-relative and world coordinates
   center transformed-center)
 
-(defun make-circle (radius &key (center +zero-vector+) (elasticity 0d0) (friction 0d0))
-  (%make-circle (float radius 1d0) center (float elasticity 1d0) (float friction 1d0)))
+(defun make-circle (radius &key (center +zero-vector+) (restitution 0d0) (friction 0d0))
+  (%make-circle (float radius 1d0) center (float restitution 1d0) (float friction 1d0)))
 
 (defmethod print-shape progn ((circle circle))
   (format t "Center: ~a, Radius: ~a"
@@ -125,7 +125,7 @@
 ;;; Segments
 ;;;
 (defstruct (segment (:constructor %make-segment
-                                  (a b friction elasticity radius
+                                  (a b friction restitution radius
                                      &aux (normal (vec-perp (vec-normalize (vec- b a))))))
                     (:include shape))
   radius                                ; Thickness
@@ -134,8 +134,8 @@
   ;; World-relative endpoints & normal
   trans-a trans-b trans-normal)
 
-(defun make-segment (a b &key (friction 0d0) (elasticity 0d0) (radius 1d0))
-  (%make-segment a b (float friction 1d0) (float elasticity 1d0) (float radius 1d0)))
+(defun make-segment (a b &key (friction 0d0) (restitution 0d0) (radius 1d0))
+  (%make-segment a b (float friction 1d0) (float restitution 1d0) (float radius 1d0)))
 
 (defmethod print-shape progn ((segment segment))
   (format t "Point A: ~a, Point B: ~a, Radius: ~a"

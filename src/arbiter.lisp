@@ -116,8 +116,8 @@
             (contact-j-bias contact)
             0d0
             (contact-bounce contact)
-            (* (shape-elasticity shape-a)
-               (shape-elasticity shape-b)
+            (* (shape-restitution shape-a)
+               (shape-restitution shape-b)
                (normal-relative-velocity body-a body-b
                                          (contact-r1 contact)
                                          (contact-r2 contact)

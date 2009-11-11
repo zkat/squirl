@@ -11,23 +11,23 @@
 
 (defun world-box (a1 b1 a2 b2 a3 b3 a4 b4 space static-body)
   (let ((shape (make-segment static-body a1 b1 1.0)))
-    (setf (shape-elasticity shape) 1.0)
+    (setf (shape-restitution shape) 1.0)
     (setf (shape-friction shape) 1.0)
 
     (world-add-static-shape space shape)
 
     (setf shape (make-segment static-body a2 b2 1.0))
-    (setf (shape-elasticity shape) 1.0)
+    (setf (shape-restitution shape) 1.0)
     (setf (shape-friction shape) 1.0)
     (world-add-static-shape space shape)
 
     (setf shape ( make-segment static-body a3 b3 1.0))
-    (setf (shape-elasticity shape) 1.0)
+    (setf (shape-restitution shape) 1.0)
     (setf (shape-friction shape) 1.0)
     (world-add-static-shape space shape)
 
     (setf shape (make-segment static-body a4 b4 1.0))
-    (setf (shape-elasticity shape) 1.0)
+    (setf (shape-restitution shape) 1.0)
     (setf (shape-friction shape) 1.0)
     (world-add-static-shape space shape)))
 
@@ -42,7 +42,7 @@
 	       (vec -320 240) (vec 320 240)
 	       world static-body)
     (world-add-body world body)
-    (setf (shape-elasticity shape) 1.0)
+    (setf (shape-restitution shape) 1.0)
     (setf (shape-friction shape) 1.0)
     (world-add-shape world shape)
     (world-add-constraint world (make-pivot-joint body static-body (vec 0 0) (vec 0 0)))
@@ -63,7 +63,7 @@
       (setf (body-velocity body) (vec* (vec (- (* 2 (/ 1.0 (+ 1 (random 10)))) 1) (- (* 2 (/ 1.0 (+ (random 10) 1))) 1)) 200))
       (world-add-body world body)
       (let ((shape (make-circle body size)))
-	(setf (shape-elasticity shape) 1.0)
+	(setf (shape-restitution shape) 1.0)
 	(setf (shape-friction shape) 1.0)
 	(world-add-shape world shape)))))
 
@@ -81,7 +81,7 @@
       (setf (body-velocity body) (vec* (vec (- (* 2 (/ 1.0 (+ 1 (random 10)))) 1) (- (* 2 (/ 1.0 (+ (random 10) 1))) 1)) 200))
       (world-add-body world body)
       (let ((shape (make-poly body verts)))
-	(setf (shape-elasticity shape) 1.0)
+	(setf (shape-restitution shape) 1.0)
 	(setf (shape-friction shape) 1.0)
 	(world-add-shape world shape)))))
 

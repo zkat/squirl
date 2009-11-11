@@ -28,7 +28,7 @@
    ;; Shapes
    :reset-shape-id-counter
    :shape-body
-   :shape-elasticity
+   :shape-restitution
    :shape-friction
    :shape-layers
    :circle
