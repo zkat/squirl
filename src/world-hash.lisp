@@ -55,11 +55,8 @@ list structure into the `world-hash-junk'."
 
 (defun clear-world-hash (hash)
   "Clear all cells in the `world-hash' HASH"
-  (declare (optimize speed (safety 0)))
-  (let ((table (world-hash-table hash)))
-    (declare (simple-vector table))
-    (dotimes (index (the fixnum (length table)))
-      (setf (svref table index) nil))))
+  (dotimes (index (world-hash-size hash))
+    (clear-hash-cell hash index)))
 
 (defun resize-world-hash (hash new-cell-size new-size)
   "Resize `world-hash' HASH to the specified dimensions"
