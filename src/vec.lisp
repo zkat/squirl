@@ -20,13 +20,6 @@
     (defun vec-y (vec)
       (imagpart vec))))
 
-;; this doesn't work very well, since with-place interns things into
-;; wrong package...
-;; probably worth adding at some point though (at least the first few, need
-;; to determine final list once we have more real usage to profile, and
-;; calling code is better optimized)
-;;(declaim (inline vec* vec-perp vec-cross vec. vec-rotate vec-neg))
-
 (define-constant +zero-vector+ (vec 0 0))
 
 (defmacro with-vec (form &body body)
@@ -177,6 +170,8 @@ WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
                    (* ,vec.x ,rot.y)))))
       whole))
 
+(declaim (ftype (function (vec vec) vec) vec-rotate vec-unrotate)
+         (inline vec-rotate vec-unrotate))
 (defun vec-rotate (vec rot)
   "Rotates VEC by (vec->angle ROT) radians. ROT should be a unit vec.
 This function is symmetric between VEC and ROT."
