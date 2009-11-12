@@ -18,7 +18,7 @@
              (:file "squirl"         :depends-on ("vec"))
              (:file "utils"          :depends-on ("package"))
              (:file "vec"            :depends-on ("utils"))
-             (:file "world"          :depends-on ("vec" "arbiter"))
+             (:file "world"          :depends-on ("vec" "arbiter" "body"))
              (:file "world-hash"     :depends-on ("hash-set" "vec"))
              (:module "constraints"  :depends-on ("shape" "poly-shape" "collision")
                       :components
