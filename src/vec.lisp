@@ -70,19 +70,15 @@ WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
        `(let ((,a ,(first rest))
               (,b ,(second rest)))
           (declare (vec ,a ,b))
-          (vec (+ (vec-x ,a) (vec-x ,b))
-               (+ (vec-y ,a) (vec-y ,b))))))
+          (+ ,a ,b))))
     (t whole)))
 
 (defun vec+ (&rest vectors)
-  (vec (reduce #'+ vectors :key #'vec-x)
-       (reduce #'+ vectors :key #'vec-y)))
+  (apply #'+ vectors))
 
 (defun vec-neg (vec)
   (declare (vec vec))
-  (with-vec vec
-    (vec (- vec.x) (- vec.y))))
-
+  (- vec))
 
 (define-compiler-macro vec- (&whole whole &rest rest)
   (declare (list rest))
@@ -101,25 +97,14 @@ WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
 
 (defun vec- (minuend &rest subtrahends)
   (declare (vec minuend))
-  (with-vec minuend
-    (if (null subtrahends) (vec-neg minuend)
-        (loop
-           with x double-float = minuend.x
-           and  y double-float = minuend.y
-           for vec in subtrahends do
-             (decf x (vec-x vec))
-             (decf y (vec-y vec))
-           finally (return (vec x y))))))
+  (apply #'- minuend subtrahends))
 
 (declaim (ftype (function (vec double-float) vec) vec*)
          (inline vec*))
 (defun vec* (vec scalar)
   "Multiplies VEC by SCALAR"
   (declare (vec vec))
-  (let ((scalar (float scalar 1d0)))
-    (with-vec vec
-      (vec (* vec.x scalar)
-           (* vec.y scalar)))))
+  (* vec scalar))
 
 (declaim (ftype (function (vec vec) double-float) vec. vec-cross)
          (inline vec. vec-cross))
