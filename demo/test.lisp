@@ -23,7 +23,8 @@
   (defun last-fps ()
     (first fps-stack))
   (defun mean-fps ()
-    (/ (reduce #'+ fps-stack) (length fps-stack)))
+    (when fps-stack
+      (/ (reduce #'+ fps-stack) (length fps-stack))))
   (defun cumulative-mean-fps ()
     cumulative-mean))
 
