@@ -13,7 +13,7 @@
       (setf (cdr (last fps-stack 2)) nil))
     (let ((now (now)))
       (when last-frame
-        (let ((time-delta (time-difference last-frame)))
+        (let ((time-delta (- now last-frame)))
           (unless (zerop time-delta)
             (push (/ time-delta)
                   fps-stack))
