@@ -15,10 +15,8 @@
    (window-height 480)))
 
 (defreply update ((demo =squirl-demo-pyramid=) delta &key)
-  (incf *elapsed* (if (> delta 0.5) 0.5 delta))
-  (loop while (>= *elapsed* *step*) do
-       (world-step *world* *step*)
-       (decf *elapsed* *step*)))
+  (declare (ignore delta))
+  (world-step *world* 1/60))
 
 (defun ortho-projection (demo)
   (with-properties (window-width window-height) demo
