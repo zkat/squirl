@@ -165,7 +165,8 @@
             (setf (contact-j-bias contact) (max 0d0 (+ jbn-old jbn))
                   jbn (- (contact-j-bias contact) jbn-old))
             ;; Apply bias impulse
-            (apply-bias-impulses body-a body-b r1 r2 (vec* n jbn)))
+            (body-apply-bias-impulse body-a (vec* n (- jbn)) r1)
+            (body-apply-bias-impulse body-b (vec* n jbn) r2))
           ;; Calculate relative velocity
           (let* ((relative-velocity (relative-velocity body-a body-b r1 r2))
                  (n-relative-velocity (vec. relative-velocity n)))

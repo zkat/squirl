@@ -21,11 +21,6 @@
   (body-apply-impulse body2 j r2)
   (values))
 
-(defun apply-bias-impulses (body1 body2 r1 r2 j)
-  (body-apply-bias-impulse body1 (vec-neg j) r1)
-  (body-apply-bias-impulse body2 j r2)
-  (values))
-
 (declaim (ftype (function (body body vec vec vec) double-float) k-scalar)
          (inline k-scalar))
 (defun k-scalar (body1 body2 r1 r2 normal)
