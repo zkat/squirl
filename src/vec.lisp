@@ -165,6 +165,20 @@ WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
   (declare (vec v1 v2))
   (vec* v2 (/ (vec. v1 v2) (vec. v2 v2))))
 
+(define-compiler-macro vec-rotate (&whole whole vec-form rot-form)
+  (if (and (listp rot-form) (eq (car rot-form) 'vec))
+      (with-gensyms (vec vec.x vec.y rot.x rot.y)
+        `(let* ((,vec ,vec-form)
+                (,vec.x (vec-x ,vec))
+                (,vec.y (vec-y ,vec))
+                (,rot.x ,(second rot-form))
+                (,rot.y ,(third rot-form)))
+           (vec (- (* ,vec.x ,rot.x)
+                   (* ,vec.y ,rot.y))
+                (+ (* ,vec.y ,rot.x)
+                   (* ,vec.x ,rot.y)))))
+      whole))
+
 (defun vec-rotate (vec rot)
   "Rotates VEC by (vec->angle ROT) radians. ROT should be a unit vec.
 This function is symmetric between VEC and ROT."
