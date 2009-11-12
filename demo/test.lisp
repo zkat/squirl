@@ -26,7 +26,11 @@
     (when fps-stack
       (/ (reduce #'+ fps-stack) (length fps-stack))))
   (defun cumulative-mean-fps ()
-    cumulative-mean))
+    cumulative-mean)
+  (defun reset-cumulative-mean-fps ()
+    "Restart calculating the cumulative mean relative to the current frame."
+    (setf frames 0)
+    (setf cumulative-mean 0)))
 
 (defproto =squirl-demo= (=engine=)
   ((title "Demo for SquirL")
