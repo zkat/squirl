@@ -40,7 +40,7 @@
    (window-height 500)
    (world nil)
    (accumulator 0)
-   (physics-timestep 0.01d0)
+   (physics-timestep (float 1/60 1d0))
    (shape-dimension 30d0)
    (shape-dimension-increment 10)))
 
