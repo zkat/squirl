@@ -25,7 +25,7 @@
     (gl:matrix-mode :projection)
     (gl:load-identity)
     (gl:viewport 0 0 window-width window-height)
-    (gl:ortho (- (/ window-width 2)) (/ window-width 2) (- (/ window-height 2)) (/ window-height 2) 10 0)
+    (gl:ortho (- window-width) window-width (- window-height) window-height 10 0)
     (gl:matrix-mode :modelview)))
 
 (defreply init :after ((demo =squirl-demo-pyramid=))
@@ -128,3 +128,6 @@
          for b = (elt vertices (mod (1+ i) (length vertices)))
          do (draw-line (make-point (vec-x a) (vec-y a))
                        (make-point (vec-x b) (vec-y b)))))))
+
+(defun run-demo ()
+  (run =squirl-demo-pyramid=))
