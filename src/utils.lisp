@@ -98,7 +98,7 @@ as the index vector. Note that this macro doesn't handle declarations properly."
            (let ((,var-name (aref ,vector ,idx-name))) ,@body))))))
 
 (defmacro with-place (conc-name (&rest slots) form &body body)
-  (flet ((conc (a b) (intern (format nil "~A~A" a b))))
+  (flet ((conc (a b) (intern (format nil "~A~A" a b) :squirl)))
     (let ((sm-prefix (if (atom conc-name) conc-name (first conc-name)))
           (acc-prefix (if (atom conc-name) conc-name (second conc-name))))
       `(with-accessors
