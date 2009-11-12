@@ -11,8 +11,7 @@
   (defun notify-frame ()
     (when (> (length fps-stack) *fps-sample-size*)
       (setf (cdr (last fps-stack 2)) nil))
-    (let ((now (/ (get-internal-real-time)
-                  internal-time-units-per-second)))
+    (let ((now (now)))
       (when last-frame
         (push (/ (- now last-frame))
               fps-stack)
