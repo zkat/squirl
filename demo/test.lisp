@@ -25,9 +25,7 @@
   (defun mean-fps ()
     (/ (reduce #'+ fps-stack) (length fps-stack)))
   (defun cumulative-mean-fps ()
-    cumulative-mean)
-  (defun get-fps-stack ()
-    fps-stack))
+    cumulative-mean))
 
 (defproto =squirl-demo= (=engine=)
   ((title "Demo for SquirL")
