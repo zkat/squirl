@@ -55,7 +55,7 @@
          (x (vec-x position))
          (y (vec-y position)))
     (with-color *green*
-     (map nil #'draw-shape (body-shapes body)))
+      (map nil #'draw-shape (body-shapes body)))
     (draw-circle (make-point x y) 2 :resolution 30 :color *red*)))
 
 (defreply init :after ((demo =squirl-demo=))

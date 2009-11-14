@@ -7,18 +7,12 @@
                          3 21 7 17 15 9 43 35 15 29 3 -3)
      collect (+ (expt 2 x) offset)))
 
-(define-constant +last-prime+ (car (last +primes+))
-  "A large prime, (- (expt 2 29) 3), which should fit within a fixnum on
-any Lisp worth using for a physics sim.")
-
 ;;; I'm just sticking this bit here for now. Move it if you find a better place.
 (define-constant +chipmunk-hash-constant+ 3344921057)
 
 (defun hash-pair (x y)
-  (declare (integer x y))
-  (expt-mod (* x +chipmunk-hash-constant+)
-            (* y +chipmunk-hash-constant+)
-            +last-prime+))
+  (logxor (* x +chipmunk-hash-constant+)
+          (* y +chipmunk-hash-constant+)))
 
 (defun next-prime (n)
   (loop for prime in +primes+ when (>= prime n) return prime
