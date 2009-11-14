@@ -186,10 +186,10 @@
     (0 (add-circle engine (mouse-x engine) (mouse-y engine)))
     (1 (add-poly engine (mouse-x engine) (mouse-y engine)))
     (2 (add-car engine (mouse-x engine) (mouse-y engine)))
-    (3 (unless (<= (shape-dimension engine)
+    (3 (incf (shape-dimension engine) (shape-dimension-increment engine)))
+    (4 (unless (<= (shape-dimension engine)
                    (shape-dimension-increment engine))
-         (decf (shape-dimension engine) (shape-dimension-increment engine))))
-    (4 (incf (shape-dimension engine) (shape-dimension-increment engine)))))
+         (decf (shape-dimension engine) (shape-dimension-increment engine))))))
 
 (defreply key-down ((engine =squirl-demo=) key)
   (case key
