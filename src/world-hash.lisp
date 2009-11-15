@@ -133,7 +133,7 @@ list structure into the `world-hash-junk'."
   (map-hash-set (fun (funcall function (handle-object _)))
                 (world-hash-handle-set hash)))
 
-(defun query (function hash chain object)
+(defun map-world-hash-chain (function hash chain object)
   (loop for handle in chain
      unless (or (= (handle-stamp handle) (world-hash-stamp hash))
                 (eq object (handle-object handle))
@@ -146,12 +146,12 @@ list structure into the `world-hash-junk'."
          (idx (with-vec (pt point)
                 (hash (floor (/ pt.x dim)) (floor (/ pt.y dim))
                       (world-hash-size hash)))))
-    (query function hash (world-hash-chain hash idx) point))
+    (map-world-hash-chain function hash (world-hash-chain hash idx) point))
   (incf (world-hash-stamp hash)))
 
 (defun world-hash-query (function hash object bbox)
   (do-bbox (chain hash bbox)
-    do (query function hash chain object))
+    do (map-world-hash-chain function hash chain object))
   (incf (world-hash-stamp hash)))
 
 (defun world-hash-query-rehash (function hash)
@@ -161,7 +161,7 @@ list structure into the `world-hash-junk'."
                     (do-bbox (chain-form hash (shape-bbox object))
                       for chain = chain-form
                       unless (find _ chain) do
-                        (query function hash chain object)
+                        (map-world-hash-chain function hash chain object)
                         (push _ chain-form)))
                   (incf (world-hash-stamp hash)))
                 (world-hash-handle-set hash)))
