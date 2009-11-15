@@ -142,12 +142,12 @@ list structure into the `world-hash-junk'."
        (stamp-handle handle hash)))
 
 (defun world-hash-point-query (function hash point)
-  (let* ((dim (world-hash-cell-size hash))
-         (idx (with-vec (pt point)
-                (hash (floor (/ pt.x dim)) (floor (/ pt.y dim))
-                      (world-hash-size hash)))))
-    (map-world-hash-chain function hash (world-hash-chain hash idx) point))
-  (incf (world-hash-stamp hash)))
+  (prog1 (let* ((dim (world-hash-cell-size hash))
+                (idx (with-vec (pt point)
+                       (hash (floor (/ pt.x dim)) (floor (/ pt.y dim))
+                             (world-hash-size hash)))))
+           (map-world-hash-chain function hash (world-hash-chain hash idx) point))
+    (incf (world-hash-stamp hash))))
 
 (defun world-hash-query (function hash object bbox)
   (do-bbox (chain hash bbox)
