@@ -95,6 +95,8 @@
    :world-static-shapes
    :resize-world-static-hash
    :resize-world-active-hash
+   :rehash-world-static-data
+   :world-point-query-first
    :world-step
 
    ;; constraints
