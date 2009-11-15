@@ -42,13 +42,19 @@
   (let ((world (apply #'%make-world keys)))
     (with-place (|| world-) (contact-set timestamp arbiters) world
       (setf (world-arbitrator world)
+            ;; Let us thank Scott Lembcke, who had to hunt bugs down and code solutions
+            ;; in C, while we can simply port said solutions into CL.
             (lambda (shape1 shape2)
+              ;; This is a kludge. It might break on new shape types.
               (when (or (and (poly-p shape1) (circle-p shape2))
                         (and (poly-p shape1) (segment-p shape2)))
                 (rotatef shape1 shape2))
               (when (collision-possible-p shape1 shape2)
                 (awhen (collide-shapes shape1 shape2)
                   (let ((arbiter (ensure-arbiter shape1 shape2 contact-set timestamp)))
+                    ;; This is also a kludge... got any better ideas?
+                    (setf (arbiter-shape-a arbiter) shape1
+                          (arbiter-shape-b arbiter) shape2)
                     (vector-push-extend arbiter arbiters)
                     (arbiter-inject arbiter it)))))))
     world))
