@@ -15,6 +15,23 @@
    :vec*
    :+zero-vector+
    :vec-length
+   :vec-lerp
+   :vec-zerop
+   :angle->vec
+   :vec->angle
+   :vec.
+   :vec-cross
+   :vec-perp
+   :vec-rperp
+   :vec-project
+   :vec-rotate
+   :vec-unrotate
+   :vec-length-sq
+   :vec-normalize
+   :vec-clamp
+   :vec-dist
+   :vec-dist-sq
+   :vec-near
 
    ;; Bodies
    :body
