@@ -20,21 +20,21 @@
   ;; Default gravity to supply when integrating rigid body motions.
   (gravity +zero-vector+ :type vec)
   ;; Default damping to supply when integrating rigid body motions.
-  (damping 1.0)
+  (damping 1f0 :type double-float)
 
   ;; Internal slots
-  (timestamp 0)  ; Time stamp, incremented on every call to WORLD-STEP
+  (timestamp 0 :type fixnum)  ; Time stamp, incremented on every call to WORLD-STEP
   ;; Static and active shape spatial hashes
-  (static-shapes (make-world-hash *initial-cell-size* *initial-count*))
-  (active-shapes (make-world-hash *initial-cell-size* *initial-count*))
+  (static-shapes (make-world-hash *initial-cell-size* *initial-count*) :type world-hash)
+  (active-shapes (make-world-hash *initial-cell-size* *initial-count*) :type world-hash)
   ;; Static and active bodies
-  (static-bodies (make-adjustable-vector *initial-array-length*))
-  (active-bodies (make-adjustable-vector *initial-array-length*))
+  (static-bodies (make-adjustable-vector *initial-array-length*) :type (vector t))
+  (active-bodies (make-adjustable-vector *initial-array-length*) :type (vector t))
   ;; Active arbiters for the impulse solver.
-  (arbiters (make-adjustable-vector *initial-array-length*))
-  (contact-set (make-hash-set 0 #'arbiter-shapes-equal)) ; Persistent contact set.
+  (arbiters (make-adjustable-vector *initial-array-length*) :type (vector t))
+  (contact-set (make-hash-set 0 #'arbiter-shapes-equal) :type hash-set) ; Persistent contact set.
   ;; Constraints in the system.
-  (constraints (make-adjustable-vector *initial-array-length*))
+  (constraints (make-adjustable-vector *initial-array-length*) :type (vector t))
   arbitrator)
 
 (defun make-world (&rest keys)
@@ -279,7 +279,8 @@
        repeat iterations do
          (do-vector (arbiter arbiters)
            (arbiter-apply-impulse arbiter elastic-coef))
-         (map nil #'apply-impulse constraints))))
+         (do-vector (constraint constraints)
+           (apply-impulse constraint)))))
 
 (defun world-step (world timestep &aux (dt (float timestep 0d0)) (dt-inv (/ dt)))
   "Step the physical state of WORLD by DT seconds."
