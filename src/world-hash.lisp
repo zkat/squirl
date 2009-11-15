@@ -189,7 +189,7 @@ list structure into the `world-hash-junk'."
         (if (> b.y a.y)
             (setf y-inc  1 next-v (* (- (floor (1+ a.x)) a.x) dt/dy))
             (setf y-inc -1 next-v (* (- a.y      (floor a.y)) dt/dy)))
-        (let ((cell-size (world-hash-cell-size hash)))
+        (let ((cell-size (world-hash-size hash)))
           (loop while (< ratio exit-ratio) for index = (hash cell-x cell-y cell-size)
              for new-ratio = (query-segment function hash (world-hash-chain hash index))
              do (setf exit-ratio (min exit-ratio new-ratio))
