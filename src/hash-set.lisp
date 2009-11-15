@@ -25,7 +25,10 @@
               make-hash-set (size test &aux
                                   (table (make-array (next-prime size)
                                                      :initial-element nil)))))
-  (count 0) test (default-value nil) table)
+  (count 0 :type fixnum)
+  (test (assert nil) :type (function (t t) boolean))
+  (default-value nil)
+  (table (assert nil) :type simple-vector))
 
 (define-print-object (hash-set)
   (format t "Count: ~D" (hash-set-count hash-set)))

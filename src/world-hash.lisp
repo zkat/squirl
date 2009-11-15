@@ -24,11 +24,11 @@
              (:constructor make-world-hash
                            (cell-size size &aux (table (make-world-hash-table size)))))
   "The spatial hash is SquirL's default (and currently only) spatial index"
-  cell-size                             ; Size of the hash's cells
-  (handle-set (make-hash-set 0 #'handle-equal)) ; `hash-set' of all handles
-  table                                         ; Bins in use
+  (cell-size (assert nil) :type double-float) ; Size of the hash's cells
+  (handle-set (make-hash-set 0 #'handle-equal) :type hash-set) ; `hash-set' of all handles
+  (table (assert nil) :type simple-vector) ; Bins in use
   ;;  (junk nil)                                    ; The "recycle bin"
-  (stamp 1)            ; Incremented on each query; see `handle-stamp'
+  (stamp 1 :type fixnum) ; Incremented on each query; see `handle-stamp'
   )
 
 (define-print-object (world-hash))
