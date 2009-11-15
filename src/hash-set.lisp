@@ -33,9 +33,12 @@
 (define-print-object (hash-set)
   (format t "Count: ~D" (hash-set-count hash-set)))
 
+(declaim (ftype (function (hash-set) fixnum) hash-set-size)
+         (inline hash-set-size))
 (defun hash-set-size (set)
   (length (hash-set-table set)))
 
+(declaim (ftype (function (hash-set fixnum) list) hash-set-chain))
 (defun hash-set-chain (set index)
   (aref (hash-set-table set) index))
 (defun (setf hash-set-chain) (new-chain set index)
@@ -54,16 +57,17 @@
     (setf (hash-set-table set) new-table)
     set))
 
-(defun hash-set-insert (set code data &aux (index (mod code (hash-set-size set))))
+(defun hash-set-insert (set code data)
   "Insert DATA into `hash-set' SET, using hash value CODE. Returns DATA if an
 insertion was made, or NIL if DATA was already present in the table."
-  (with-accessors ((test hash-set-test)) set
-    (unless (find data (hash-set-chain set index) :test test :key #'cdr)
-      (when (hash-set-full-p set)
-        (hash-set-resize set))
-      (push (cons code data) (hash-set-chain set index))
-      (incf (hash-set-count set))
-      data)))
+  (let ((index (mod code (hash-set-size set))))
+    (with-accessors ((test hash-set-test)) set
+      (unless (find data (hash-set-chain set index) :test test :key #'cdr)
+        (when (hash-set-full-p set)
+          (hash-set-resize set))
+        (push (cons code data) (hash-set-chain set index))
+        (incf (hash-set-count set))
+        data))))
 
 (defun hash-set-find (set code data)
   "Searches for DATA in `hash-set' SET, using hash value CODE. On success, two
