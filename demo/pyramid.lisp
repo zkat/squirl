@@ -36,7 +36,7 @@
   (setf *floor* (make-body))
   (attach-shape (make-segment (vec -600 -240)
                               (vec 600 -240)
-                              :radius 0d0
+                              :radius 1d0
                               :restitution 1
                               :friction 1)
                 *floor*)

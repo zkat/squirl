@@ -42,7 +42,8 @@
    (accumulator 0)
    (physics-timestep (float 1/60 1d0))
    (shape-dimension 30d0)
-   (shape-dimension-increment 10)))
+   (shape-dimension-increment 10)
+   (current-view (create-view 0 0 500 500))))
 
 (defun draw-a-circle (circle)
   (let* ((position (body-position circle))
@@ -149,7 +150,7 @@
     (world-add-body (world demo) body)))
 
 (defun add-poly (demo x y)
-  (let* ((mass (* 50 (expt (shape-dimension demo) 2)))
+  (let* ((mass (* 125 (expt (shape-dimension demo) 2.5)))
          (size (/ (shape-dimension demo) 2))
          (verts (list (vec size size)
                       (vec size (- size))
