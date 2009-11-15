@@ -26,7 +26,7 @@
                                   (table (make-array (next-prime size)
                                                      :initial-element nil)))))
   (count 0 :type fixnum)
-  (test (assert nil) :type (function (t t) boolean))
+  test
   (default-value nil)
   (table (assert nil) :type simple-vector))
 
