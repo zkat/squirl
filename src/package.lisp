@@ -100,6 +100,8 @@
    :world-step
 
    ;; constraints
+   :constraint-body-a
+   :constraint-body-b
    :breakable-joint
    :make-breakable-joint
    :pivot-joint
