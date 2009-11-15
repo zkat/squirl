@@ -18,7 +18,6 @@
   (j-acc +zero-vector+ :type vec))
 
 (defmethod pre-step ((pivot pivot-joint) dt dt-inv)
-  (declare (ignore dt))
   (with-accessors ((body-a pivot-joint-body-a)
                    (body-b pivot-joint-body-b)
                    (j-max-length pivot-joint-j-max-length)
@@ -27,6 +26,8 @@
                    (j-acc pivot-joint-j-acc)
                    (r1 pivot-joint-r1)
                    (r2 pivot-joint-r2)
+                   (k1 pivot-joint-k1)
+                   (k2 pivot-joint-k2)
                    (max-bias pivot-joint-max-bias)
                    (anchor1 pivot-joint-anchor1)
                    (anchor2 pivot-joint-anchor2))
@@ -34,15 +35,20 @@
     (setf r1 (vec-rotate anchor1 (body-rotation body-a)))
     (setf r2 (vec-rotate anchor2 (body-rotation body-b)))
     ;; calculate mass tensor
-    (k-tensor body-a body-b r1 r2)
+    (multiple-value-bind (new-k1 new-k2) (k-tensor body-a body-b r1 r2)
+      (setf k1 new-k1 k2 new-k2))
+    ;; compute max impulse
+    (setf j-max-length (impulse-max pivot dt))
     ;; calculate bias velocity
-    (setf bias (vec-clamp (vec* (vec- (vec+ (body-position body-b) r2) (vec+ (body-position body-b) r1)) (- (* bias-coef dt-inv))) max-bias))
+    (let ((delta (vec- (vec+ (body-position body-b) r2)
+                       (vec+ (body-position body-a) r1))))
+      (setf bias (vec-clamp (vec* delta (- (* bias-coef dt-inv)))
+                            max-bias)))
     ;; apply joint torque
     (apply-impulses body-a body-b r1 r2 j-acc)))
 
 (defmethod apply-impulse ((pivot pivot-joint))
-    (with-accessors (
-                   (body-a pivot-joint-body-a)
+  (with-accessors ((body-a pivot-joint-body-a)
                    (body-b pivot-joint-body-b)
                    (j-max-length pivot-joint-j-max-length)
                    (bias pivot-joint-bias)
@@ -52,15 +58,15 @@
                    (r2 pivot-joint-r2)
                    (k1 pivot-joint-k1)
                    (k2 pivot-joint-k2)) pivot
-      ;; compute relative velocity
-      (let* ((vr (relative-velocity body-a body-b r1 r2))
-             ;; compute normal impulse
-             (j (mult-k (vec- bias vr) k1 k2))
-             (j-old j-acc))
-        (setf j-acc (vec-clamp (vec+ j-acc j) j-max-length))
-        (setf j (vec- j-acc j-old))
-        ;;  apply impulse
-        (apply-impulses body-a body-b r1 r2 j))))
+    ;; compute relative velocity
+    (let* ((vr (relative-velocity body-a body-b r1 r2))
+           ;; compute normal impulse
+           (j (mult-k (vec- bias vr) k1 k2))
+           (j-old j-acc))
+      (setf j-acc (vec-clamp (vec+ j-acc j) j-max-length))
+      (setf j (vec- j-acc j-old))
+      ;;  apply impulse
+      (apply-impulses body-a body-b r1 r2 j))))
 
 (defmethod get-impulse ((pivot pivot-joint))
   (vec-length (pivot-joint-j-acc pivot)))
