@@ -24,6 +24,15 @@
    :body-position
    :body-velocity
    :body-shapes
+   :staticp
+   :body-update-velocity
+   :body-update-position
+   :body-slew
+   :body-local->world
+   :world->body-local
+   :body-reset-forces
+   :body-apply-force
+   :apply-damped-spring
 
    ;; Shapes
    :reset-shape-id-counter
