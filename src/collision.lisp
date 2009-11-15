@@ -8,14 +8,15 @@
 ;;; Collision resolution functions
 ;;;
 (defun circle-to-circle-query (p1 p2 r1 r2)
+  (declare (optimize speed) (double-float r1 r2))
   (let* ((delta (vec- p2 p1))
          (mindist (+ r1 r2))
          (distsq (vec-length-sq delta)))
    (when (< distsq (* mindist mindist))
      (let* ((dist (sqrt distsq)))
        (make-contact (vec+ p1 (vec* delta
-                                    (+ 0.5 (maybe/ (- r1 (/ mindist 2))
-                                                   dist))))
+                                    (+ 0.5d0 (maybe/ (- r1 (/ mindist 2))
+                                                     dist))))
                      (vec* delta (maybe/ 1d0 dist)) ; Same as (vec-normalize delta)
                      (- dist mindist))))))
 
@@ -146,7 +147,7 @@
             (if contacts contacts
                 (flet ((try-endpoint (point vertex)
                          (let ((collision (circle-to-circle-query
-                                           point vertex (segment-radius segment) 0)))
+                                           point vertex (segment-radius segment) 0d0)))
                            (when collision (return-from segment-to-poly (list collision))))))
                   (let ((vert-a (svref (poly-transformed-vertices poly) min-i))
                         (vert-b (svref (poly-transformed-vertices poly)
@@ -185,7 +186,7 @@
         (cond
           ((< dt dtb)
            (circle-to-circle-query (circle-transformed-center circle)
-                                   b (circle-radius circle) 0))
+                                   b (circle-radius circle) 0d0))
           ((< dt dta)
            (make-contact (vec- (circle-transformed-center circle)
                                (vec* normal
@@ -193,7 +194,7 @@
                                         (/ min 2))))
                          (vec-neg normal) min))
           (t (circle-to-circle-query (circle-transformed-center circle)
-                                     a (circle-radius circle) 0)))))))
+                                     a (circle-radius circle) 0d0)))))))
 
 (defun poly-to-poly (poly1 poly2)
   ;; This is definitely returning contacts, and they look correct.
