@@ -20,7 +20,7 @@
   ;; Default gravity to supply when integrating rigid body motions.
   (gravity +zero-vector+ :type vec)
   ;; Default damping to supply when integrating rigid body motions.
-  (damping 1f0 :type double-float)
+  (damping 1d0 :type double-float)
 
   ;; Internal slots
   (timestamp 0 :type fixnum)  ; Time stamp, incremented on every call to WORLD-STEP
@@ -261,7 +261,7 @@
   (with-place (|| world-) (arbiters constraints elastic-iterations) world
     (loop repeat elastic-iterations
        do (do-vector (arbiter arbiters)
-            (arbiter-apply-impulse arbiter 1d0))
+            (arbiter-apply-impulse arbiter t))
           (map nil #'apply-impulse constraints))))
 
 (defun integrate-velocities (world dt &aux (damping (expt (world-damping world) (- dt))))
@@ -275,12 +275,12 @@
 (defun solve-impulses (world)
   "Run the impulse solver, using the old-style elastic solver if elastic iterations are disabled"
   (with-place (|| world-) (iterations elastic-iterations arbiters constraints) world
-    (loop with elastic-coef = (if (zerop elastic-iterations) 1d0 0d0)
+    (loop with old-style-p = (zerop elastic-iterations)
        repeat iterations do
-         (do-vector (arbiter arbiters)
-           (arbiter-apply-impulse arbiter elastic-coef))
-         (do-vector (constraint constraints)
-           (apply-impulse constraint)))))
+       (do-vector (arbiter arbiters)
+         (arbiter-apply-impulse arbiter old-style-p))
+       (do-vector (constraint constraints)
+         (apply-impulse constraint)))))
 
 (defun world-step (world timestep &aux (dt (float timestep 0d0)) (dt-inv (/ dt)))
   "Step the physical state of WORLD by DT seconds."
