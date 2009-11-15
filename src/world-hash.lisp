@@ -79,9 +79,13 @@ list structure into the `world-hash-junk'."
 ;;        (setf (car ,node) ,handle)
 ;;        (push-cons ,node ,chain))))
 
+(declaim (ftype (function (fixnum fixnum fixnum) fixnum) hash))
 (defun hash (x y n)
   "Hash X, Y, and N to generate a hash code"
-  (mod (logxor (* x 2185031351) (* y 4232417593)) n))
+  (mod (the fixnum
+         (logand (logxor (* x 2185031351) (* y 4232417593))
+                 most-positive-fixnum))
+       n))
 
 (defmacro do-bbox ((chain-macro hash-form bbox-form) &body body)
   (with-gensyms (hash bbox size dim bb.l bb.r bb.b bb.t i j index)

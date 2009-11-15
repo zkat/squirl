@@ -10,9 +10,11 @@
 ;;; I'm just sticking this bit here for now. Move it if you find a better place.
 (define-constant +chipmunk-hash-constant+ 3344921057)
 
+(declaim (ftype (function (fixnum fixnum) fixnum) hash-pair))
 (defun hash-pair (x y)
-  (logxor (* x +chipmunk-hash-constant+)
-          (* y +chipmunk-hash-constant+)))
+  (logand (logxor (* x +chipmunk-hash-constant+)
+                  (* y +chipmunk-hash-constant+))
+          most-positive-fixnum))
 
 (defun next-prime (n)
   (loop for prime in +primes+ when (>= prime n) return prime
