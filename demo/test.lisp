@@ -43,7 +43,10 @@
    (physics-timestep (float 1/60 1d0))
    (shape-dimension 30d0)
    (shape-dimension-increment 10)
-   (current-view (create-view 0 0 500 500))))
+   (current-view (create-view 0 0 500 500))
+   (mouse-body (make-body))
+   (mouse-joint nil)
+   (mouse-point-last +zero-vector+)))
 
 (defun draw-a-circle (circle)
   (let* ((position (body-position circle))
@@ -71,6 +74,18 @@
     (mapc (lambda (_) (attach-shape _ body))
           (list floor left-wall right-wall))
     (world-add-body (world demo) body)))
+
+(defun draw-constraint (constraint)
+  (let* ((body-a (constraint-body-a constraint))
+         (body-b-pos (body-local->world (constraint-body-b constraint)
+                                        (squirl::pivot-joint-anchor2 constraint))))
+    (with-color *green*
+      (draw-circle (make-point (vec-x (body-position body-a))
+                               (vec-y (body-position body-a)))
+                   5 :resolution 10)
+      (draw-circle (make-point (vec-x body-b-pos)
+                               (vec-y body-b-pos))
+                   5 :resolution 10))))
 
 (defgeneric draw-shape (shape)
   (:method ((circle circle))
@@ -118,6 +133,7 @@
           (mean-fps)
           (cumulative-mean-fps))
   (map-world #'draw-body (world demo))
+  (map nil #'draw-constraint (world-constraints (world demo)))
   (draw-scale (shape-dimension demo) (mouse-x demo) (mouse-y demo)))
 
 ;; This allows us to fix the physics timestep without fixing the framerate.
@@ -125,6 +141,10 @@
 ;; how fast your computer's calculating :)
 (defreply update ((demo =squirl-demo=) dt &key)
   (notify-frame)
+  (let ((new-point (vec-lerp (mouse-point-last demo) (vec (mouse-x demo) (mouse-y demo)) 1/4)))
+    (setf (body-position (mouse-body demo)) new-point
+          (body-velocity (mouse-body demo)) (vec* (vec- new-point (mouse-point-last demo)) 60d0)
+          (mouse-point-last demo) new-point))
   (update-world-state demo dt)
   (empty-out-bottomless-pit (world demo)))
 
@@ -187,13 +207,31 @@
 
 (defreply mouse-down ((engine =squirl-demo=) button)
   (case button
-    (0 (add-circle engine (mouse-x engine) (mouse-y engine)))
+    (0 (grab-object engine))
     (1 (add-poly engine (mouse-x engine) (mouse-y engine)))
     (2 (add-car engine (mouse-x engine) (mouse-y engine)))
     (3 (incf (shape-dimension engine) (shape-dimension-increment engine)))
     (4 (unless (<= (shape-dimension engine)
                    (shape-dimension-increment engine))
          (decf (shape-dimension engine) (shape-dimension-increment engine))))))
+
+(defun grab-object (engine)
+  (let* ((point (vec (mouse-x engine) (mouse-y engine)))
+         (shape (world-point-query-first (world engine) point)))
+    (when shape
+      (let ((body (shape-body shape)))
+        (setf (mouse-joint engine) (make-pivot-joint (mouse-body engine) body 
+                                                     +zero-vector+ (world->body-local body point))
+              (squirl::constraint-bias-coefficient (mouse-joint engine)) 0.15)
+        (world-add-constraint (world engine) (mouse-joint engine))))))
+
+(defreply mouse-up ((engine =squirl-demo=) button)
+  (case button
+    (0 (release-object engine))))
+
+(defun release-object (engine)
+  (world-remove-constraint (world engine) (mouse-joint engine))
+  (setf (mouse-joint engine) nil))
 
 (defreply key-down ((engine =squirl-demo=) key)
   (case key
