@@ -63,6 +63,7 @@
 
 (defgeneric body-update-velocity (body gravity damping dt)
   (:method ((body body) gravity damping dt)
+    (declare (optimize speed) (double-float dt))
     (with-accessors ((angular-velocity body-angular-velocity)
                      (inv-inertia body-inverse-inertia)
                      (inv-mass body-inverse-mass)
@@ -74,7 +75,8 @@
                   (vec* (vec+ gravity (vec* force inv-mass)) dt)))
       (setf angular-velocity
             (+ (* angular-velocity damping)
-               (* torque inv-inertia dt))))))
+               (* torque inv-inertia dt)))
+      (values))))
 
 (defgeneric body-update-position (body dt)
   (:method ((body body) dt)
