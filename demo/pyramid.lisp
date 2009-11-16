@@ -88,6 +88,12 @@
                (list (make-body
                       :mass 1
                       :inertia (moment-for-poly 1 verts)
+                      :position (vec+ (vec (- 17)
+                                           -174)
+                                      offset))
+                     (make-body
+                      :mass 1
+                      :inertia (moment-for-poly 1 verts)
                       :position (vec+ (vec (+ (* (1- i) 60) 17)
                                            -174)
                                       offset)))))))
