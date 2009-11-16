@@ -6,6 +6,7 @@
 (defparameter *sleep-ticks* 16)
 
 (defvar *world*)
+(defvar *demos* nil)
 (defvar *current-demo*)
 
 (defvar *mouse-point*)
@@ -20,6 +21,10 @@
 
 (defvar *arrow-direction* +zero-vector+)
 
+(defclass squirl-demo (glut:window)
+  ()
+  (:default-initargs :width 640 :height 480 :mode '(:double :rgba) :title (demo-title (car *demos*))))
+
 (defun draw-string (x y string)
   (gl:color 0 0 0)
   (gl:raster-pos x y)
@@ -31,7 +36,7 @@
     (draw-string x y "Controls:")
     (draw-string x (- y 16) "TODO.")))
 
-(defun display ()
+(defmethod glut:display ((w squirl-demo))
   (gl:clear :color-buffer-bit)
   (draw-world world)
   (draw-instructions)
@@ -39,8 +44,8 @@
   (let ((new-point (vec-lerp *mouse-point-last* *mouse-point* 1/4)))
     (setf (body-position *mouse-body*) new-point
           (body-velocity *mouse-body*) (vec* (vec- new-point *mouse-point-last*) 60)
-          *mouse-point-last* new-point))
-  (update *current-demo*))
+          *mouse-point-last* new-point)
+    (update *current-demo*)))
 
 (defun demo-title (demo)
   (concatenate 'string "Demo: " (demo-name demo)))
@@ -51,9 +56,17 @@
         *world* (init-demo demo))
   (glut:set-window-title (demo-title demo)))
 
-(defun keyboard (key)
-  ;; todo
-  )
+(defmethod glut:keyboard ((w squirl-demo) key x y)
+  (declare (ignore x y))
+  (case key
+    (#\Esc (glut:destroy-current-window))
+    (#\Return (run-demo *current-demo*))
+    (#\\ (gl:enable :line-smooth)
+         (gl:enable :point-smooth)
+         (gl:enable :blend)
+         (gl:blend-func :src-alpha :one-minus-src-alpha)
+         (gl:hint :line-smooth-hint :dont-care)
+         (gl:hint :point-smooth-hint :dont-care))))
 
 (defun mouse-to-space (x y)
   (let ((model (gl:get-double :modelview-matrix))
@@ -64,15 +77,25 @@
                         :modelview model :projection proj :viewport view)
       (vec mx my))))
 
-(defun mouse (x y)
+(defmethod glut:passive-motion ((w squirl-demo) button state x y)
   (setf *mouse-point* (mouse-to-space x y)))
 
-(defun click (button state x y)
-  ;; todo
-  )
+(defmethod glut:mouse ((w squirl-demo) button state x y)
+  (if (eq button :left-button)
+      (if (eq state :down)
+          (let* ((point (mouse-to-space x y))
+                 (shape (world-point-query-first *world* point)))
+            (when shape
+              (let ((body (shape-body shape)))
+                (setf *mouse-joint* (make-pivot-joint *mouse-body* body 
+                                                      +zero-vector+ 
+                                                      (world->body-local body point))
+                      (squirl::constraint-max-force *mouse-joint*) 50000
+                      (squirl::constraint-bias-coefficient *mouse-joint* 0.15))
+                (world-add-constraint *world* *mouse-joint*))))
+          (progn (world-remove-constraint *world* *mouse-joint*) (setf *mouse-joint* nil)))))
 
-(defun timer-call (value)
-  ;; todo
+(defmethod glut:idle ((w squirl-demo))
   (glut:post-redisplay))
 
 (defun set-arrow-direction ()
@@ -83,18 +106,23 @@
     (when *key-left* (decf x))
     (setf *arrow-direction* (vec x y))))
 
-(defun arrow-key-down (key x y)
-  ;; todo
-  )
+(defmethod glut:special ((w squirl-demo) key x y)
+  (case key
+    (:key-up (setf *key-up* t))
+    (:key-down (setf *key-down* t))
+    (:key-left (setf *key-left* t))
+    (:key-right (setf *key-right* t)))
+  (set-arrow-direction))
 
-(defun arrow-key-up (key x y)
-  ;; todo
-  )
+(defmethod glut:special-up ((w squirl-demo) key x y)
+  (case key
+    (:key-up (setf *key-up* nil))
+    (:key-down (setf *key-down* nil))
+    (:key-left (setf *key-left* nil))
+    (:key-right (setf *key-right* nil)))
+  (set-arrow-direction))
 
-(defun idle ()
-  (glut:post-redisplay))
-
-(defun init-gl ()
+(defmethod glut:display-window ((w squirl-demo))
   (gl:clear-color 1 1 1 0)
   (gl:matrix-mode :projection)
   (gl:load-identity)
@@ -102,17 +130,8 @@
   (gl:translate 1/2 1/2 0)
   (gl:enable-client-state :vertex-array))
 
-(defun glut-stuff ()
-  ;; todo
-  (glut:init)
-  (glut:init-display-mode (logior :double :rgba))
-  (glut:init-window-size 640 480)
-  (glut:create-window "Squirl Demo")
-  (init-gl)
-  ;; ...
-  )
-
 (defun run-demo ()
   (setf *mouse-body* (make-body))
-  ;; todo
-  )
+  (glut:display-window (make-instance 'squirl-demo))
+  (when *demos*
+    (run-demo (car *demos*))))
