@@ -88,6 +88,8 @@
 
 (defmethod glut:motion ((w squirl-window) x y)
   (setf *mouse-position* (mouse-to-space x y)))
+(defmethod glut:passive-motion ((w squirl-window) x y)
+  (setf *mouse-position* (mouse-to-space x y)))
 
 (defmethod glut:mouse ((w squirl-window) button state x y)
   (if (eq button :left-button)
