@@ -17,7 +17,7 @@
   (vec. (relative-velocity body1 body2 r1 r2) normal))
 
 (defun apply-impulses (body1 body2 r1 r2 j)
-  (body-apply-impulse body1 (vec-neg j) r1)
+  (body-apply-impulse body1 (vec- j) r1)
   (body-apply-impulse body2 j r2)
   (values))
 

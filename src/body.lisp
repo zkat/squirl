@@ -63,7 +63,7 @@
 
 (defgeneric body-update-velocity (body gravity damping dt)
   (:method ((body body) gravity damping dt)
-    (declare (optimize speed) (double-float dt))
+    (declare (optimize speed) (double-float dt) (vec gravity))
     (with-accessors ((angular-velocity body-angular-velocity)
                      (inv-inertia body-inverse-inertia)
                      (inv-mass body-inverse-mass)
@@ -166,4 +166,4 @@ Warning: Large damping values can be unstable. Use a DAMPED-SPRING constraint fo
          (f (vec* normal (+ f-spring f-damp))))
     ;; Apply!
     (body-apply-force body1 f anchor1)
-    (body-apply-force body2 (vec-neg f) anchor2)))
+    (body-apply-force body2 (vec- f) anchor2)))

@@ -193,7 +193,7 @@
 (defmethod shape-segment-query ((seg segment) a b)
   (let ((n (segment-trans-normal seg)))
     (when (< (vec. a n) (vec. (segment-trans-a seg) n))
-      (setf n (vec-neg n)))
+      (setf n (vec- n)))
     (let* ((an (vec. a n))
            (bn (vec. b n))
            (d (+ (vec. (segment-trans-a seg) n) (segment-radius seg)))

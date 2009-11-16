@@ -69,10 +69,6 @@ WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
 (defun vec+ (&rest vectors)
   (apply #'+ vectors))
 
-(defun vec-neg (vec)
-  (declare (vec vec))
-  (- vec))
-
 (define-compiler-macro vec- (&rest rest)
   (declare (list rest))
   `(- ,@rest))

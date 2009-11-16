@@ -70,7 +70,7 @@
 (defun find-vertices (poly1 poly2 normal distance &aux contacts)
   "Add contacts for penetrating vertices"
   (do-vector ((i vertex) (poly-transformed-vertices poly1))
-    (when (partial-poly-contains-vertex-p poly2 vertex (vec-neg normal))
+    (when (partial-poly-contains-vertex-p poly2 vertex (vec- normal))
       (push (make-contact vertex normal distance (hash-pair (shape-id poly1) i)) contacts)))
   (do-vector ((i vertex) (poly-transformed-vertices poly2) contacts)
     (when (partial-poly-contains-vertex-p poly1 vertex normal)
@@ -106,7 +106,7 @@
                      (segment-trans-a segment)))
          (min-norm (- (poly-value-on-axis poly (segment-trans-normal segment) segD)
                       (segment-radius segment)))
-         (min-neg (- (poly-value-on-axis poly (vec-neg (segment-trans-normal segment)) (- segD))
+         (min-neg (- (poly-value-on-axis poly (vec- (segment-trans-normal segment)) (- segD))
                      (segment-radius segment))))
     (unless (or (> min-neg 0) (> min-norm 0))
       (let ((min-i 0)
@@ -121,7 +121,7 @@
                          (when (> distance poly-min)
                            (setf poly-min distance
                                  min-i i))))))
-          (let* ((poly-normal (vec-neg (poly-axis-normal (svref axes min-i))))
+          (let* ((poly-normal (vec- (poly-axis-normal (svref axes min-i))))
                  (vertex-a (vec+ (segment-trans-a segment)
                                  (vec* poly-normal (segment-radius segment))))
                  (vertex-b (vec+ (segment-trans-b segment)
@@ -192,7 +192,7 @@
                                (vec* normal
                                      (+ (circle-radius circle)
                                         (/ min 2))))
-                         (vec-neg normal) min))
+                         (vec- normal) min))
           (t (circle-to-circle-query (circle-transformed-center circle)
                                      a (circle-radius circle) 0d0)))))))
 
@@ -204,7 +204,7 @@
       (when (and msa1 msa2)
         (if (> min1 min2)
             (find-vertices poly1 poly2 (poly-axis-normal msa1) min1)
-            (find-vertices poly1 poly2 (vec-neg (poly-axis-normal msa2)) min2))))))
+            (find-vertices poly1 poly2 (vec- (poly-axis-normal msa2)) min2))))))
 
 ;;;
 ;;; Generic function
