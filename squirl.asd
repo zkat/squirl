@@ -41,11 +41,12 @@
   :version "0.1 (unreleased)"
   :maintainer "Kat Marchán <kzm@sykosomatic.org>"
   :licence "MIT"
-  :depends-on (:squirl :until-it-dies.base)
+  :depends-on (:squirl :cl-opengl :cl-glu :cl-glut)
   :components
   ((:module "demo"
             :components
-            ((:file "test")))))
+            ((:file "squirl-demo" :depends-on ("draw-world"))
+             (:file "draw-world")))))
 
 (asdf:defsystem squirl.demo-2
   :version "0.1 (unreleased)"
