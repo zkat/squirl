@@ -1,5 +1,5 @@
 (defpackage #:squirl-demo
-  (:use :cl :uid :squirl :sheeple)
+  (:use :cl :squirl)
   (:export :run-all-demos))
 (in-package :squirl-demo)
 
@@ -23,7 +23,7 @@
 
 (defclass squirl-window (glut:window)
   ()
-  (:default-initargs :width 640 :height 480 :mode '(:double :rgba) :title (demo-title (car *demos*))))
+  (:default-initargs :width 640 :height 480 :mode '(:double :rgba) :title "Squirl Demo App"))
 
 (defun draw-string (x y string)
   (gl:color 0 0 0)
@@ -36,6 +36,10 @@
     (draw-string x y "Controls:")
     (draw-string x (- y 16) "TODO.")))
 
+(defclass demo () ((name :initarg :name :accessor demo-name)))
+(defgeneric update-demo (demo ticks))
+(defgeneric init-demo (demo))
+
 (defmethod glut:display ((w squirl-window))
   (gl:clear :color-buffer-bit)
   (draw-world *world*)
@@ -45,14 +49,10 @@
     (setf (body-position *mouse-body*) new-point
           (body-velocity *mouse-body*) (vec* (vec- new-point *mouse-point-last*) 60d0)
           *mouse-point-last* new-point)
-    (update *current-demo*)))
+    (update-demo *current-demo*)))
 
 (defun demo-title (demo)
   (concatenate 'string "Demo: " (demo-name demo)))
-
-(defclass demo () ((name :initarg :name :accessor demo-name)))
-
-(defgeneric init-demo (demo))
 
 (defun run-demo (demo)
   (setf *current-demo* demo
@@ -81,7 +81,7 @@
                         :modelview model :projection proj :viewport view)
       (vec mx my))))
 
-(defmethod glut:passive-motion ((w squirl-window) button state x y)
+(defmethod glut:passive-motion ((w squirl-window) x y)
   (setf *mouse-point* (mouse-to-space x y)))
 
 (defmethod glut:mouse ((w squirl-window) button state x y)
