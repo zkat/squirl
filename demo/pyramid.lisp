@@ -52,7 +52,7 @@
        for offset = (vec (- (/ (* i 60) 2))
                          (* (- n i) 52))
        do (loop
-             for j from 0 to i do
+             for j from 0 below i do
                (mapc (lambda (body)
                        (attach-shape (make-poly verts
                                                 :friction friction
