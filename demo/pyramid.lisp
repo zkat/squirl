@@ -1,7 +1,4 @@
-(defpackage #:squirl-demo-pyramid
-  (:use :cl :uid :squirl :sheeple)
-  (:export :run-demo))
-(in-package :squirl-demo-pyramid)
+(in-package :squirl-demo)
 
 (defvar *world*)
 (defvar *floor*)
@@ -10,27 +7,16 @@
 
 (defparameter *step* (/ 1 60 2))
 
-(defproto =squirl-demo-pyramid= (=engine=)
-  ((window-width 640)
-   (window-height 480)))
+(defclass pyramid-demo (demo)
+  ()
+  (:default-initargs :name "Pyramid Topple"))
 
 (defreply update ((demo =squirl-demo-pyramid=) delta &key)
   (declare (ignore delta))
   (world-step *world* *step*))
 
-(defun ortho-projection (demo)
-  (with-properties (window-width window-height) demo
-    (gl:matrix-mode :projection)
-    (gl:load-identity)
-    (gl:viewport 0 0 window-width window-height)
-    (let ((x (/ window-width 2))
-          (y (/ window-height 2)))
-     (gl:ortho (- x) x (- y) y -1 1))
-    (gl:matrix-mode :modelview)))
-
-(defreply init :after ((demo =squirl-demo-pyramid=))
+(defmethod init-demo ((demo pyramid-demo))
   (reset-shape-id-counter)
-  (ortho-projection demo)
   (setf *world* (make-world :iterations 20
                             :gravity (vec 0 -300)))
   (resize-world-active-hash *world* 40.0 2999)
@@ -100,40 +86,4 @@
                                            -174)
                                       offset)))))))
 
-(defreply draw ((demo =squirl-demo-pyramid=) &key)
-  (map-world #'draw-body *world*))
-
-(defun draw-body (body)
-  (let* ((position (body-position body))
-         (x (vec-x position))
-         (y (vec-y position)))
-    (with-color *green*
-      (map nil #'draw-shape (body-shapes body)))
-    (draw-circle (make-point x y) 2 :resolution 30 :color *red*)))
-
-(defgeneric draw-shape (shape)
-  (:method ((circle circle))
-    (let* ((circle-center (circle-transformed-center circle))
-           (edge (vec* (body-rotation (shape-body circle))
-                       (circle-radius circle)))
-           (edge-t (vec+ edge circle-center))
-           (edge-neg-t (vec- circle-center edge)))
-      (draw-circle (make-point (vec-x circle-center) (vec-y circle-center))
-                   (round (circle-radius circle)) :filledp nil)
-      (draw-line (make-point (vec-x edge-t) (vec-y edge-t))
-                 (make-point (vec-x edge-neg-t) (vec-y edge-neg-t)))))
-  (:method ((seg segment))
-    (let ((a (segment-trans-a seg))
-          (b (segment-trans-b seg)))
-      (draw-line (make-point (vec-x a) (vec-y a))
-                 (make-point (vec-x b) (vec-y b)))))
-  (:method ((poly poly))
-    (let ((vertices (poly-transformed-vertices poly)))
-      (loop for i below (length vertices)
-         for a = (elt vertices i)
-         for b = (elt vertices (mod (1+ i) (length vertices)))
-         do (draw-line (make-point (vec-x a) (vec-y a))
-                       (make-point (vec-x b) (vec-y b)))))))
-
-(defun run-demo ()
-  (run =squirl-demo-pyramid=))
+(pushnew 'pyramid-demo *demos*)

@@ -5,12 +5,12 @@
 
 (defparameter *sleep-ticks* 16)
 
-(defvar *world*)
+(defvar *world* nil)
 (defvar *demos* nil)
 (defvar *current-demo*)
 
-(defvar *mouse-point*)
-(defvar *mouse-point-last*)
+(defvar *mouse-point* +zero-vector+)
+(defvar *mouse-point-last* +zero-vector+)
 (defvar *mouse-body*)
 (defvar *mouse-joint*)
 
@@ -42,8 +42,8 @@
 
 (defmethod glut:display ((w squirl-window))
   (gl:clear :color-buffer-bit)
-  (draw-world *world*)
-  (draw-instructions)
+  (when *world* (draw-world *world*))
+  #+nil(draw-instructions)
   (glut:swap-buffers)
   (let ((new-point (vec-lerp *mouse-point-last* *mouse-point* 1/4)))
     (setf (body-position *mouse-body*) new-point
@@ -54,17 +54,18 @@
 (defun demo-title (demo)
   (concatenate 'string "Demo: " (demo-name demo)))
 
-(defun run-demo (demo)
-  (setf *current-demo* demo
-        *mouse-joint* nil
-        *world* (init-demo demo))
-  (glut:set-window-title (demo-title demo)))
+(defun run-demo (demo-class)
+  (let ((demo (make-instance demo-class)))
+    (setf *current-demo* demo
+          *mouse-joint* nil
+          *world* (init-demo demo))
+    (glut:set-window-title (demo-title demo))))
 
 (defmethod glut:keyboard ((w squirl-window) key x y)
   (declare (ignore x y))
   (case key
     (#\Esc (glut:destroy-current-window))
-    (#\Return (run-demo *current-demo*))
+    (#\Return (run-demo (class-of *current-demo*)))
     (#\\ (gl:enable :line-smooth)
          (gl:enable :point-smooth)
          (gl:enable :blend)
