@@ -30,13 +30,16 @@
 (defun draw-string (x y string)
   (gl:color 0 0 0)
   (gl:raster-pos x y)
-  (glut:bitmap-string :bitmap-helvetica-10 string))
+  (glut:bitmap-string glut:+bitmap-helvetica-10+ string))
 
 (defun draw-instructions ()
-  (let ((x -300)
-        (y 220))
-    (draw-string x y "Controls:")
-    (draw-string x (- y 16) "TODO.")))
+  (let ((x -300) (y 220))
+    (draw-string x y (format nil
+                             "Controls: ~%~
+                              N chooses the next demo~%~
+                              Use the mouse to grab objects~%~
+                              Arrow keys control some demos~%~
+                              \ enables anti-aliasing."))))
 
 (defclass demo () ((name :initarg :name :accessor demo-name)))
 (defgeneric update-demo (demo ticks))
@@ -45,7 +48,7 @@
 (defmethod glut:display ((w squirl-window))
   (gl:clear :color-buffer-bit)
   (draw-world *world*)
-  #+nil(draw-instructions)
+  (draw-instructions)
   (glut:swap-buffers)
   (incf *ticks*)
   (let ((new-point (vec-lerp *mouse-point-last* *mouse-position* 1/4)))
