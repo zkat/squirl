@@ -9,15 +9,17 @@
 (defvar *demos* nil)
 (defvar *current-demo*)
 
-(defvar *mouse-point* +zero-vector+)
+(defvar *mouse-position* +zero-vector+)
 (defvar *mouse-point-last* +zero-vector+)
-(defvar *mouse-body*)
+(defvar *mouse-body* (make-body))
 (defvar *mouse-joint*)
 
 (defvar *key-up* nil)
 (defvar *key-down* nil)
 (defvar *key-left* nil)
 (defvar *key-right* nil)
+
+(defvar *ticks* 0)
 
 (defvar *arrow-direction* +zero-vector+)
 
@@ -42,14 +44,15 @@
 
 (defmethod glut:display ((w squirl-window))
   (gl:clear :color-buffer-bit)
-  (when *world* (draw-world *world*))
+  (draw-world *world*)
   #+nil(draw-instructions)
   (glut:swap-buffers)
-  (let ((new-point (vec-lerp *mouse-point-last* *mouse-point* 1/4)))
+  (incf *ticks*)
+  (let ((new-point (vec-lerp *mouse-point-last* *mouse-position* 1/4)))
     (setf (body-position *mouse-body*) new-point
           (body-velocity *mouse-body*) (vec* (vec- new-point *mouse-point-last*) 60d0)
           *mouse-point-last* new-point)
-    (update-demo *current-demo*)))
+    (update-demo *current-demo* *ticks*)))
 
 (defun demo-title (demo)
   (concatenate 'string "Demo: " (demo-name demo)))
@@ -58,8 +61,9 @@
   (let ((demo (make-instance demo-class)))
     (setf *current-demo* demo
           *mouse-joint* nil
+          *ticks* 0
           *world* (init-demo demo))
-    (glut:set-window-title (demo-title demo))))
+    #+nil(glut:set-window-title (demo-title demo))))
 
 (defmethod glut:keyboard ((w squirl-window) key x y)
   (declare (ignore x y))
@@ -82,8 +86,8 @@
                         :modelview model :projection proj :viewport view)
       (vec mx my))))
 
-(defmethod glut:passive-motion ((w squirl-window) x y)
-  (setf *mouse-point* (mouse-to-space x y)))
+(defmethod glut:motion ((w squirl-window) x y)
+  (print (setf *mouse-position* (mouse-to-space x y))))
 
 (defmethod glut:mouse ((w squirl-window) button state x y)
   (if (eq button :left-button)
@@ -101,6 +105,7 @@
           (progn (world-remove-constraint *world* *mouse-joint*) (setf *mouse-joint* nil)))))
 
 (defmethod glut:idle ((w squirl-window))
+  (sleep 0.0016)
   (glut:post-redisplay))
 
 (defun set-arrow-direction ()
@@ -127,7 +132,7 @@
     (:key-right (setf *key-right* nil)))
   (set-arrow-direction))
 
-(defmethod glut:display-window ((w squirl-window))
+(defmethod glut:display-window :before ((w squirl-window))
   (gl:clear-color 1 1 1 0)
   (gl:matrix-mode :projection)
   (gl:load-identity)
@@ -137,6 +142,10 @@
 
 (defun run-all-demos ()
   (setf *mouse-body* (make-body))
-  (glut:display-window (make-instance 'squirl-window))
   (when *demos*
-    (run-demo (car *demos*))))
+    (run-demo (car *demos*)))
+  (glut:init)
+  (glut:display-window (make-instance 'squirl-window))
+  ;; this is a kludge around an apparent cl-glut bug.
+  (setf glut::*glut-initialized-p* nil))
+

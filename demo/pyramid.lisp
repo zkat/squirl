@@ -1,6 +1,5 @@
 (in-package :squirl-demo)
 
-(defvar *world*)
 (defvar *floor*)
 
 (defparameter *elapsed* 0)
@@ -11,9 +10,15 @@
   ()
   (:default-initargs :name "Pyramid Topple"))
 
+<<<<<<< HEAD
 (defreply update ((demo =squirl-demo-pyramid=) delta &key)
   (declare (ignore delta))
   (world-step *world* *step*))
+=======
+(defmethod update-demo ((demo pyramid-demo) ticks)
+  (declare (ignore ticks))
+  (world-step *world* 1/120))
+>>>>>>> Pyramid demo is now functional.
 
 (defmethod init-demo ((demo pyramid-demo))
   (reset-shape-id-counter)
@@ -84,6 +89,7 @@
                       :inertia (moment-for-poly 1 verts)
                       :position (vec+ (vec (+ (* (1- i) 60) 17)
                                            -174)
-                                      offset)))))))
+                                      offset))))))
+  *world*)
 
 (pushnew 'pyramid-demo *demos*)

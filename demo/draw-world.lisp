@@ -71,12 +71,14 @@
         (b (segment-trans-b seg)))
     (draw-line (vec-x a) (vec-y a) (vec-x b) (vec-y b))))
 (defmethod draw-shape ((poly poly))
+  (apply #'gl:color '(0 1 0))
   (let ((vertices (poly-transformed-vertices poly)))
-    (loop for i below (length vertices)
-       for a = (elt vertices i)
-       for b = (elt vertices (mod (1+ i) (length vertices)))
-       do (gl:vertex (vec-x a) (vec-y a))
-         (gl:vertex (vec-x b) (vec-y b)))))
+    (gl:with-primitives :lines
+      (loop for i below (length vertices)
+         for a = (elt vertices i)
+         for b = (elt vertices (mod (1+ i) (length vertices)))
+         do (gl:vertex (vec-x a) (vec-y a))
+         (gl:vertex (vec-x b) (vec-y b))))))
 
 ;;;
 ;;; Constraints
@@ -164,7 +166,7 @@
      do (gl:vertex (vec-x contact-position) (vec-y contact-position))))
 
 (defun draw-world (world &key (line-thickness 1)
-                   draw-bb-p draw-shapes-p body-point-size collision-point-size)
+                   draw-bb-p (draw-shapes-p t) (body-point-size 2) (collision-point-size 1))
   (gl:line-width 1)
   (when draw-bb-p
     (gl:color 0.6 1.0 0.6)
