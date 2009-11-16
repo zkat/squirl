@@ -48,7 +48,7 @@
                      (vec 3 -20))))
     (loop
        with n = 9
-       for i from 0 to n
+       for i from 1 to n
        for offset = (vec (- (/ (* i 60) 2))
                          (* (- n i) 52))
        do (loop
