@@ -10,15 +10,9 @@
   ()
   (:default-initargs :name "Pyramid Topple"))
 
-<<<<<<< HEAD
-(defreply update ((demo =squirl-demo-pyramid=) delta &key)
-  (declare (ignore delta))
-  (world-step *world* *step*))
-=======
 (defmethod update-demo ((demo pyramid-demo) ticks)
   (declare (ignore ticks))
-  (world-step *world* 1/120))
->>>>>>> Pyramid demo is now functional.
+  (world-step *world* *step*))
 
 (defmethod init-demo ((demo pyramid-demo))
   (reset-shape-id-counter)
