@@ -8,7 +8,7 @@
 ;;; Collision resolution functions
 ;;;
 (defun circle-to-circle-query (p1 p2 r1 r2)
-  (declare (optimize speed) (double-float r1 r2))
+  (declare (optimize speed) (double-float r1 r2) (vec p1 p2))
   (let* ((delta (vec- p2 p1))
          (mindist (+ r1 r2))
          (distsq (vec-length-sq delta)))
