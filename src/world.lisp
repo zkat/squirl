@@ -187,11 +187,11 @@
 ;;;
 
 (defun resize-world-static-hash (world dimension count)
-  (resize-world-hash (world-static-shapes world) dimension count)
+  (resize-world-hash (world-static-shapes world) (float dimension 1d0) count)
   (rehash-world-hash (world-static-shapes world)))
 
 (defun resize-world-active-hash (world dimension count)
-  (resize-world-hash (world-active-shapes world) dimension count))
+  (resize-world-hash (world-active-shapes world) (float dimension 1d0) count))
 
 (defun rehash-world-static-data (world)
   (map-world-hash #'shape-cache-data (world-static-shapes world))
