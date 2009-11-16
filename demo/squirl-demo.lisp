@@ -73,6 +73,9 @@
   (case key
     (#\Esc (glut:destroy-current-window))
     (#\Return (run-demo (class-of *current-demo*)))
+    (#\n (run-demo (elt *demos*
+                        (mod (1+ (position (class-name (class-of *current-demo*)) *demos*))
+                             (length *demos*)))))
     (#\\ (gl:enable :line-smooth)
          (gl:enable :point-smooth)
          (gl:enable :blend)
