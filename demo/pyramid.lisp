@@ -16,7 +16,7 @@
 
 (defreply update ((demo =squirl-demo-pyramid=) delta &key)
   (declare (ignore delta))
-  (world-step *world* 1/60))
+  (world-step *world* *step*))
 
 (defun ortho-projection (demo)
   (with-properties (window-width window-height) demo
