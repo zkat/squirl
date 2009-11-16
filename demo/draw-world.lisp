@@ -3,9 +3,9 @@
 ;;;
 ;;; Configuration
 ;;;
-(defparameter *line-color* '(0 0 0))
-(defparameter *collision-color* '(1 0 0))
-(defparameter *body-color* '(0 0 1))
+(defparameter *line-color* '(0 0 0 1))
+(defparameter *collision-color* '(1 0 0 1))
+(defparameter *body-color* '(0 0 1 1))
 (defparameter *shapes-filled-p* t)
 
 ;;;
