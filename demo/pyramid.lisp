@@ -23,7 +23,9 @@
     (gl:matrix-mode :projection)
     (gl:load-identity)
     (gl:viewport 0 0 window-width window-height)
-    (gl:ortho (- window-width) window-width (- window-height) window-height 10 0)
+    (let ((x (/ window-width 2))
+          (y (/ window-height 2)))
+     (gl:ortho (- x) x (- y) y -1 1))
     (gl:matrix-mode :modelview)))
 
 (defreply init :after ((demo =squirl-demo-pyramid=))
