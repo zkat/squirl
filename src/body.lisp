@@ -4,8 +4,14 @@
 (defstruct (body
              (:constructor
               %make-body (%mass %inertia position velocity force actor %angle
-                                &aux (inverse-mass (/ %mass))
-                                     (inverse-inertia (/ %inertia))
+                                &aux (inverse-mass
+                                      #+clisp(ext:without-floating-point-underflow
+                                                 (/ %mass))
+                                      #-clisp(/ %mass))
+                                     (inverse-inertia
+                                      #+clisp(ext:without-floating-point-underflow
+                                                 (/ %inertia))
+                                      #-clisp(/ %mass))
                                      (rotation (angle->vec %angle)))))
   world                 ; world that this body is attached to, if any.
   actor                 ; Actor used for the COLLIDE "callback"
