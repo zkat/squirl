@@ -95,9 +95,10 @@
      finally (return (make-bbox minx miny maxx maxy))))
 
 (defun poly-transform-vertices (poly position rotation)
-  (map-into (poly-transformed-vertices poly)
-            (fun (vec+ position (vec-rotate _ rotation)))
-            (poly-vertices poly)))
+  (declare (vec position rotation) (optimize speed))
+  (do-vector ((i vertex) (poly-vertices poly))
+    (setf (aref (poly-transformed-vertices poly) i)
+          (vec+ position (vec-rotate vertex rotation)))))
 
 (defun poly-transform-axes (poly position rotation)
   (flet ((transformed-axis (axis &aux (normal (vec-rotate (poly-axis-normal axis) rotation)))
