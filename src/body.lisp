@@ -3,7 +3,7 @@
 
 (defstruct (body
              (:constructor
-              %make-body (%mass %inertia position velocity force actor %angle
+              %make-body (%mass %inertia position velocity force actor %angle angular-velocity
                                 &aux (inverse-mass
                                       #+clisp(ext:without-floating-point-underflow
                                                  (/ %mass))
@@ -36,9 +36,9 @@
 
 (defun make-body (&key (mass most-positive-double-float) (inertia most-positive-double-float)
                   (position +zero-vector+) (velocity +zero-vector+) (force +zero-vector+) actor
-                  shapes (angle 0d0))
+                  shapes (angle 0d0) (angular-velocity 0d0))
   (let ((body (%make-body (float mass 0d0) (float inertia 1d0) position velocity
-                          force actor (float angle 0d0))))
+                          force actor (float angle 0d0) (float angular-velocity 0d0))))
     (map nil (fun (attach-shape _ body)) shapes)
     body))
 
