@@ -6,16 +6,15 @@
 (defparameter *line-color* '(0 0 0 1))
 (defparameter *collision-color* '(1 0 0 1))
 (defparameter *body-color* '(0 0 1 1))
-(defparameter *shapes-filled-p* t)
 
 ;;;
 ;;; Primitives
 ;;;
-(defun draw-circle (x y radius &key (resolution 10))
+(defun draw-circle (x y radius &key (resolution 10) (filled t))
   (let* ((theta (* 2 (/ pi resolution)))
          (tangential-factor (tan theta))
          (radial-factor (- 1 (cos theta))))
-    (gl:with-primitives (if *shapes-filled-p* :triangle-fan :line-loop)
+    (gl:with-primitives (if filled :triangle-fan :line-loop)
       (loop with curr-x = (+ x radius)
          with curr-y = y
          repeat resolution
@@ -33,6 +32,14 @@
   (gl:with-primitives :lines
     (gl:vertex x1 y1)
     (gl:vertex x2 y2)))
+
+(defun draw-poly (vertices &key (filled t))
+  (gl:with-primitives (if filled :polygon :lines)
+    (loop for i below (length vertices)
+       for a = (elt vertices i)
+       for b = (elt vertices (mod (1+ i) (length vertices)))
+       do (gl:vertex (vec-x a) (vec-y a))
+       (gl:vertex (vec-x b) (vec-y b)))))
 
 ;;;
 ;;; Bodies and shapes
@@ -64,8 +71,9 @@
          (radius (circle-radius circle))
          (edge (vec* (body-rotation body) radius))
          (edge-t (vec+ edge center)))
-    (draw-circle x y (round radius) :resolution 30)
+    (draw-circle x y (round radius) :resolution 30 :filled t)
     (gl:color 0 0 0)
+    (draw-circle x y (round radius) :resolution 30 :filled nil)
     (draw-line (vec-x edge-t) (vec-y edge-t) (vec-x center) (vec-y center))))
 
 (defmethod draw-shape ((seg segment))
@@ -74,12 +82,9 @@
     (draw-line (vec-x a) (vec-y a) (vec-x b) (vec-y b))))
 (defmethod draw-shape ((poly poly))
   (let ((vertices (poly-transformed-vertices poly)))
-    (gl:with-primitives (if *shapes-filled-p* :polygon :lines)
-      (loop for i below (length vertices)
-         for a = (elt vertices i)
-         for b = (elt vertices (mod (1+ i) (length vertices)))
-         do (gl:vertex (vec-x a) (vec-y a))
-         (gl:vertex (vec-x b) (vec-y b))))))
+    (draw-poly vertices :filled t)
+    (gl:color 0 0 0)
+    (draw-poly vertices :filled nil)))
 
 ;;;
 ;;; Constraints
