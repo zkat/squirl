@@ -1,6 +1,33 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
+(defmacro defbody (name)
+  `(progn 
+     (defstruct (,name
+                  (:include body)
+                  (:constructor ,(intern (concatenate 'string "%MAKE-" (symbol-name name)))
+                                (%mass %inertia position
+                                       velocity force actor
+                                       %angle angular-velocity
+                                       &aux (inverse-mass
+                                             #+clisp(ext:without-floating-point-underflow
+                                                        (/ %mass))
+                                             #-clisp(/ %mass))
+                                       (inverse-inertia
+                                        #+clisp(ext:without-floating-point-underflow
+                                                   (/ %inertia))
+                                        #-clisp(/ %inertia))
+                                       (rotation (angle->vec %angle))))))
+     (defun ,(intern (concatenate 'string "MAKE-" (symbol-name name)))
+         (&key (mass most-positive-double-float) (inertia most-positive-double-float)
+          (position +zero-vector+) (velocity +zero-vector+) (force +zero-vector+)
+          actor shapes (angle 0d0) (angular-velocity 0d0))
+       (let ((body (,(intern (concatenate 'string "%MAKE-" (symbol-name name)))
+                     (float mass 0d0) (float inertia 1d0) position velocity
+                     force actor (float angle 0d0) (float angular-velocity 0d0))))
+         (map nil (lambda (_) (attach-shape _ body)) shapes)
+         body))))
+
 (defstruct (body
              (:constructor
               %make-body (%mass %inertia position velocity force actor %angle angular-velocity

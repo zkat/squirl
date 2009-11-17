@@ -35,6 +35,7 @@
 
    ;; Bodies
    :body
+   :defbody
    :make-body
    :body-world
    :body-actor
