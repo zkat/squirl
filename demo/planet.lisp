@@ -15,7 +15,7 @@
 ;; Oh my fucking god this sucks
 (defstruct (planetary-body (:include body)
                            (:constructor %make-planetary-body
-                                         (squirl::%mass squirl::%inertia squirl::position 
+                                         (squirl::%mass squirl::%inertia squirl::position
                                                         squirl::velocity squirl::force squirl::actor
                                                         squirl::%angle squirl::angular-velocity
                                                         &aux (squirl::inverse-mass
@@ -47,7 +47,7 @@
                           (- 320 radius))
                        (- (random (- 480 (* 2 radius)))
                           (- 240 radius)))
-     when (< (vec-length vec) 100)
+     when (< 88 (vec-length vec) 200)
      return vec))
 
 (defun add-box ()
@@ -59,19 +59,19 @@
          (radius (vec-length (vec size size)))
          (body (make-planetary-body :mass mass :inertia (moment-for-poly mass verts)
                                     :position (random-position radius)
-                                    :velocity (vec* (vec (- (random 2) 1) (- (random 2) 1)) 200d0)))
-         (shape (make-poly verts :friction 0.7)))
-    (attach-shape shape body)
+                                    :velocity (vec* (angle->vec (* pi (random 2d0)))
+                                                    (random 200d0)))))
+    (attach-shape (make-poly verts :friction 0.7 :restitution 1) body)
     (world-add-body *world* body)))
 
 (defmethod init-demo ((demo planet-demo))
-  (let ((static-body (make-body :angular-velocity 0.2))
-        (shape (make-circle 70 :restitution 1 :friction 1)))
+  (let ((static-body (make-body :angular-velocity 0.3))
+        (shape (make-circle 70 :restitution 1 :friction 0.8)))
     (attach-shape shape static-body)
     (setf *planet* static-body)
     (reset-shape-id-counter)
     (setf *world* (make-world :iterations 20))
-    (loop repeat 30 do (add-box))
+    (loop repeat 22 do (add-box))
     (world-add-body *world* static-body)
     *world*))
 
