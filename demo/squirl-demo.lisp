@@ -35,11 +35,11 @@
 (defun draw-instructions ()
   (let ((x -300) (y 220))
     (draw-string x y (format nil
-                             "Controls: ~%~
-                              N chooses the next demo~%~
-                              Use the mouse to grab objects~%~
-                              Arrow keys control some demos~%~
-                              \ enables anti-aliasing."))))
+                             "Controls:~@
+                              N chooses the next demo~@
+                              Use the mouse to grab objects~@
+                              Arrow keys control some demos~@
+                              \\ enables anti-aliasing."))))
 
 (defclass demo () ((name :initarg :name :accessor demo-name)))
 (defgeneric update-demo (demo ticks))
