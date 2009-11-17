@@ -1,46 +1,45 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
-(defstruct (body
-             (:constructor
-              %make-body (%mass %inertia position velocity force actor %angle angular-velocity
-                                &aux (inverse-mass
-                                      #+clisp(ext:without-floating-point-underflow
-                                                 (/ %mass))
-                                      #-clisp(/ %mass))
-                                     (inverse-inertia
-                                      #+clisp(ext:without-floating-point-underflow
-                                                 (/ %inertia))
-                                      #-clisp(/ %inertia))
-                                     (rotation (angle->vec %angle)))))
-  world                 ; world that this body is attached to, if any.
-  actor                 ; Actor used for the COLLIDE "callback"
-  %shapes               ; shapes associated with this body.
-  ;; Mass properties, and cached inverses
-  (%mass (assert nil) :type double-float)
-  (inverse-mass (assert nil) :type double-float)
-  (%inertia (assert nil) :type double-float)
-  (inverse-inertia (assert nil) :type double-float)
-  ;; Linear components of motion
-  (position +zero-vector+ :type vec)
-  (velocity +zero-vector+ :type vec)
-  (force    +zero-vector+ :type vec)
-  ;; Angular components of motion, and cached rotation vector
-  (%angle 0d0 :type double-float)
-  (rotation +initial-rotation+ :type vec)
-  (angular-velocity 0d0 :type double-float)
-  (torque 0d0 :type double-float)
-  ;; Velocity bias values used when solving penetrations and correcting constraints.
-  (velocity-bias +zero-vector+ :type vec)
-  (angular-velocity-bias 0d0 :type double-float))
+(defclass body ()
+  ((world :initform nil :accessor body-world)
+   (actor :initarg :actor :initform nil :accessor body-actor)
+   (shapes :initarg :shapes :initform nil :accessor body-shapes)
+   (mass :accessor body-mass :type double-float)
+   (inverse-mass :accessor body-inverse-mass :type double-float)
+   (inertia :accessor body-inertia :type double-float)
+   (inverse-inertia :accessor body-inverse-inertia :type double-float)
+   (position :initform +zero-vector+ :initarg :position :accessor body-position :type vec)
+   (velocity :initform +zero-vector+ :initarg :velocity :accessor body-velocity :type vec)
+   (force :initform +zero-vector+ :initarg :force :accessor body-force :type vec)
+   (angle :accessor body-angle :type double-float)
+   (rotation :accessor body-rotation :type vec)
+   (angular-velocity :accessor body-angular-velocity :type double-float)
+   (torque :initarg :torque :initform 0d0 :accessor body-torque :type double-float)
+   (velocity-bias :initform +zero-vector+ :accessor body-velocity-bias :type vec)
+   (angular-velocity-bias :initform 0d0 :accessor body-angular-velocity-bias :type double-float)))
 
-(defun make-body (&key (mass most-positive-double-float) (inertia most-positive-double-float)
-                  (position +zero-vector+) (velocity +zero-vector+) (force +zero-vector+) actor
-                  shapes (angle 0d0) (angular-velocity 0d0))
-  (let ((body (%make-body (float mass 0d0) (float inertia 1d0) position velocity
-                          force actor (float angle 0d0) (float angular-velocity 0d0))))
-    (map nil (fun (attach-shape _ body)) shapes)
-    body))
+(defmethod initialize-instance :after ((body body) 
+                                       &key (mass most-positive-double-float)
+                                       (inertia most-positive-double-float)
+                                       (angle 0d0) (angular-velocity 0d0))
+  (setf (body-mass body) (float mass 0d0)
+        (body-inertia body) (float inertia 1d0)
+        (body-angle body) (float angle 0d0)
+        (body-angular-velocity body) (float angular-velocity 0d0)
+        (body-inverse-mass body)
+        #-clisp(/ (body-mass body))
+        #+clisp(ext:without-floating-point-underflow
+                   (/ (body-mass body)))
+        (body-inverse-inertia body)
+        #-clisp(/ (body-inertia body))
+        #+clisp(ext:without-floating-point-underflow
+                   (/ (body-inertia body)))
+        (body-rotation body) (angle->vec (body-angle body)))
+  (map nil (fun (attach-shape _ body)) (body-shapes body)))
+
+(defun make-body (&rest all-keys)
+  (apply #'make-instance 'body all-keys))
 
 (defun staticp (body)
   (when (= most-positive-double-float (body-mass body) (body-inertia body))
@@ -49,23 +48,16 @@
 (defun body-attached-p (body world)
   (eq world (body-world body)))
 
-(defun body-shapes (body)
-  (body-%shapes body))
-
 (define-print-object (body)
   (format t "~@[Actor: ~a, ~]Mass: ~a, Inertia: ~a"
           (body-actor body) (body-mass body) (body-inertia body)))
 
-;;; Wraps the mass, inertia, and angle slots so that setting them updates
-;;; the inverse-mass, inverse-inertia, and rotation slots.
-(macrolet ((wrap (external internal cached wrapper)
-             `(progn (defun ,external (body) (,internal body))
-                     (defun (setf ,external) (new-value body)
-                       (setf (,internal body) new-value
-                             (,cached body) (,wrapper new-value))))))
-  (wrap body-mass body-%mass body-inverse-mass /)
-  (wrap body-inertia body-%inertia body-inverse-inertia /)
-  (wrap body-angle body-%angle body-rotation angle->vec))
+(defmethod (setf body-mass) :after (new-value (body body))
+  (setf (body-inverse-mass body) (/ new-value)))
+(defmethod (setf body-inertia) :after (new-value (body body))
+  (setf (body-inverse-inertia body) (/ new-value)))
+(defmethod (setf body-angle) :after (new-value (body body))
+  (setf (body-rotation body) (angle->vec new-value)))
 
 (defgeneric body-update-velocity (body gravity damping dt)
   (:method ((body body) gravity damping dt)
