@@ -74,20 +74,33 @@
 
 (defmacro defcollision (&rest args)
   (multiple-value-bind (qualifiers lambda-list body)
-      (parse-defcollision args)
-    `(progn
-       (defmethod squirl:collide ,@qualifiers ,lambda-list ,@body)
-       (defmethod squirl:collide ,@qualifiers ,(reverse lambda-list) ,@body))))
-
-(defun parse-defcollision (args)
-  (let (qualifiers lambda-list body (parse-state :qualifiers))
-    (dolist (arg args)
-      (ecase parse-state
-        (:qualifiers (if (and (atom arg) arg)
-                         (push arg qualifiers)
-                         (setf lambda-list arg parse-state :body)))
-        (:body (push arg body))))
-    (values qualifiers lambda-list (nreverse body))))
+      (parse-defmethod args)
+    (destructuring-bind (actor1-and-spec actor2-and-spec contacts-name) lambda-list
+      (flet ((parse-specified-arg (arg)
+               (etypecase arg
+                 (symbol (values arg t))
+                 (list (destructuring-bind (arg-name specializer) arg
+                         (values arg-name specializer))))))
+        (multiple-value-bind (actor1-name actor1-spec)
+            (parse-specified-arg actor1-and-spec)
+          (multiple-value-bind (actor2-name actor2-spec)
+              (parse-specified-arg actor2-and-spec)
+            (if (equal actor1-spec actor2-spec)
+                `(defmethod collide ,@qualifiers ,lambda-list ,@body)
+                `(flet ((inner (,actor1-name ,actor2-name ,contacts-name) ,@body))
+                   (defmethod collide ,@qualifiers
+                       (,actor1-and-spec ,actor2-and-spec ,contacts-name)
+                     (funcall #'inner ,actor1-name ,actor2-name ,contacts-name))
+                   (defmethod collide ,@qualifiers
+                       (,actor2-and-spec ,actor1-and-spec ,contacts-name)
+                     (funcall #'inner ,actor1-name ,actor2-name
+                              ;; Because the actors are reversed, we should reverse the normals
+                              ;; FIXME: I suck! Stack allocate me or something!
+                              (mapcar (fun (with-accessors ((point contact-point)
+                                                            (distance contact-distance)
+                                                            (normal contact-normal)) _
+                                             (make-contact point (vec- normal) distance)))
+                                      ,contacts-name)))))))))))
 
 ;;;
 ;;; Body, Shape, and Joint Management

@@ -111,7 +111,7 @@
             (* (- +bias-coefficient+)
                dt-inverse
                (min 0d0 (+ (contact-distance contact)
-                             +collision-slop+)))
+                           +collision-slop+)))
             (contact-j-bias contact)
             0d0
             (contact-bounce contact)

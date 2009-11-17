@@ -109,3 +109,15 @@ as the index vector. Note that this macro doesn't handle declarations properly."
 (defmacro awhen (test-form &body body)
   `(aif ,test-form
         (progn ,@body)))
+
+(defun parse-defmethod (args)
+  (let (qualifiers lambda-list body (parse-state :qualifiers))
+    (dolist (arg args)
+      (ecase parse-state
+        (:qualifiers (if (and (atom arg)
+                              (not (null arg)))
+                         (push arg qualifiers)
+                         (setf lambda-list arg
+                               parse-state :body)))
+        (:body (push arg body))))
+    (values qualifiers lambda-list (nreverse body))))
