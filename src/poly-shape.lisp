@@ -20,9 +20,12 @@
 (defstruct (poly (:include shape)
                  (:constructor
                   %make-poly (length restitution friction &aux
-                                     (transformed-vertices (make-array length))
-                                     (transformed-axes (make-array length)))))
-  vertices axes transformed-vertices transformed-axes)
+                                     (transformed-vertices (make-array length :element-type 'vec))
+                                     (transformed-axes (make-array length :element-type 'poly-axis)))))
+  (vertices (make-array 0 :element-type 'vec) :type (simple-array vec (*)))
+  (axes (make-array 0 :element-type 'poly-axis) :type (simple-array poly-axis (*)))
+  (transformed-vertices (assert nil) :type (simple-array vec (*)))
+  (transformed-axes (assert nil) :type (simple-array poly-axis (*))))
 
 (defmethod print-shape progn ((poly poly))
   (format t "Vertex count: ~a" (length (poly-vertices poly))))
