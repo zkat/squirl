@@ -38,6 +38,10 @@
 ;;; Bodies and shapes
 ;;;
 (defun draw-body (body)
+  (unless (body-actor body)
+    (setf (body-actor body)
+          (list (random 1.0) (random 1.0) (random 1.0))))
+  (apply #'gl:color (body-actor body))
   (map nil #'draw-shape (body-shapes body)))
 
 (defun draw-bbox (body)
@@ -53,7 +57,6 @@
 
 (defgeneric draw-shape (shape))
 (defmethod draw-shape ((circle circle))
-  (apply #'gl:color *body-color*)
   (let* ((body (shape-body circle))
          (center (circle-transformed-center circle))
          (x (vec-x center))
@@ -66,12 +69,10 @@
     (draw-line (vec-x edge-t) (vec-y edge-t) (vec-x center) (vec-y center))))
 
 (defmethod draw-shape ((seg segment))
-  (apply #'gl:color *line-color*)
   (let ((a (segment-trans-a seg))
         (b (segment-trans-b seg)))
     (draw-line (vec-x a) (vec-y a) (vec-x b) (vec-y b))))
 (defmethod draw-shape ((poly poly))
-  (apply #'gl:color '(0 1 0))
   (let ((vertices (poly-transformed-vertices poly)))
     (gl:with-primitives (if *shapes-filled-p* :polygon :lines)
       (loop for i below (length vertices)
