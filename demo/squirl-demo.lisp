@@ -177,12 +177,14 @@ makes sure that the current world is updated by 1 time unit per second."
     (#\n (run-demo (elt *demos*
                         (mod (1+ (position (class-name (class-of *current-demo*)) *demos*))
                              (length *demos*)))))
-    (#\\ (gl:enable :line-smooth)
-         (gl:enable :point-smooth)
-         (gl:enable :blend)
+    (#\\ (gl:enable :polygon-smooth
+                    :line-smooth
+                    :point-smooth
+                    :blend)
          (gl:blend-func :src-alpha :one-minus-src-alpha)
-         (gl:hint :line-smooth-hint :dont-care)
-         (gl:hint :point-smooth-hint :dont-care))))
+         (gl:hint :polygon-smooth-hint :nicest)
+         (gl:hint :line-smooth-hint :nicest)
+         (gl:hint :point-smooth-hint :nicest))))
 
 (defun mouse-to-space (x y)
   (let ((model (gl:get-double :modelview-matrix))
