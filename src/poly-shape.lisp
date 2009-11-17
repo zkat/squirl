@@ -59,9 +59,20 @@
 
 (defun poly-value-on-axis (poly normal distance)
   "Returns the minimum distance of the polygon to the axis."
-  (- (loop for vertex across (poly-transformed-vertices poly)
-        minimizing (vec. normal vertex))
-     distance))
+  ;; Abandon all hope, ye who enter here!
+  (declare (optimize speed) (double-float distance) (vec normal))
+  (prog* ((transformed-vertices (poly-transformed-vertices poly))
+          (min (vec. normal (aref transformed-vertices 0)))
+          (limit (length transformed-vertices))
+          (index 1)
+          (dot (vec. normal (aref transformed-vertices index))))
+     (declare (fixnum index limit) (double-float min dot))
+   loop  (when (< dot min) (setf min dot))
+         (incf index)
+         (when (= index limit) (go exit))
+         (setf dot (vec. normal (aref transformed-vertices index)))
+         (go loop)
+   exit  (return (- min distance))))
 
 (defun poly-contains-vertex-p (poly vertex)
   "Returns true if the polygon contains the vertex."
