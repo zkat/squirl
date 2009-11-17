@@ -76,6 +76,7 @@ Returns both the difference in time and the current-time used in the computation
 ;;;
 (defclass demo ()
   ((name :initarg :name :accessor demo-name)
+   (pausedp :initform nil :accessor pausedp)
    (accumulator :initform 0 :accessor accumulator)
    (world :initarg :world :accessor world)
    (delta-time :initform 1 :accessor delta-time)
@@ -108,6 +109,16 @@ Returns both the difference in time and the current-time used in the computation
 (defgeneric grabbablep (actor)
   (:method (actor) (declare (ignore actor)) t))
 
+(defun toggle-pause (demo)
+  (if (pausedp demo)
+      (setf (pausedp demo) nil)
+      (setf (pausedp demo) t)))
+
+(defmethod update-demo :around ((demo demo) dt)
+  (declare (ignore dt))
+  (unless (pausedp demo)
+    (call-next-method)))
+
 (defmethod update-demo ((demo demo) dt)
   "The default method locks the update loop to 'realtime'. That is, it
 makes sure that the current world is updated by 1 time unit per second."
@@ -134,6 +145,7 @@ makes sure that the current world is updated by 1 time unit per second."
     (draw-string x y (format nil
                              "Controls:~@
                               #\\N chooses the next demo~@
+                              #\\P toggles pause~@
                               Use the mouse to grab objects~@
                               Arrow keys control some demos~@
                               #\\A toggles anti-aliasing."))))
@@ -185,6 +197,7 @@ makes sure that the current world is updated by 1 time unit per second."
   (case key
     (#\Esc (glut:destroy-current-window))
     (#\Return (run-demo (class-of *current-demo*)))
+    (#\p (toggle-pause *current-demo*))
     (#\n (run-demo (elt *demos*
                         (mod (1+ (position (class-name (class-of *current-demo*)) *demos*))
                              (length *demos*)))))
