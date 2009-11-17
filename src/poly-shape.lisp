@@ -91,9 +91,11 @@
           (vec+ position (vec-rotate vertex rotation)))))
 
 (defun poly-transform-axes (poly position rotation)
-  (flet ((transformed-axis (axis &aux (normal (vec-rotate (poly-axis-normal axis) rotation)))
-           (make-poly-axis normal (+ (vec. position normal) (poly-axis-distance axis)))))
-    (map-into (poly-transformed-axes poly) #'transformed-axis (poly-axes poly))))
+  (declare (vec position rotation) (optimize speed))
+  (do-vector ((i axis) (poly-axes poly))
+    (let ((normal (vec-rotate (poly-axis-normal axis) rotation)))
+      (setf (aref (poly-transformed-axes poly) i)
+            (make-poly-axis normal (+ (vec. position normal) (poly-axis-distance axis)))))))
 
 (defmethod shape-cache-data ((poly poly))
   (with-place (body. body-) (position rotation) (poly-body poly)
