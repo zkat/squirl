@@ -11,7 +11,7 @@
 ;;;
 ;;; Primitives
 ;;;
-(defun draw-circle (x y radius &key resolution)
+(defun draw-circle (x y radius &key (resolution 10))
   (let* ((theta (* 2 (/ pi resolution)))
          (tangential-factor (tan theta))
          (radial-factor (- 1 (cos theta))))
@@ -60,11 +60,11 @@
          (y (vec-y center))
          (radius (circle-radius circle))
          (edge (vec* (body-rotation body) radius))
-         (edge-t (vec+ edge center))
-         (edge-neg-t (vec- center edge)))
-    (draw-circle x y (round radius))
-    (draw-line (vec-x edge-t) (vec-y edge-t)
-               (vec-x edge-neg-t) (vec-y edge-neg-t))))
+         (edge-t (vec+ edge center)))
+    (draw-circle x y (round radius) :resolution 30)
+    (gl:color 0 0 0)
+    (draw-line (vec-x edge-t) (vec-y edge-t) (vec-x center) (vec-y center))))
+
 (defmethod draw-shape ((seg segment))
   (apply #'gl:color *line-color*)
   (let ((a (segment-trans-a seg))
