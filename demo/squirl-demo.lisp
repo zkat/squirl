@@ -6,7 +6,7 @@
 (defparameter *sleep-ticks* 16)
 
 (defvar *demos* nil)
-(defvar *current-demo*)
+(defvar *current-demo* nil)
 
 (defvar *key-up* nil)
 (defvar *key-down* nil)
@@ -270,6 +270,7 @@ makes sure that the current world is updated by 1 time unit per second."
   (gl:ortho -320 320 -240 240 -1 1)
   (gl:translate 1/2 1/2 0)
   (gl:enable-client-state :vertex-array)
+  (enable-anti-aliasing)
   #+nil(glut:timer-func 16 (cffi:callback timercall) 0))
 
 (defun run-all-demos ()
