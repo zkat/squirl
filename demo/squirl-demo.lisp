@@ -89,7 +89,7 @@ Returns both the difference in time and the current-time used in the computation
    (line-thickness :initarg :line-thickness :initform 1 :accessor line-thickness)
    (draw-shapes-p :initarg :draw-shapes-p :initform t :accessor draw-shapes-p)
    (draw-bb-p :initarg :draw-bb-p :initform nil :accessor draw-bb-p)
-   (body-point-size :initarg :body-point-size :initform 2 :accessor body-point-size)
+   (body-point-size :initarg :body-point-size :initform 0 :accessor body-point-size)
    (collision-point-size :initarg :collision-point-size :initform 2 :accessor collision-point-size)))
 
 (defgeneric mouse-position (demo)
@@ -115,7 +115,8 @@ Returns both the difference in time and the current-time used in the computation
 (defgeneric update-demo (demo dt))
 (defgeneric init-demo (demo))
 (defgeneric grabbablep (actor)
-  (:method (actor) (declare (ignore actor)) t))
+  (:method (actor) (declare (ignore actor)) t)
+  (:method ((actor (eql :not-grabbable))) nil))
 
 (defun toggle-pause (demo)
   (if (pausedp demo)

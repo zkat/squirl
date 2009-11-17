@@ -193,12 +193,12 @@
   ;; draw constraints
   (gl:color 0.5 1 0.5)
   (map nil #'draw-constraint (world-constraints world))
-  (when body-point-size
+  (when (> body-point-size 0)
     (gl:point-size body-point-size)
     (gl:with-primitives :points
       (apply #'gl:color *line-color*)
       (map-world #'set-body-point world)))
-  (when collision-point-size
+  (when (> collision-point-size 0)
     (gl:point-size collision-point-size)
     (gl:with-primitives :points
       (apply #'gl:color *collision-color*)

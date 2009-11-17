@@ -52,6 +52,7 @@
   (make-body :mass 1.0 :position (vec x y) :shapes (list (make-circle 0.95))))
 
 (defmethod update-demo ((demo logo-smash) dt)
+  (declare (ignore dt))
   (world-step (world demo) 1/60))
 
 (defmethod init-demo ((demo logo-smash))
@@ -67,12 +68,10 @@
   (let ((bullet (make-body :position (vec -800 -10)
                            :velocity (vec 400 0)
                            :mass 100000 :inertia 100000
-                           :actor :bullet)))
+                           :actor :not-grabbable)))
     (attach-shape (make-circle 8) bullet)
     (world-add-body (world demo) bullet)
     (setf *bullet* bullet))
   (world demo))
-
-(defmethod grabbablep ((obj (eql :bullet))) nil)
 
 (pushnew 'logo-smash *demos*)

@@ -17,7 +17,7 @@
                             :gravity (vec 0 -300)))
   (resize-world-active-hash (world demo) 40.0 2999)
   (resize-world-static-hash (world demo) 40.0 999)
-  (setf (demo-floor demo) (make-body))
+  (setf (demo-floor demo) (make-body :actor :not-grabbable))
   (attach-shape (make-segment (vec -600 -240)
                               (vec 600 -240)
                               :radius 1d0

@@ -40,11 +40,8 @@
       (attach-shape (make-poly verts :friction 0.7 :restitution 1) body)
       (world-add-body (world *current-demo*) body))))
 
-(defmethod grabbablep ((actor (eql :planet-body)))
-  nil)
-
 (defmethod init-demo ((demo planet-demo))
-  (let ((planet-body (make-body :angular-velocity 0.3 :actor :planet-body))
+  (let ((planet-body (make-body :angular-velocity 0.3 :actor :not-grabbable))
         (shape (make-circle 70 :restitution 1 :friction 0.8)))
     (attach-shape shape planet-body)
     (setf (planet demo) planet-body)
