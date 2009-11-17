@@ -6,6 +6,7 @@
 (defparameter *line-color* '(0 0 0 1))
 (defparameter *collision-color* '(1 0 0 1))
 (defparameter *body-color* '(0 0 1 1))
+(defparameter *line-width* 2.5)
 
 ;;;
 ;;; Primitives
@@ -73,17 +74,20 @@
          (edge-t (vec+ edge center)))
     (draw-circle x y (round radius) :resolution 30 :filled t)
     (gl:color 0 0 0)
+    (gl:line-width *line-width*)
     (draw-circle x y (round radius) :resolution 30 :filled nil)
     (draw-line (vec-x edge-t) (vec-y edge-t) (vec-x center) (vec-y center))))
 
 (defmethod draw-shape ((seg segment))
   (let ((a (segment-trans-a seg))
         (b (segment-trans-b seg)))
+    (gl:line-width *line-width*)
     (draw-line (vec-x a) (vec-y a) (vec-x b) (vec-y b))))
 (defmethod draw-shape ((poly poly))
   (let ((vertices (poly-transformed-vertices poly)))
     (draw-poly vertices :filled t)
     (gl:color 0 0 0)
+    (gl:line-width *line-width*)
     (draw-poly vertices :filled nil)))
 
 ;;;
