@@ -45,11 +45,17 @@
 ;;;
 ;;; Bodies and shapes
 ;;;
+(defparameter *color-hash* (make-hash-table :test 'eq))
+(defun clear-color-hash ()
+  (clearhash *color-hash*))
+
+(defun ensure-color (body)
+  (let ((color (gethash body *color-hash*)))
+    (or color (let ((color (list (random 0.9) (random 0.9) (random 0.9) 1.0)))
+                (setf (gethash body *color-hash*) color) color))))
+
 (defun draw-body (body)
-  (unless (body-actor body)
-    (setf (body-actor body)
-          (list (random 0.9) (random 0.9) (random 0.9) 1.0)))
-  (apply #'gl:color (body-actor body))
+  (apply #'gl:color (ensure-color body))
   (map nil #'draw-shape (body-shapes body)))
 
 (defun draw-bbox (body)

@@ -132,5 +132,6 @@
    :make-spring
 
    ;; callbacks
+   :collide
    :defcollision
    ))

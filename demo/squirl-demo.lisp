@@ -105,6 +105,8 @@ Returns both the difference in time and the current-time used in the computation
 
 (defgeneric update-demo (demo dt))
 (defgeneric init-demo (demo))
+(defgeneric grabbablep (actor)
+  (:method (actor) (declare (ignore actor)) t))
 
 (defmethod update-demo ((demo demo) dt)
   "The default method locks the update loop to 'realtime'. That is, it
@@ -171,6 +173,7 @@ makes sure that the current world is updated by 1 time unit per second."
 (defun run-demo (demo-class)
   (let ((old-demo *current-demo*))
     (reset-cumulative-mean-fps)
+    (clear-color-hash)
     (setf *current-demo* (make-instance demo-class)
           (world *current-demo*) (init-demo *current-demo*))
     (when old-demo
@@ -223,7 +226,7 @@ makes sure that the current world is updated by 1 time unit per second."
       (if (eq state :down)
           (let* ((point (mouse-to-space x y))
                  (shape (world-point-query-first (world *current-demo*) point)))
-            (when shape
+            (when (and shape (grabbablep (body-actor (shape-body shape))))
               (let ((body (shape-body shape)))
                 (setf (mouse-joint *current-demo*) (make-pivot-joint (mouse-body *current-demo*) body 
                                                                      +zero-vector+ 

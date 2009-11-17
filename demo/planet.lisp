@@ -63,15 +63,18 @@
       (attach-shape (make-poly verts :friction 0.7 :restitution 1) body)
       (world-add-body (world *current-demo*) body))))
 
+(defmethod grabbablep ((actor (eql :planet-body)))
+  nil)
+
 (defmethod init-demo ((demo planet-demo))
-  (let ((static-body (make-body :angular-velocity 0.3))
+  (let ((planet-body (make-body :angular-velocity 0.3 :actor :planet-body))
         (shape (make-circle 70 :restitution 1 :friction 0.8)))
-    (attach-shape shape static-body)
-    (setf (planet demo) static-body)
+    (attach-shape shape planet-body)
+    (setf (planet demo) planet-body)
     (reset-shape-id-counter)
     (setf (world demo) (make-world :iterations 20))
     (loop repeat 22 do (add-box))
-    (world-add-body (world demo) static-body)
+    (world-add-body (world demo) planet-body)
     (world demo)))
 
 (pushnew 'planet-demo *demos*)
