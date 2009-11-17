@@ -155,6 +155,7 @@ makes sure that the current world is updated by 1 time unit per second."
   (concatenate 'string "Demo: " (demo-name demo)))
 
 (defun run-demo (demo-class)
+  (reset-cumulative-mean-fps)
   (setf *current-demo* (make-instance demo-class)
         (world *current-demo*) (init-demo *current-demo*)))
 
