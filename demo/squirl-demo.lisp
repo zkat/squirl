@@ -16,6 +16,8 @@
 (defvar *arrow-direction* +zero-vector+)
 
 (defvar *aa-enabled-p* nil)
+
+(defparameter *dt-threshold* 0.05)
 ;;;
 ;;; Utils
 ;;;
@@ -107,7 +109,7 @@ Returns both the difference in time and the current-time used in the computation
 (defmethod update-demo ((demo demo) dt)
   "The default method locks the update loop to 'realtime'. That is, it
 makes sure that the current world is updated by 1 time unit per second."
-  (incf (accumulator demo) (if (> dt 0.1) 0.1 dt))
+  (incf (accumulator demo) (if (> dt *dt-threshold*) *dt-threshold* dt))
   (loop while (>= (accumulator demo) (physics-timestep demo))
      do (world-step (world demo) (physics-timestep demo))
        (decf (accumulator demo) (physics-timestep demo))))
