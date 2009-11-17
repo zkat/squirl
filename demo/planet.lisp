@@ -1,16 +1,15 @@
 (in-package :squirl-demo)
 
-(defvar *planet*)
-
 (defclass planet-demo (demo)
-  ()
+  ((planet :initarg :planet :accessor planet))
   (:default-initargs :name "Planetary Gravity OMFG."))
 
-(defmethod update-demo ((demo planet-demo) ticks)
-  (declare (ignore ticks))
-  (let ((dt  (float (/ 1 60 3) 1d0)))
-    (world-step *world* dt)
-    (body-update-position *planet* dt)))
+(defmethod update-demo ((demo planet-demo) dt)
+  (incf (accumulator demo) (if (> dt 0.5) 0.5 dt))
+  (loop while (>= (accumulator demo) (physics-timestep demo))
+     do (world-step (world demo) (physics-timestep demo))
+       (body-update-position (planet demo) (physics-timestep demo))
+     (decf (accumulator demo) (physics-timestep demo))))
 
 ;; Oh my fucking god this sucks
 (defstruct (planetary-body (:include body)
@@ -61,17 +60,17 @@
                                       :velocity (vec* (angle->vec (* pi (random 2d0)))
                                                       (random 200d0)))))
       (attach-shape (make-poly verts :friction 0.7 :restitution 1) body)
-      (world-add-body *world* body))))
+      (world-add-body (world *current-demo*) body))))
 
 (defmethod init-demo ((demo planet-demo))
   (let ((static-body (make-body :angular-velocity 0.3))
         (shape (make-circle 70 :restitution 1 :friction 0.8)))
     (attach-shape shape static-body)
-    (setf *planet* static-body)
+    (setf (planet demo) static-body)
     (reset-shape-id-counter)
-    (setf *world* (make-world :iterations 20))
+    (setf (world demo) (make-world :iterations 20))
     (loop repeat 22 do (add-box))
-    (world-add-body *world* static-body)
-    *world*))
+    (world-add-body (world demo) static-body)
+    (world demo)))
 
 (pushnew 'planet-demo *demos*)

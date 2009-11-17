@@ -5,24 +5,78 @@
 
 (defparameter *sleep-ticks* 16)
 
-(defvar *world* nil)
 (defvar *demos* nil)
 (defvar *current-demo*)
-
-(defvar *mouse-position* +zero-vector+)
-(defvar *mouse-point-last* +zero-vector+)
-(defvar *mouse-body* (make-body))
-(defvar *mouse-joint*)
 
 (defvar *key-up* nil)
 (defvar *key-down* nil)
 (defvar *key-left* nil)
 (defvar *key-right* nil)
 
-(defvar *ticks* 0)
-
 (defvar *arrow-direction* +zero-vector+)
 
+;;;
+;;; Utils
+;;;
+(defmacro fun (&body body)
+  "This macro puts the FUN back in LAMBDA"
+  `(lambda (&optional _)
+     (declare (ignorable _))
+     ,@body))
+
+(defun now ()
+  (/ (get-internal-real-time) internal-time-units-per-second))
+
+(defun time-difference (time-before)
+  "Checks the difference between the internal-time provided and the current time.
+Returns both the difference in time and the current-time used in the computation"
+  (let* ((time-now (now))
+         (difference (- time-now time-before)))
+    (if (minusp difference)
+        0                               ; just in case
+        (values (- time-now time-before)
+                time-now))))
+
+;;;
+;;; Demo class
+;;;
+(defclass demo ()
+  ((name :initarg :name :accessor demo-name)
+   (accumulator :initform 0 :accessor accumulator)
+   (world :initarg :world :accessor world)
+   (delta-time :initform 1 :accessor delta-time)
+   (last-frame-time :initform (now) :accessor last-frame-time)
+   (physics-timestep :initform (float 1/120 1d0) :accessor physics-timestep)
+   (mouse-joint :accessor mouse-joint)
+   (mouse-body :initarg :mouse-body :initform (make-body) :accessor mouse-body)
+   (last-mouse-position :initform +zero-vector+ :accessor last-mouse-position)))
+
+(defgeneric mouse-position (demo)
+  (:method ((demo demo)) (body-position (mouse-body demo))))
+(defgeneric (setf mouse-position) (new-pos demo)
+  (:method (new-pos (demo demo)) (setf (body-position (mouse-body demo)) new-pos)))
+
+(defun update-time (demo)
+  (with-slots (delta-time last-frame-time) demo
+    (multiple-value-bind (new-dt now)
+        (time-difference last-frame-time)
+      (setf last-frame-time now
+            delta-time new-dt))))
+
+(defgeneric update-demo (demo dt))
+(defgeneric init-demo (demo))
+
+(defmethod update-demo ((demo demo) dt)
+  "The default method locks the update loop to 'realtime'. That is, it
+makes sure that the current world is updated by 1 time unit per second."
+  (incf (accumulator demo) (if (> dt 0.5) 0.5 dt))
+  (loop while (>= (accumulator demo) (physics-timestep demo))
+     do (world-step (world demo) (physics-timestep demo))
+       (decf (accumulator demo) (physics-timestep demo))))
+
+;;;
+;;; Drawing the demos
+;;;
 (defclass squirl-window (glut:window)
   ()
   (:default-initargs :width 640 :height 480 :mode '(:double :rgba) :title "Squirl Demo App"))
@@ -41,36 +95,30 @@
                               Arrow keys control some demos~@
                               \\ enables anti-aliasing."))))
 
-(defclass demo () ((name :initarg :name :accessor demo-name)))
-(defgeneric update-demo (demo ticks))
-(defgeneric init-demo (demo))
-
 (defmethod glut:idle ((w squirl-window))
-  (sleep 0.016)
+  (update-time *current-demo*)
   (glut:post-redisplay))
 
 (defmethod glut:display ((w squirl-window))
   (gl:clear :color-buffer-bit)
-  (draw-world *world*)
+  (draw-world (world *current-demo*))
   (draw-instructions)
   (glut:swap-buffers)
-  (incf *ticks*)
-  (let ((new-point (vec-lerp *mouse-point-last* *mouse-position* 1/4)))
-    (setf (body-position *mouse-body*) new-point
-          (body-velocity *mouse-body*) (vec* (vec- new-point *mouse-point-last*) 60d0)
-          *mouse-point-last* new-point)
-    (update-demo *current-demo* *ticks*)))
+  (let ((new-point (vec-lerp (last-mouse-position *current-demo*) 
+                             (mouse-position *current-demo*) 1/4)))
+    (setf (mouse-position *current-demo*) new-point
+          (body-velocity (mouse-body *current-demo*)) (vec* (vec- new-point
+                                                                  (last-mouse-position *current-demo*))
+                                                            60d0)
+          (last-mouse-position *current-demo*) new-point)
+    (update-demo *current-demo* (delta-time *current-demo*))))
 
 (defun demo-title (demo)
   (concatenate 'string "Demo: " (demo-name demo)))
 
 (defun run-demo (demo-class)
-  (let ((demo (make-instance demo-class)))
-    (setf *current-demo* demo
-          *mouse-joint* nil
-          *ticks* 0
-          *world* (init-demo demo))
-    #+nil(glut:set-window-title (demo-title demo))))
+  (setf *current-demo* (make-instance demo-class)
+        (world *current-demo*) (init-demo *current-demo*)))
 
 (defmethod glut:keyboard ((w squirl-window) key x y)
   (declare (ignore x y))
@@ -97,24 +145,25 @@
       (vec mx my))))
 
 (defmethod glut:motion ((w squirl-window) x y)
-  (setf *mouse-position* (mouse-to-space x y)))
+  (setf (mouse-position *current-demo*) (mouse-to-space x y)))
 (defmethod glut:passive-motion ((w squirl-window) x y)
-  (setf *mouse-position* (mouse-to-space x y)))
+  (setf (mouse-position *current-demo*) (mouse-to-space x y)))
 
 (defmethod glut:mouse ((w squirl-window) button state x y)
   (if (eq button :left-button)
       (if (eq state :down)
           (let* ((point (mouse-to-space x y))
-                 (shape (world-point-query-first *world* point)))
+                 (shape (world-point-query-first (world *current-demo*) point)))
             (when shape
               (let ((body (shape-body shape)))
-                (setf *mouse-joint* (make-pivot-joint *mouse-body* body
-                                                      +zero-vector+
-                                                      (world->body-local body point))
-                      (squirl::constraint-max-force *mouse-joint*) 50000
-                      (squirl::constraint-bias-coefficient *mouse-joint*) 0.15)
-                (world-add-constraint *world* *mouse-joint*))))
-          (progn (world-remove-constraint *world* *mouse-joint*) (setf *mouse-joint* nil)))))
+                (setf (mouse-joint *current-demo*) (make-pivot-joint (mouse-body *current-demo*) body 
+                                                                     +zero-vector+ 
+                                                                     (world->body-local body point))
+                      (squirl::constraint-max-force (mouse-joint *current-demo*)) 50000
+                      (squirl::constraint-bias-coefficient (mouse-joint *current-demo*)) 0.15)
+                (world-add-constraint (world *current-demo*) (mouse-joint *current-demo*)))))
+          (progn (world-remove-constraint (world *current-demo*) (mouse-joint *current-demo*)) 
+                 (setf (mouse-joint *current-demo*) nil)))))
 
 (cffi:defcallback timercall :void ((value :int))
   (declare (ignore value))
@@ -155,7 +204,6 @@
   #+nil(glut:timer-func 16 (cffi:callback timercall) 0))
 
 (defun run-all-demos ()
-  (setf *mouse-body* (make-body))
   (when *demos*
     (run-demo (car *demos*)))
   (glut:display-window (make-instance 'squirl-window))
