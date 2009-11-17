@@ -6,9 +6,10 @@
   ((floor :accessor demo-floor))
   (:default-initargs :name "Pyramid Topple"))
 
-#+nil(defmethod update-demo ((demo pyramid-demo) ticks)
-  (declare (ignore ticks))
-  (world-step *world* *step*))
+;; uncomment this bit to let the pyramid demo run at maximum speed.
+#+nil(defmethod update-demo ((demo pyramid-demo) dt)
+  (declare (ignore dt))
+  (world-step (world demo) (physics-timestep demo)))
 
 (defmethod init-demo ((demo pyramid-demo))
   (reset-shape-id-counter)
