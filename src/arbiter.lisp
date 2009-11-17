@@ -151,6 +151,7 @@
          (avb-b (body-angular-velocity-bias body-b)))
     (dolist (contact (arbiter-contacts arbiter))
       (flet ((relative-bias-velocity (vb r avb)
+               (declare (vec vb r) (double-float avb))
                (vec+ vb (vec* (vec-perp r) avb))))
         (let* ((n (contact-normal contact))
                (r1 (contact-r1 contact))
@@ -159,6 +160,7 @@
                (vb1 (relative-bias-velocity vb-a r1 avb-a))
                (vb2 (relative-bias-velocity vb-b r2 avb-b))
                (vbn (vec. (vec- vb2 vb1) n)))
+          (declare (vec r1 r2))
           ;; Calculate and clamp bias impulse
           (let ((jbn (* (- (contact-bias contact) vbn)
                         (contact-normal-mass contact)))

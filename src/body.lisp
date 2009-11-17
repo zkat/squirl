@@ -68,6 +68,7 @@
                      (velocity body-velocity)
                      (torque body-torque)
                      (force body-force)) body
+      (declare (double-float angular-velocity inv-mass inv-inertia torque))
       (setf velocity
             (vec+ (vec* velocity damping)
                   (vec* (vec+ gravity (vec* force inv-mass)) dt)))
@@ -115,6 +116,8 @@ gravity (also in world coordinates)."
                    (inverse-inertia body-inverse-inertia)
                    (inverse-mass body-inverse-mass)
                    (velocity body-velocity)) body
+    (declare (double-float angular-velocity inverse-inertia inverse-mass)
+             (vec velocity))
     (setf velocity (vec+ velocity (vec* impulse inverse-mass)))
     (incf angular-velocity (* inverse-inertia (vec-cross relative impulse)))
     (values)))
@@ -126,6 +129,8 @@ gravity (also in world coordinates)."
                    (inverse-inertia body-inverse-inertia)
                    (inverse-mass body-inverse-mass)
                    (velocity-bias body-velocity-bias)) body
+    (declare (double-float angular-velocity-bias inverse-mass inverse-inertia)
+             (vec velocity-bias))
     (setf velocity-bias (vec+ velocity-bias (vec* impulse inverse-mass)))
     (incf angular-velocity-bias (* inverse-inertia (vec-cross relative impulse))))
   (values))
