@@ -48,7 +48,7 @@
 (defun draw-body (body)
   (unless (body-actor body)
     (setf (body-actor body)
-          (list (random 1.0) (random 1.0) (random 1.0))))
+          (list (random 0.9) (random 0.9) (random 0.9) 1.0)))
   (apply #'gl:color (body-actor body))
   (map nil #'draw-shape (body-shapes body)))
 
