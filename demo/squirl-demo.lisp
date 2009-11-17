@@ -17,7 +17,7 @@
 
 (defvar *aa-enabled-p* nil)
 
-(defparameter *dt-threshold* 0.05)
+(defparameter *dt-threshold* 0.01)
 ;;;
 ;;; Utils
 ;;;
@@ -169,9 +169,13 @@ makes sure that the current world is updated by 1 time unit per second."
   (concatenate 'string "Demo: " (demo-name demo)))
 
 (defun run-demo (demo-class)
-  (reset-cumulative-mean-fps)
-  (setf *current-demo* (make-instance demo-class)
-        (world *current-demo*) (init-demo *current-demo*)))
+  (let ((old-demo *current-demo*))
+    (reset-cumulative-mean-fps)
+    (setf *current-demo* (make-instance demo-class)
+          (world *current-demo*) (init-demo *current-demo*))
+    (when old-demo
+      (setf (mouse-position *current-demo*) (mouse-position old-demo)
+            (last-mouse-position *current-demo*) (last-mouse-position old-demo)))))
 
 (defmethod glut:keyboard ((w squirl-window) key x y)
   (declare (ignore x y))
