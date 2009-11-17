@@ -5,7 +5,7 @@
   (:default-initargs :name "Planetary Gravity OMFG."))
 
 (defmethod update-demo ((demo planet-demo) dt)
-  (incf (accumulator demo) (if (> dt 0.5) 0.5 dt))
+  (incf (accumulator demo) (if (> dt 0.1) 0.1 dt))
   (loop while (>= (accumulator demo) (physics-timestep demo))
      do (world-step (world demo) (physics-timestep demo))
        (body-update-position (planet demo) (physics-timestep demo))
