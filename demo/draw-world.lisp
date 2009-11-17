@@ -47,7 +47,7 @@
 ;;;
 (defparameter *color-hash* (make-hash-table :test 'eq))
 (defun clear-color-hash ()
-  (clearhash *color-hash*))
+  (clrhash *color-hash*))
 
 (defun ensure-color (body)
   (let ((color (gethash body *color-hash*)))
