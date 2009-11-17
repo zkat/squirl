@@ -187,4 +187,3 @@
     (gl:with-primitives :points
       (apply #'gl:color *collision-color*)
       (map nil #'set-collision-points (squirl::world-arbiters world)))))
-

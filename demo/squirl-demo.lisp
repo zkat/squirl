@@ -108,8 +108,8 @@
                  (shape (world-point-query-first *world* point)))
             (when shape
               (let ((body (shape-body shape)))
-                (setf *mouse-joint* (make-pivot-joint *mouse-body* body 
-                                                      +zero-vector+ 
+                (setf *mouse-joint* (make-pivot-joint *mouse-body* body
+                                                      +zero-vector+
                                                       (world->body-local body point))
                       (squirl::constraint-max-force *mouse-joint*) 50000
                       (squirl::constraint-bias-coefficient *mouse-joint*) 0.15)
@@ -161,4 +161,3 @@
   (glut:display-window (make-instance 'squirl-window))
   ;; this is a kludge around an apparent cl-glut bug.
   (setf glut::*glut-initialized-p* nil))
-
