@@ -117,7 +117,8 @@ makes sure that the current world is updated by 1 time unit per second."
 ;;;
 (defclass squirl-window (glut:window)
   ()
-  (:default-initargs :width 640 :height 480 :mode '(:double :rgba) :title "Squirl Demo App"))
+  (:default-initargs :width 640 :height 480 :mode '(:double :rgba :multisample)
+                     :title "Squirl Demo App"))
 
 (defun draw-string (x y string)
   (gl:color 0 0 0)
@@ -186,11 +187,11 @@ makes sure that the current world is updated by 1 time unit per second."
       (enable-anti-aliasing)))
 
 (defun disable-anti-aliasing ()
-  (gl:disable :polygon-smooth :line-smooth :point-smooth :blend)
+  (gl:disable :polygon-smooth :line-smooth :point-smooth :blend :multisample)
   (setf *aa-enabled-p* nil))
 
 (defun enable-anti-aliasing ()
-  (gl:enable :polygon-smooth :line-smooth :point-smooth :blend)
+  (gl:enable :polygon-smooth :line-smooth :point-smooth :blend :multisample)
   (gl:blend-func :src-alpha :one-minus-src-alpha)
   (gl:hint :polygon-smooth-hint :nicest)
   (gl:hint :line-smooth-hint :nicest)
