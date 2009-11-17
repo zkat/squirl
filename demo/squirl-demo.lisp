@@ -80,7 +80,13 @@ Returns both the difference in time and the current-time used in the computation
    (physics-timestep :initform (float 1/120 1d0) :accessor physics-timestep)
    (mouse-joint :initform nil :accessor mouse-joint)
    (mouse-body :initarg :mouse-body :initform (make-body) :accessor mouse-body)
-   (last-mouse-position :initform +zero-vector+ :accessor last-mouse-position)))
+   (last-mouse-position :initform +zero-vector+ :accessor last-mouse-position)
+   ;; drawing
+   (line-thickness :initarg :line-thickness :initform 1 :accessor line-thickness)
+   (draw-shapes-p :initarg :draw-shapes-p :initform t :accessor draw-shapes-p)
+   (draw-bb-p :initarg :draw-bb-p :initform nil :accessor draw-bb-p)
+   (body-point-size :initarg :body-point-size :initform 2 :accessor body-point-size)
+   (collision-point-size :initarg :collision-point-size :initform 2 :accessor collision-point-size)))
 
 (defgeneric mouse-position (demo)
   (:method ((demo demo)) (body-position (mouse-body demo))))
@@ -138,7 +144,11 @@ makes sure that the current world is updated by 1 time unit per second."
 
 (defmethod glut:display ((w squirl-window))
   (gl:clear :color-buffer-bit)
-  (draw-world (world *current-demo*))
+  (with-slots (line-thickness draw-shapes-p draw-bb-p body-point-size collision-point-size)
+      *current-demo*
+    (draw-world (world *current-demo*) :draw-shapes-p draw-shapes-p
+                :draw-bb-p draw-bb-p :line-thickness line-thickness
+                :body-point-size body-point-size :collision-point-size collision-point-size))
   (draw-fps)
   (draw-instructions)
   (glut:swap-buffers)
