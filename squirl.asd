@@ -47,6 +47,7 @@
             :components
             ((:file "squirl-demo")
              (:file "draw-world" :depends-on ("squirl-demo"))
+             (:file "planet" :depends-on ("squirl-demo"))
              (:file "pyramid" :depends-on ("squirl-demo"))))))
 
 (asdf:defsystem squirl.demo-2
