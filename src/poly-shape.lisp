@@ -31,15 +31,21 @@
   (format t "Vertex count: ~a" (length (poly-vertices poly))))
 
 (defun compute-new-vertices (vertices offset &aux (limit (1- (length vertices))))
+  ;; The proper approach here would be to maintain a separate "fill pointer" aka index
+  ;; Three advantages -- we need not return new arrays, the arrays will be simple-arrays
+  ;; and thus smaller, and we can share one index for both arrays
   (loop
-     with new-vertices = (make-adjustable-vector (1+ limit))
-     and  new-axes     = (make-adjustable-vector (1+ limit))
+     with new-vertices = (make-array (1+ limit) :fill-pointer 0 :element-type 'vec)
+     and  new-axes     = (make-array (1+ limit) :fill-pointer 0 :element-type 'poly-axis)
      for v in vertices for b = (vec+ offset v)
      and a = (vec+ offset (car (last vertices))) then b
      for normal = (vec-normalize (vec-perp (vec- b a)))
      do (vector-push a new-vertices)
         (vector-push (make-poly-axis normal (vec. normal a)) new-axes)
-     finally (return (values new-vertices new-axes))))
+     finally (return (values (make-array (1+ limit) :element-type 'vec
+                                         :initial-contents new-vertices)
+                             (make-array (1+ limit) :element-type 'poly-axis
+                                         :initial-contents new-axes)))))
 
 (defun validate-vertices (vertices)
   "Check that a set of vertices has a correct winding, and that they form a convex polygon."
