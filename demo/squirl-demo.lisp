@@ -15,6 +15,7 @@
 
 (defvar *arrow-direction* +zero-vector+)
 
+(defvar *aa-enabled-p* nil)
 ;;;
 ;;; Utils
 ;;;
@@ -130,7 +131,7 @@ makes sure that the current world is updated by 1 time unit per second."
                               N chooses the next demo~@
                               Use the mouse to grab objects~@
                               Arrow keys control some demos~@
-                              \\ enables anti-aliasing."))))
+                              \\ toggles anti-aliasing."))))
 
 (defun draw-fps ()
   (let ((x -300) (y 100))
@@ -177,14 +178,24 @@ makes sure that the current world is updated by 1 time unit per second."
     (#\n (run-demo (elt *demos*
                         (mod (1+ (position (class-name (class-of *current-demo*)) *demos*))
                              (length *demos*)))))
-    (#\\ (enable-anti-aliasing))))
+    (#\\ (toggle-anti-aliasing))))
+
+(defun toggle-anti-aliasing ()
+  (if *aa-enabled-p*
+      (disable-anti-aliasing)
+      (enable-anti-aliasing)))
+
+(defun disable-anti-aliasing ()
+  (gl:disable :polygon-smooth :line-smooth :point-smooth :blend)
+  (setf *aa-enabled-p* nil))
 
 (defun enable-anti-aliasing ()
   (gl:enable :polygon-smooth :line-smooth :point-smooth :blend)
   (gl:blend-func :src-alpha :one-minus-src-alpha)
   (gl:hint :polygon-smooth-hint :nicest)
   (gl:hint :line-smooth-hint :nicest)
-  (gl:hint :point-smooth-hint :nicest))
+  (gl:hint :point-smooth-hint :nicest)
+  (setf *aa-enabled-p* t))
 
 (defun mouse-to-space (x y)
   (let ((model (gl:get-double :modelview-matrix))
