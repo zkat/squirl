@@ -37,6 +37,37 @@ Returns both the difference in time and the current-time used in the computation
         (values (- time-now time-before)
                 time-now))))
 
+(defparameter *fps-sample-size* 10)
+(let (last-frame
+      (fps-stack)
+      (frames 0)
+      (cumulative-mean 0))
+  (defun notify-frame ()
+    (when (> (length fps-stack) *fps-sample-size*)
+      (setf (cdr (last fps-stack 2)) nil))
+    (let ((now (now)))
+      (when last-frame
+        (let ((time-delta (- now last-frame)))
+          (unless (zerop time-delta)
+            (push (/ time-delta)
+                  fps-stack)
+            (setf cumulative-mean (/ (+ (last-fps)
+                                        (* frames cumulative-mean))
+                                     (1+ frames)))
+            (incf frames))))
+      (setf last-frame now)))
+  (defun last-fps ()
+    (first fps-stack))
+  (defun mean-fps ()
+    (when fps-stack
+      (/ (reduce #'+ fps-stack) (length fps-stack))))
+  (defun cumulative-mean-fps ()
+    cumulative-mean)
+  (defun reset-cumulative-mean-fps ()
+    "Restart calculating the cumulative mean relative to the current frame."
+    (setf frames 0)
+    (setf cumulative-mean 0)))
+
 ;;;
 ;;; Demo class
 ;;;
@@ -95,13 +126,20 @@ makes sure that the current world is updated by 1 time unit per second."
                               Arrow keys control some demos~@
                               \\ enables anti-aliasing."))))
 
+(defun draw-fps ()
+  (let ((x -300) (y 100))
+    (draw-string x y (format nil "Last FPS: ~7,2f~%Mean FPS: ~7,2f~%Cumulative Mean FPS:~7,2f"
+                             (last-fps) (mean-fps) (cumulative-mean-fps)))))
+
 (defmethod glut:idle ((w squirl-window))
+  (notify-frame)
   (update-time *current-demo*)
   (glut:post-redisplay))
 
 (defmethod glut:display ((w squirl-window))
   (gl:clear :color-buffer-bit)
   (draw-world (world *current-demo*))
+  (draw-fps)
   (draw-instructions)
   (glut:swap-buffers)
   (let ((new-point (vec-lerp (last-mouse-position *current-demo*) 
