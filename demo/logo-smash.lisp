@@ -50,6 +50,11 @@
 (defun make-ball (x y)
   (make-body :mass 1.0 :position (vec x y) :shapes (list (make-circle 0.95))))
 
+(defmethod draw-demo ((demo logo-smash))
+  (gl:point-size 0.95)
+  (gl:with-primitives :points
+    (map-world #'set-body-point (world demo))))
+
 (defmethod update-demo ((demo logo-smash) dt)
   (world-step (world demo) 1/60))
 

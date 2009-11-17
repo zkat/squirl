@@ -104,6 +104,14 @@ Returns both the difference in time and the current-time used in the computation
       (setf last-frame-time now
             delta-time new-dt))))
 
+(defgeneric draw-demo (demo)
+  (:method ((demo demo))
+    (with-slots (line-thickness draw-shapes-p draw-bb-p body-point-size collision-point-size)
+        *current-demo*
+      (draw-world (world *current-demo*) :draw-shapes-p draw-shapes-p
+                  :draw-bb-p draw-bb-p :line-thickness line-thickness
+                  :body-point-size body-point-size :collision-point-size collision-point-size))))
+
 (defgeneric update-demo (demo dt))
 (defgeneric init-demo (demo))
 (defgeneric grabbablep (actor)
@@ -162,11 +170,7 @@ makes sure that the current world is updated by 1 time unit per second."
 
 (defmethod glut:display ((w squirl-window))
   (gl:clear :color-buffer-bit)
-  (with-slots (line-thickness draw-shapes-p draw-bb-p body-point-size collision-point-size)
-      *current-demo*
-    (draw-world (world *current-demo*) :draw-shapes-p draw-shapes-p
-                :draw-bb-p draw-bb-p :line-thickness line-thickness
-                :body-point-size body-point-size :collision-point-size collision-point-size))
+  (draw-demo *current-demo*)
   (draw-fps)
   (draw-instructions)
   (glut:swap-buffers)
