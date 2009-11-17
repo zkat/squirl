@@ -11,30 +11,7 @@
        (body-update-position (planet demo) (physics-timestep demo))
      (decf (accumulator demo) (physics-timestep demo))))
 
-;; Oh my fucking god this sucks
-(defstruct (planetary-body (:include body)
-                           (:constructor %make-planetary-body
-                                         (squirl::%mass squirl::%inertia squirl::position
-                                                        squirl::velocity squirl::force squirl::actor
-                                                        squirl::%angle squirl::angular-velocity
-                                                        &aux (squirl::inverse-mass
-                                                              #+clisp(ext:without-floating-point-underflow
-                                                                         (/ squirl::%mass))
-                                                              #-clisp(/ squirl::%mass))
-                                                        (squirl::inverse-inertia
-                                                         #+clisp(ext:without-floating-point-underflow
-                                                                    (/ squirl::%inertia))
-                                                         #-clisp(/ squirl::%inertia))
-                                                        (squirl::rotation (angle->vec squirl::%angle))))))
-
-;; GAAAAHHH
-(defun make-planetary-body (&key (mass most-positive-double-float) (inertia most-positive-double-float)
-                            (position +zero-vector+) (velocity +zero-vector+) (force +zero-vector+)
-                            actor shapes (angle 0d0) (angular-velocity 0d0))
-  (let ((body (%make-planetary-body (float mass 0d0) (float inertia 1d0) position velocity
-                                    force actor (float angle 0d0) (float angular-velocity 0d0))))
-    (map nil (lambda (_) (attach-shape _ body)) shapes)
-    body))
+(defbody planetary-body)
 
 (defmethod body-update-velocity ((body planetary-body) gravity damping dt)
   (declare (ignore gravity))
