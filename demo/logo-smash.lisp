@@ -45,15 +45,17 @@
 
 (defun get-pixel (x y)
   (logand (ash (svref *logo* (+ (ash x -3) (* y *image-row-length*)))
-               (logand (1+ (lognot x)) #x7)) 1))
+               (- (logand (lognot x) 7))) 1))
 
 (defun make-ball (x y)
-  (let ((body (make-body :mass 1.0 :position (vec x y))))
-    (attach-shape (make-circle 0.95) body)
-     body))
+  (make-body :mass 1.0 :position (vec x y) :shapes (list (make-circle 0.95))))
+
+(defmethod update-demo ((demo logo-smash) dt)
+  (world-step (world demo) 1/60))
 
 (defmethod init-demo ((demo logo-smash))
   (setf (world demo) (make-world :iterations 1))
+  (resize-world-active-hash (world demo) 2.0 10000)
   (loop for y below *image-height*
      do (loop for x below *image-width*
            for x-jitter = (random 0.05) for y-jitter = (random 0.05)
@@ -61,13 +63,15 @@
            do (let ((ball (make-ball (* 2 (- x (/ *image-width* 2) (- x-jitter)))
                                      (* 2 (- (/ *image-height* 2) y (- y-jitter))))))
                 (world-add-body (world demo) ball))))
-  (let ((bullet (make-body :position (vec -400 -10)
+  (let ((bullet (make-body :position (vec -800 -10)
                            :velocity (vec 400 0)
-                           :mass 100000
-                           :inertia 100000)))
-    (attach-shape (make-circle 6) bullet)
+                           :mass 100000 :inertia 100000
+                           :actor :bullet)))
+    (attach-shape (make-circle 8) bullet)
     (world-add-body (world demo) bullet)
     (setf *bullet* bullet))
   (world demo))
+
+(defmethod grabbablep ((obj (eql :bullet))) nil)
 
 (pushnew 'logo-smash *demos*)
