@@ -41,7 +41,8 @@
 
 (defclass logo-smash (demo)
   ()
-  (:default-initargs :name "Smash that damn logo."))
+  (:default-initargs :name "Smash that damn logo."
+    :draw-shapes-p nil :draw-bb-p nil :body-point-size 3 :collision-point-size 2))
 
 (defun get-pixel (x y)
   (logand (ash (svref *logo* (+ (ash x -3) (* y *image-row-length*)))
@@ -49,11 +50,6 @@
 
 (defun make-ball (x y)
   (make-body :mass 1.0 :position (vec x y) :shapes (list (make-circle 0.95))))
-
-(defmethod draw-demo ((demo logo-smash))
-  (gl:point-size 0.95)
-  (gl:with-primitives :points
-    (map-world #'set-body-point (world demo))))
 
 (defmethod update-demo ((demo logo-smash) dt)
   (world-step (world demo) 1/60))
