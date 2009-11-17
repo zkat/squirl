@@ -36,6 +36,8 @@
    ;; Bodies
    :body
    :make-body
+   :body-world
+   :body-actor
    :body-rotation
    :body-angle
    :body-position
