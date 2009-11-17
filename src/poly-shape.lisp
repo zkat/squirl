@@ -59,7 +59,7 @@
   (length (poly-vertices poly)))
 
 (defun nth-vertex (index poly)
-  (svref (poly-vertices poly) index))
+  (aref (poly-vertices poly) index))
 
 (defun poly-value-on-axis (poly normal distance)
   "Returns the minimum distance of the polygon to the axis."
@@ -121,7 +121,6 @@
                 (let* ((point (vec-lerp a b ratio))
                        (dt (- (vec-cross normal point)))
                        (dt-min (- (vec-cross normal vert)))
-                       (dt-max (- (vec-cross normal (svref vertices (rem (1+ i)
-                                                                         (length vertices)))))))
+                       (dt-max (- (vec-cross normal (aref vertices (rem (1+ i) (length vertices)))))))
                   (when (<= dt-min dt dt-max)
                     (values poly ratio normal)))))))))
