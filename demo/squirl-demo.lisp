@@ -45,6 +45,10 @@
 (defgeneric update-demo (demo ticks))
 (defgeneric init-demo (demo))
 
+(defmethod glut:idle ((w squirl-window))
+  (sleep 0.016)
+  (glut:post-redisplay))
+
 (defmethod glut:display ((w squirl-window))
   (gl:clear :color-buffer-bit)
   (draw-world *world*)
@@ -112,8 +116,9 @@
                 (world-add-constraint *world* *mouse-joint*))))
           (progn (world-remove-constraint *world* *mouse-joint*) (setf *mouse-joint* nil)))))
 
-(defmethod glut:idle ((w squirl-window))
-  (sleep 0.0016)
+(cffi:defcallback timercall :void ((value :int))
+  (declare (ignore value))
+  (glut:timer-func 16 (cffi:callback timercall) 0)
   (glut:post-redisplay))
 
 (defun set-arrow-direction ()
@@ -146,13 +151,13 @@
   (gl:load-identity)
   (gl:ortho -320 320 -240 240 -1 1)
   (gl:translate 1/2 1/2 0)
-  (gl:enable-client-state :vertex-array))
+  (gl:enable-client-state :vertex-array)
+  #+nil(glut:timer-func 16 (cffi:callback timercall) 0))
 
 (defun run-all-demos ()
   (setf *mouse-body* (make-body))
   (when *demos*
     (run-demo (car *demos*)))
-  (glut:init)
   (glut:display-window (make-instance 'squirl-window))
   ;; this is a kludge around an apparent cl-glut bug.
   (setf glut::*glut-initialized-p* nil))
