@@ -37,6 +37,7 @@
     body))
 
 (defmethod body-update-velocity ((body planetary-body) gravity damping dt)
+  (declare (ignore gravity))
   (let* ((position (body-position body))
          (gravity (vec* position (/ -50000 (vec. position position)))))
     (call-next-method body gravity damping dt)))

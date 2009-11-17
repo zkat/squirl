@@ -248,6 +248,7 @@ makes sure that the current world is updated by 1 time unit per second."
     (setf *arrow-direction* (vec x y))))
 
 (defmethod glut:special ((w squirl-window) key x y)
+  (declare (ignore x y))
   (case key
     (:key-up (setf *key-up* t))
     (:key-down (setf *key-down* t))
@@ -256,6 +257,7 @@ makes sure that the current world is updated by 1 time unit per second."
   (set-arrow-direction))
 
 (defmethod glut:special-up ((w squirl-window) key x y)
+  (declare (ignore x y))
   (case key
     (:key-up (setf *key-up* nil))
     (:key-down (setf *key-down* nil))
