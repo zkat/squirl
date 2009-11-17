@@ -11,7 +11,7 @@
                                      (inverse-inertia
                                       #+clisp(ext:without-floating-point-underflow
                                                  (/ %inertia))
-                                      #-clisp(/ %mass))
+                                      #-clisp(/ %inertia))
                                      (rotation (angle->vec %angle)))))
   world                 ; world that this body is attached to, if any.
   actor                 ; Actor used for the COLLIDE "callback"
