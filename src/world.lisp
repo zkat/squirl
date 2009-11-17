@@ -72,6 +72,23 @@
     (declare (ignore actor1 actor2 contacts))
     t))
 
+(defmacro defcollision (&rest args)
+  (multiple-value-bind (qualifiers lambda-list body)
+      (parse-defcollision args)
+    `(progn
+       (defmethod squirl:collide ,@qualifiers ,lambda-list ,@body)
+       (defmethod squirl:collide ,@qualifiers ,(reverse lambda-list) ,@body))))
+
+(defun parse-defcollision (args)
+  (let (qualifiers lambda-list body (parse-state :qualifiers))
+    (dolist (arg args)
+      (ecase parse-state
+        (:qualifiers (if (and (atom arg) arg)
+                         (push arg qualifiers)
+                         (setf lambda-list arg parse-state :body)))
+        (:body (push arg body))))
+    (values qualifiers lambda-list (nreverse body))))
+
 ;;;
 ;;; Body, Shape, and Joint Management
 ;;;
