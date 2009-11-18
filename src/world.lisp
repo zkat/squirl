@@ -68,9 +68,7 @@
              (length (world-static-bodies world)))))
 
 (defgeneric collide (actor1 actor2 contacts)
-  (:method (actor1 actor2 contacts)
-    (declare (ignore actor1 actor2 contacts))
-    t))
+  (:method ((actor1 t) (actor2 t) (contacts t)) t))
 
 (defmacro defcollision (&rest args)
   (multiple-value-bind (qualifiers lambda-list body)
