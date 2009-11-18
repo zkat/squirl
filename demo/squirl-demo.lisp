@@ -321,7 +321,7 @@ makes sure that the current world is updated by 1 time unit per second."
 
 (defun run-all-demos ()
   (when *demos*
-    (run-demo (car *demos*)))
-  (glut:display-window (make-instance 'squirl-window))
-  ;; this is a kludge around an apparent cl-glut bug.
-  (setf glut::*glut-initialized-p* nil))
+    (run-demo (nth (random (length *demos*)) *demos*))
+    (glut:display-window (make-instance 'squirl-window))
+    ;; this is a kludge around an apparent cl-glut bug.
+    (setf glut::*glut-initialized-p* nil)))
