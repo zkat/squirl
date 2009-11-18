@@ -47,20 +47,20 @@
                      (vec -30 80)
                      (vec 30 64)
                      (vec 30 -80))))
-    (world-add-body 
+    (world-add-body
      world (make-body :mass 1 :position (vec -160 -80) :actor 1
                       :shapes (list (make-poly verts :restitution 1 :friction 0.5))))))
 
 (defun add-small-gear (world static-body)
-  (let ((gear (world-add-body 
-               world (make-body :mass 10 :inertia (moment-for-circle 10 80 0) :angle (/ pi -2) 
+  (let ((gear (world-add-body
+               world (make-body :mass 10 :inertia (moment-for-circle 10 80 0) :angle (/ pi -2)
                                 :position (vec -160 -160) :shapes (list (make-circle 80)) :actor 0))))
     ;; todo - this needs to be in a different 'layer'
     (world-add-constraint world (make-pivot-joint static-body gear (vec -160 -160) +zero-vector+))
     gear))
 
 (defun add-big-gear (world static-body)
-  (let ((gear (world-add-body 
+  (let ((gear (world-add-body
                world (make-body :mass 40 :inertia (moment-for-circle 40 160 0)
                                 :position (vec 80 -160) :angle (/ pi 2) :actor 0
                                 :shapes (list (make-circle 160))))))
@@ -90,7 +90,7 @@
 (defmethod init-demo ((demo pump-demo))
   (setf (world demo) (make-world :gravity (vec 0 -600)))
   (setf (demo-static-body demo) (setup-static-body (world demo)))
-  (dotimes (i *num-balls*) (pushnew (add-ball (world demo) (vec -224 (+ 80 (* i 64)))) 
+  (dotimes (i *num-balls*) (pushnew (add-ball (world demo) (vec -224 (+ 80 (* i 64))))
                                     (demo-balls demo)))
   (let* ((plunger (add-plunger (world demo)))
          (small-gear (add-small-gear (world demo) (demo-static-body demo)))

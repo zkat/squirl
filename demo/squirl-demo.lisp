@@ -187,7 +187,7 @@ makes sure that the current world is updated by 1 time unit per second."
   (draw-pause-state)
   (draw-instructions)
   (glut:swap-buffers)
-  (let ((new-point (vec-lerp (last-mouse-position *current-demo*) 
+  (let ((new-point (vec-lerp (last-mouse-position *current-demo*)
                              (mouse-position *current-demo*) 1/4)))
     (setf (mouse-position *current-demo*) new-point
           (body-velocity (mouse-body *current-demo*)) (vec* (vec- new-point
@@ -261,13 +261,13 @@ makes sure that the current world is updated by 1 time unit per second."
                  (shape (world-point-query-first (world *current-demo*) point)))
             (when (and shape (grabbablep (body-actor (shape-body shape))))
               (let ((body (shape-body shape)))
-                (setf (mouse-joint *current-demo*) (make-pivot-joint (mouse-body *current-demo*) body 
-                                                                     +zero-vector+ 
+                (setf (mouse-joint *current-demo*) (make-pivot-joint (mouse-body *current-demo*) body
+                                                                     +zero-vector+
                                                                      (world->body-local body point))
                       (squirl::constraint-max-force (mouse-joint *current-demo*)) 50000
                       (squirl::constraint-bias-coefficient (mouse-joint *current-demo*)) 0.15)
                 (world-add-constraint (world *current-demo*) (mouse-joint *current-demo*)))))
-          (progn (world-remove-constraint (world *current-demo*) (mouse-joint *current-demo*)) 
+          (progn (world-remove-constraint (world *current-demo*) (mouse-joint *current-demo*))
                  (setf (mouse-joint *current-demo*) nil)))))
 
 (cffi:defcallback timercall :void ((value :int))
