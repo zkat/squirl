@@ -11,15 +11,15 @@
                                        %angle angular-velocity
                                        &aux (inverse-mass
                                              #+clisp(ext:without-floating-point-underflow
-                                                        (/ %mass))
-                                             #-clisp(/ %mass))
+                                                        (if (zerop %mass) 0d0 (/ %mass)))
+                                             #-clisp (if (zerop %mass) 0d0 (/ %mass)))
                                        (inverse-inertia
                                         #+clisp(ext:without-floating-point-underflow
                                                    (/ %inertia))
                                         #-clisp(/ %inertia))
                                        (rotation (angle->vec %angle))))))
      (defun ,(intern (concatenate 'string "MAKE-" (symbol-name name)))
-         (&key (mass most-positive-double-float) (inertia most-positive-double-float)
+         (&key (mass 0d0) (inertia most-positive-double-float)
           (position +zero-vector+) (velocity +zero-vector+) (force +zero-vector+)
           actor shapes (angle 0d0) (angular-velocity 0d0))
        (let ((body (,(intern (concatenate 'string "%MAKE-" (symbol-name name)))
@@ -33,8 +33,8 @@
               %make-body (%mass %inertia position velocity force actor %angle angular-velocity
                                 &aux (inverse-mass
                                       #+clisp(ext:without-floating-point-underflow
-                                                 (/ %mass))
-                                      #-clisp(/ %mass))
+                                                 (if (zerop %mass) 0d0 (/ %mass)))
+                                      #-clisp (if (zerop %mass) 0d0 (/ %mass)))
                                      (inverse-inertia
                                       #+clisp(ext:without-floating-point-underflow
                                                  (/ %inertia))
@@ -61,7 +61,7 @@
   (velocity-bias +zero-vector+ :type vec)
   (angular-velocity-bias 0d0 :type double-float))
 
-(defun make-body (&key (mass most-positive-double-float) (inertia most-positive-double-float)
+(defun make-body (&key (mass 0d0) (inertia most-positive-double-float)
                   (position +zero-vector+) (velocity +zero-vector+) (force +zero-vector+) actor
                   shapes (angle 0d0) (angular-velocity 0d0))
   (let ((body (%make-body (float mass 0d0) (float inertia 1d0) position velocity
@@ -70,8 +70,7 @@
     body))
 
 (defun staticp (body)
-  (when (= most-positive-double-float (body-mass body) (body-inertia body))
-    t))
+  (when (= 0 (body-mass body)) t))
 
 (defun body-attached-p (body world)
   (eq world (body-world body)))
