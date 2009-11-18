@@ -175,14 +175,27 @@
                                     (body-rotation body-a))))
          (point-b (vec+ (body-position body-b)
                         (vec-rotate (squirl::damped-spring-anchor2 spring)
-                                    (body-rotation body-b)))))
-    (gl:point-size 5)
-    (gl:with-primitives :points
-      (gl:vertex (vec-x point-a) (vec-y point-a))
-      (gl:vertex (vec-x point-b) (vec-y point-b)))
+                                    (body-rotation body-b))))
+         (delta (vec- point-a point-b))
+         (k (spring-stiffness spring)))
+    ;; Establish transformation
+    (gl:matrix-mode :modelview)
+    (gl:push-matrix)
+    (gl:load-identity)
+    (gl:rotate (vec->angle delta) 0 0 0)
+    (gl:translate (vec-x point-a) (vec-x point-b) 0)
+    (gl:scale (vec-x delta) (vec-y delta) 0)
+    ;; Draw spring
     (gl:with-primitives :lines
-      (gl:vertex (vec-x point-a) (vec-y point-a))
-      (gl:vertex (vec-x point-b) (vec-y point-b)))))
+      (gl:vertex 0 0)
+      (gl:vertex 0 1)
+      (gl:vertex 1 1.25)
+      (loop for i from 1 to (ceiling k) do
+           (gl:vertex -1 i)
+           (gl:vertex 1 i)
+         finally
+           (gl:vertex 0 (1+ i)))
+      (gl:pop-matrix))))
 
 ;;;
 ;;; Drawing the world.
