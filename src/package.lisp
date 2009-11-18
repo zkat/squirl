@@ -113,6 +113,7 @@
    :make-damped-rotary-spring
    :damped-spring
    :make-damped-spring
+   :spring-stiffness
    :gear-joint
    :make-gear-joint
    :groove-joint
