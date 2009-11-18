@@ -120,8 +120,8 @@ Returns both the difference in time and the current-time used in the computation
 
 (defun toggle-pause (demo)
   (if (pausedp demo)
-      (setf (pausedp demo) nil)
-      (setf (pausedp demo) t)))
+      (progn (setf (pausedp demo) nil) (reset-cumulative-mean-fps))
+      (progn (setf (pausedp demo) t) (reset-cumulative-mean-fps))))
 
 (defmethod update-demo :around ((demo demo) dt)
   (declare (ignore dt))
@@ -166,6 +166,10 @@ makes sure that the current world is updated by 1 time unit per second."
     (draw-string x y (format nil "Last FPS: ~7,2f~%Mean FPS: ~7,2f~%Cumulative Mean FPS:~7,2f"
                              (last-fps) (mean-fps) (cumulative-mean-fps)))))
 
+(defun draw-pause-state ()
+  (when (pausedp *current-demo*)
+    (draw-string -300 112 "SIMULATION PAUSED")))
+
 (defmethod glut:idle ((w squirl-window))
   (notify-frame)
   (update-time *current-demo*)
@@ -175,6 +179,7 @@ makes sure that the current world is updated by 1 time unit per second."
   (gl:clear :color-buffer-bit)
   (draw-demo *current-demo*)
   (draw-fps)
+  (draw-pause-state)
   (draw-instructions)
   (glut:swap-buffers)
   (let ((new-point (vec-lerp (last-mouse-position *current-demo*) 
