@@ -51,6 +51,7 @@
              (:file "planet" :depends-on ("squirl-demo"))
              (:file "tumble" :depends-on ("squirl-demo"))
              (:file "plink" :depends-on ("squirl-demo"))
+             (:file "pump" :depends-on ("squirl-demo"))
              (:file "pyramid" :depends-on ("squirl-demo"))))))
 
 (asdf:defsystem squirl.demo-2
