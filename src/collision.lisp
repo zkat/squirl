@@ -231,4 +231,8 @@
   (:method ((poly poly) (circle circle))
     (ensure-list (circle-to-poly circle poly)))
   (:method ((poly1 poly) (poly2 poly))
-    (poly-to-poly poly1 poly2)))
+    (poly-to-poly poly1 poly2))
+  (:method ((seg1 segment) (seg2 segment))
+    ;; todo
+    nil))
+

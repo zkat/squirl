@@ -179,22 +179,21 @@
          (k (spring-stiffness spring)))
     ;; Establish transformation
     (gl:matrix-mode :modelview)
-    (gl:push-matrix)
-    (gl:load-identity)
-    (gl:rotate (vec->angle delta) 0 0 0)
-    (gl:translate (vec-x point-a) (vec-x point-b) 0)
-    (gl:scale (vec-x delta) (vec-y delta) 0)
+    (gl:with-pushed-matrix
+      (gl:load-identity)
+      (gl:rotate (vec->angle delta) 0 0 0)
+      (gl:translate (vec-x point-a) (vec-x point-b) 0)
+      (gl:scale (vec-x delta) (vec-y delta) 0)
     ;; Draw spring
-    (gl:with-primitives :lines
-      (gl:vertex 0 0)
-      (gl:vertex 0 1)
-      (gl:vertex 1 1.25)
-      (loop for i from 1 to (ceiling k) do
-           (gl:vertex -1 i)
-           (gl:vertex 1 i)
-         finally
-           (gl:vertex 0 (1+ i)))
-      (gl:pop-matrix))))
+      (gl:with-primitives :lines
+        (gl:vertex 0 0)
+        (gl:vertex 0 1)
+        (gl:vertex 1 1.25)
+        (loop for i from 1 to (ceiling k) do
+             (gl:vertex -1 i)
+             (gl:vertex 1 i)
+             finally
+             (gl:vertex 0 (1+ i)))))))
 
 ;;;
 ;;; Drawing the world.
