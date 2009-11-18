@@ -92,9 +92,11 @@
                                (next-method-p () (funcall ,nmp-sym)))
                           ,@body)))
                  (defmethod collide ,@qualifiers (,arg-a ,arg-b ,contacts)
+                   (declare (ignorable ,arg-a ,arg-b ,contacts))
                    (handler ,actor-a ,actor-b ,contacts #'call-next-method #'next-method-p))
                  ,(unless (equal spec-a spec-b)
                     `(defmethod collide ,@qualifiers (,arg-b ,arg-a ,contacts)
+                       (declare (ignorable ,arg-a ,arg-b ,contacts))
                        (handler ,actor-a ,actor-b
                                 (mapc (fun (setf (contact-normal _) (vec- (contact-normal _))))
                                       (mapcar #'copy-contact ,contacts))
