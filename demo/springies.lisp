@@ -17,7 +17,8 @@
   ((bodies :initarg :bodies :initform nil :accessor springy-bodies)))
 
 (defmethod initialize-instance :after ((springy springy) &key)
-  (loop for body in (springy-bodies springy) do (setf (body-actor body) springy)))
+  (dolist (body (springy-bodies springy))
+    (setf (body-actor body) springy)))
 
 (defcollision ((a springy) (b springy) contacts) (unless (eq a b) t))
 
