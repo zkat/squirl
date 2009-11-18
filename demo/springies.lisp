@@ -6,11 +6,11 @@
 
 (defstruct (springy-spring (:include damped-spring)
                            (:constructor
-                            (make-springy-spring
-                             (body-a body-b anchor1 anchor2 rest-length stiffness damping)))))
+                            make-springy-spring
+                            (body-a body-b anchor1 anchor2 rest-length stiffness damping))))
 
 (defmethod squirl::spring-force (spring distance &aux (clamp 20d0))
-  (* (squirl::clamp (- (squirl::damped-spring-rest-length spring) distance (- clamp) clamp))
+  (* (squirl::clamp (- (squirl::damped-spring-rest-length spring) distance) (- clamp) clamp)
      (squirl::damped-spring-stiffness spring)))
 
 (defclass springy ()
@@ -20,7 +20,7 @@
   (dolist (body (springy-bodies springy))
     (setf (body-actor body) springy)))
 
-(defcollision ((a springy) (b springy) contacts) (unless (eq a b) t))
+(defcollision ((a springy) (b springy) contacts) (declare (ignore contacts)) (unless (eq a b) t))
 
 (defun build-springies (world)
   (let ((springies
@@ -56,7 +56,7 @@
     springies))
 
 (defun add-bar (world point-a point-b)
-  (let* ((center (vec* (vec+ point-a point-b) 1/2))
+  (let* ((center (vec* (vec+ point-a point-b) 0.5d0))
          (length (vec-length (vec- point-a point-b)))
          (mass (/ length 160)))
     (world-add-body world
@@ -65,16 +65,15 @@
                                                            :radius 10))))))
 
 (defun add-springs (world static-body springies &aux (sb static-body))
-  (let ((bodies (mapcan (lambda (_) (copy-list (spring-bodies _))) springies))
+  (let ((bodies (mapcan (lambda (_) (copy-list (springy-bodies _))) springies))
         (stiffness 100) (damping 0.5))
-    (flet ((con (body-a-or-n body-b-or-n anchor1-x anchor1-y anchor2-x anchor2-y)
+    (flet ((con (body-a-or-n body-b anchor1-x anchor1-y anchor2-x anchor2-y)
              (world-add-constraint world (make-springy-spring
                                           (if (numberp body-a-or-n)
                                               (elt bodies (1- body-a-or-n))
-                                              body-a)
-                                          (if (numberp body-b-or-n)
-                                              (elt bodies (1- body-b-or-n))
-                                              body-b) (vec anchor1-x anchor1-y)
+                                              body-a-or-n)
+                                          (elt bodies (1- body-b))
+                                          (vec anchor1-x anchor1-y)
                                           (vec anchor2-x anchor2-y)
                                           0 stiffness damping))))
       ;; against static body
@@ -121,10 +120,10 @@
 
 (defmethod init-demo ((demo springies-demo))
   (setf (static-body demo) (make-body)
-        (world demo (make-world)))
+        (world demo) (make-world))
   (resize-world-active-hash (world demo) 30 999)
   (resize-world-static-hash (world demo) 200 99)
-  (add-springs (world demo) (build-springies (world demo)))
+  (add-springs (world demo) (static-body demo) (build-springies (world demo)))
   (world demo))
 
 (pushnew 'springies-demo *demos*)
