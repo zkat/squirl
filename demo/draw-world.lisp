@@ -93,7 +93,7 @@
 (defmethod draw-shape ((seg segment))
   (let ((a (segment-trans-a seg))
         (b (segment-trans-b seg)))
-    (gl:line-width *line-width*)
+    (gl:line-width (squirl::segment-radius seg))
     (draw-line (vec-x a) (vec-y a) (vec-x b) (vec-y b))))
 (defmethod draw-shape ((poly poly))
   (let ((vertices (poly-transformed-vertices poly)))
@@ -185,6 +185,7 @@
       (gl:translate (vec-x point-a) (vec-x point-b) 0)
       (gl:scale (vec-x delta) (vec-y delta) 0)
     ;; Draw spring
+      (gl:line-width *line-width*)
       (gl:with-primitives :lines
         (gl:vertex 0 0)
         (gl:vertex 0 1)
