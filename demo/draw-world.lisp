@@ -51,8 +51,9 @@
 
 (defun ensure-color (body)
   (let ((color (gethash body *color-hash*)))
-    (or color (let ((color (list (random 0.9) (random 0.9) (random 0.9) 1.0)))
-                (setf (gethash body *color-hash*) color) color))))
+    (or color
+        (setf (gethash body *color-hash*)
+              (list (random 0.9) (random 0.9) (random 0.9))))))
 
 (defun draw-body (body)
   (apply #'gl:color (ensure-color body))
@@ -70,6 +71,9 @@
       (gl:vertex (squirl::bbox-right bbox) (squirl::bbox-bottom bbox)))))
 
 (defgeneric draw-shape (shape))
+(defmethod draw-shape :around (shape)
+  (call-next-method))
+
 (defmethod draw-shape ((circle circle))
   (let* ((body (shape-body circle))
          (center (circle-transformed-center circle))
