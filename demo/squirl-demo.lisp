@@ -154,7 +154,9 @@ makes sure that the current world is updated by 1 time unit per second."
     (draw-string x y (format nil
                              "Controls:~@
                               #\\N chooses the next demo~@
-                              #\\P toggles pause~@
+                              #\\P chooses the previous demo~@
+                              #\\Space toggles pause~@
+                              #\\Return restarts the current demo~@
                               Use the mouse to grab objects~@
                               Arrow keys control some demos~@
                               #\\A toggles anti-aliasing."))))
@@ -202,9 +204,12 @@ makes sure that the current world is updated by 1 time unit per second."
   (case key
     (#\Esc (glut:destroy-current-window))
     (#\Return (run-demo (class-of *current-demo*)))
-    (#\p (toggle-pause *current-demo*))
+    (#\Space (toggle-pause *current-demo*))
     (#\n (run-demo (elt *demos*
                         (mod (1+ (position (class-name (class-of *current-demo*)) *demos*))
+                             (length *demos*)))))
+    (#\p (run-demo (elt *demos*
+                        (mod (1- (position (class-name (class-of *current-demo*)) *demos*))
                              (length *demos*)))))
     (#\a (toggle-anti-aliasing))))
 
