@@ -127,6 +127,7 @@
         (t (vector-push-extend body (world-active-bodies world))
            (dolist (shape (body-shapes body))
              (world-add-active-shape world shape))))
+  (setf (body-world body) world)
   body)
 
 (defun world-add-constraint (world constraint)
