@@ -144,13 +144,8 @@
 (defmethod compute-shape-bbox ((seg segment))
   (with-place (|| segment-) ((ta trans-a) (tb trans-b) (r radius)) seg
     (with-vecs (ta tb)
-      (flet ((box (left right)
-               (if (< ta.y tb.y)
-                   (make-bbox left (- ta.y r) right (+ tb.y r))
-                   (make-bbox left (- tb.y r) right (+ tb.y r)))))
-        (if (< ta.x tb.x)
-            (box (- ta.x r) (+ tb.x r))
-            (box (- tb.x r) (+ tb.x r)))))))
+      (make-bbox (min ta.x tb.x) (min ta.y tb.y)
+                 (max ta.x tb.x) (max ta.y tb.y)))))
 
 (defmethod shape-cache-data ((seg segment))
   (with-place (seg.t segment-trans-) (a b normal) seg
