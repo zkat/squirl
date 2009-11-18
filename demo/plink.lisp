@@ -4,7 +4,7 @@
   ((num-verts :initarg :num-verts :initform 5 :accessor plink-num-verts)
    (static-body :initarg :static-body :initform (make-body :actor :not-grabbable)
                 :accessor demo-static-body))
-  (:default-initargs :name "Plink!"))
+  (:default-initargs :name "Plink!" :physics-timestep 1/60))
 
 (defun reset-fallen-body (body)
   (let* ((position (body-position body))
@@ -14,9 +14,8 @@
       (setf (body-position body)
             (vec (- (random 640) 320) 260)))))
 
-(defmethod update-demo ((demo plink-demo) dt)
+(defmethod update-demo :after ((demo plink-demo) dt)
   (declare (ignore dt))
-  (world-step (world demo) (physics-timestep demo))
   (map-world #'reset-fallen-body (world demo)))
 
 (defun create-static-triangles (demo)
