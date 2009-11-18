@@ -59,6 +59,8 @@ Returns both the difference in time and the current-time used in the computation
                                      (1+ frames)))
             (incf frames))))
       (setf last-frame now)))
+  (defun notify-unpause ()
+    (setf last-frame (now)))
   (defun last-fps ()
     (first fps-stack))
   (defun mean-fps ()
@@ -120,8 +122,9 @@ Returns both the difference in time and the current-time used in the computation
 
 (defun toggle-pause (demo)
   (if (pausedp demo)
-      (progn (setf (pausedp demo) nil) (reset-cumulative-mean-fps))
-      (progn (setf (pausedp demo) t) (reset-cumulative-mean-fps))))
+      (progn (setf (pausedp demo) nil)
+             (notify-unpause))
+      (setf (pausedp demo) t)))
 
 (defmethod update-demo :around ((demo demo) dt)
   (declare (ignore dt))
@@ -171,7 +174,8 @@ makes sure that the current world is updated by 1 time unit per second."
     (draw-string -300 112 "SIMULATION PAUSED")))
 
 (defmethod glut:idle ((w squirl-window))
-  (notify-frame)
+  (unless (pausedp *current-demo*)
+    (notify-frame))
   (update-time *current-demo*)
   (glut:post-redisplay))
 
