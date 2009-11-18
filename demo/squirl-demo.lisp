@@ -83,7 +83,8 @@ Returns both the difference in time and the current-time used in the computation
    (world :initarg :world :accessor world)
    (delta-time :initform 1 :accessor delta-time)
    (last-frame-time :initform (now) :accessor last-frame-time)
-   (physics-timestep :initform (float 1/120 1d0) :accessor physics-timestep)
+   (physics-timestep :initarg :physics-timestep
+                     :initform (float 1/120 1d0) :accessor physics-timestep)
    (mouse-joint :initform nil :accessor mouse-joint)
    (mouse-body :initarg :mouse-body :initform (make-body) :accessor mouse-body)
    (last-mouse-position :initform +zero-vector+ :accessor last-mouse-position)

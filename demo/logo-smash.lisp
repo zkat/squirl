@@ -41,7 +41,7 @@
 
 (defclass logo-smash (demo)
   ()
-  (:default-initargs :name "Smash that damn logo."
+  (:default-initargs :name "Smash that damn logo." :physics-timestep 1/60
     :draw-shapes-p nil :draw-bb-p nil :body-point-size 3 :collision-point-size 2))
 
 (defun get-pixel (x y)
@@ -53,7 +53,7 @@
 
 (defmethod update-demo ((demo logo-smash) dt)
   (declare (ignore dt))
-  (world-step (world demo) 1/60))
+  (world-step (world demo) (physics-timestep demo)))
 
 (defmethod init-demo ((demo logo-smash))
   (setf (world demo) (make-world :iterations 1))
