@@ -227,9 +227,11 @@ makes sure that the current world is updated by 1 time unit per second."
                              (length *demos*)))))
     (#\a (toggle-anti-aliasing))
     (#\] (incf (body-point-size *current-demo*)))
-    (#\[ (decf (body-point-size *current-demo*)))
+    (#\[ (unless (<= (body-point-size *current-demo*) 0)
+           (decf (body-point-size *current-demo*))))
     (#\} (incf (collision-point-size *current-demo*)))
-    (#\{ (decf (collision-point-size *current-demo*)))))
+    (#\{ (unless (<= (collision-point-size *current-demo*) 0)
+           (decf (collision-point-size *current-demo*))))))
 
 (defun toggle-anti-aliasing ()
   (if *aa-enabled-p*
