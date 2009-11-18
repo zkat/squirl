@@ -7,7 +7,7 @@
 (defparameter *collision-color* '(1 0 0 1))
 (defparameter *body-color* '(0 0 1 1))
 (defparameter *line-width* 2.5)
-(defparameter *bb-color* '(1 0 0))
+(defparameter *bb-color* '(1 0 0 1))
 (defparameter *bb-line-width* 2)
 
 ;;;
@@ -55,7 +55,7 @@
   (let ((color (gethash body *color-hash*)))
     (or color
         (setf (gethash body *color-hash*)
-              (list (random 0.9) (random 0.9) (random 0.9))))))
+              (list (random 0.9) (random 0.9) (random 0.9) 1)))))
 
 (defun draw-body (body)
   (map nil #'draw-shape (body-shapes body)))
