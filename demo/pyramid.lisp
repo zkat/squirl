@@ -17,13 +17,11 @@
                             :gravity (vec 0 -300)))
   (resize-world-active-hash (world demo) 40.0 2999)
   (resize-world-static-hash (world demo) 40.0 999)
-  (setf (demo-floor demo) (make-body :actor :not-grabbable))
-  (attach-shape (make-segment (vec -600 -240)
-                              (vec 600 -240)
-                              :radius 1d0
-                              :restitution 1
-                              :friction 1)
-                (demo-floor demo))
+  (setf (demo-floor demo) (make-body :actor :not-grabbable
+                                     :shapes (list (make-segment (vec -600 -240)
+                                                                 (vec 600 -240)
+                                                                 :restitution 1
+                                                                 :friction 1))))
   (world-add-body (world demo) (demo-floor demo))
   (let ((friction 0.6)
         (verts (list (vec -3 -20)
