@@ -11,11 +11,11 @@
                                        %angle angular-velocity
                                        &aux
                                        (inverse-mass
-                                        (#-clisp progn
+                                        (#-clisp values
                                                  #+clisp ext:without-floating-point-underflow
                                                  (if (zerop %mass) 0d0 (/ %mass))))
                                        (inverse-inertia
-                                        (#-clisp progn
+                                        (#-clisp values
                                                  #+clisp ext:without-floating-point-underflow
                                                    (/ %inertia)))
                                        (rotation (angle->vec %angle))))))
@@ -34,11 +34,11 @@
               %make-body (%mass %inertia position velocity force actor %angle angular-velocity
                                 &aux
                                 (inverse-mass
-                                 (#-clisp progn
+                                 (#-clisp values
                                           #+clisp ext:without-floating-point-underflow
                                           (if (zerop %mass) 0d0 (/ %mass))))
                                 (inverse-inertia
-                                 (#-clisp progn
+                                 (#-clisp values
                                           #+clisp ext:without-floating-point-underflow
                                           (/ %inertia)))
                                 (rotation (angle->vec %angle)))))
