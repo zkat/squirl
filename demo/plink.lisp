@@ -39,7 +39,7 @@
     (dotimes (i 300)
       (world-add-body (world demo)
                       (make-body :mass 1 :inertia inertia :position (vec (- (random 640) 320) 350)
-                                 :shapes (list (make-poly verts :friction 0.4)))))))
+                                 :shapes (list (make-poly verts :friction 0.2)))))))
 
 (defmethod init-demo ((demo plink-demo))
   (setf (world demo) (make-world :iterations 5 :gravity (vec 0 -100)))

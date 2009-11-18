@@ -108,6 +108,14 @@
 ;;;
 (defgeneric draw-constraint (constraint))
 
+(defmethod draw-constraint ((constraint squirl::constraint))
+  (let* ((position-a (body-position (constraint-body-a constraint)))
+         (position-b (body-position (constraint-body-b constraint))))
+    (gl:point-size 5)
+    (gl:with-primitives :points
+      (gl:vertex (vec-x position-a) (vec-y position-a))
+      (gl:vertex (vec-x position-b) (vec-y position-b)))))
+
 (defmethod draw-constraint ((joint pivot-joint))
   (let* ((body-a (constraint-body-a joint))
          (body-b (constraint-body-b joint))
