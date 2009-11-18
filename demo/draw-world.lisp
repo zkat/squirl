@@ -56,7 +56,6 @@
               (list (random 0.9) (random 0.9) (random 0.9))))))
 
 (defun draw-body (body)
-  (apply #'gl:color (ensure-color body))
   (map nil #'draw-shape (body-shapes body)))
 
 (defun draw-bbox (body)
@@ -71,8 +70,8 @@
       (gl:vertex (squirl::bbox-right bbox) (squirl::bbox-bottom bbox)))))
 
 (defgeneric draw-shape (shape))
-(defmethod draw-shape :around (shape)
-  (call-next-method))
+(defmethod draw-shape :before (shape)
+  (apply #'gl:color (ensure-color shape)))
 
 (defmethod draw-shape ((circle circle))
   (let* ((body (shape-body circle))
