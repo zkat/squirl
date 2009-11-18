@@ -190,13 +190,11 @@
 
 (defun draw-world (world &key (line-thickness 1)
                    draw-bb-p (draw-shapes-p t) (body-point-size 2) (collision-point-size 2))
-  (gl:line-width 1)
-  (when draw-bb-p
-    (gl:color 0.6 1.0 0.6)
-    (map-world #'draw-bbox world))
   (gl:line-width line-thickness)
   (when draw-shapes-p
     (map-world #'draw-body world))
+  (when draw-bb-p
+    (map-world #'draw-bbox world))
   ;; draw constraints
   (gl:color 0.5 1 0.5)
   (map nil #'draw-constraint (world-constraints world))
