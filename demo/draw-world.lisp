@@ -7,6 +7,8 @@
 (defparameter *collision-color* '(1 0 0 1))
 (defparameter *body-color* '(0 0 1 1))
 (defparameter *line-width* 2.5)
+(defparameter *bb-color* '(1 0 0))
+(defparameter *bb-line-width* 2)
 
 ;;;
 ;;; Primitives
@@ -63,6 +65,8 @@
 
 (defun draw-shape-bbox (shape)
   (let ((bbox (squirl::shape-bbox shape)))
+    (apply #'gl:color *bb-color*)
+    (gl:line-width *bb-line-width*)
     (gl:with-primitives :line-loop
       (gl:vertex (squirl::bbox-left bbox) (squirl::bbox-bottom bbox))
       (gl:vertex (squirl::bbox-left bbox) (squirl::bbox-top bbox))
