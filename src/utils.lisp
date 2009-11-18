@@ -121,3 +121,11 @@ as the index vector. Note that this macro doesn't handle declarations properly."
                                parse-state :body)))
         (:body (push arg body))))
     (values qualifiers lambda-list (nreverse body))))
+
+(defmacro pop-declarations (place)
+  "Returns and removes all leading declarations from PLACE, which should be
+a setf-able form. NOTE: This is a kludge hack shit substitute for parse-declarations"
+  (with-gensyms (form)
+    `(loop for ,form in ,place
+        while (handler-case (string-equal (car ,form) 'declare) (type-error ()))
+        collect (pop ,place))))
