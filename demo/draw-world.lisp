@@ -51,11 +51,10 @@
 (defun clear-color-hash ()
   (clrhash *color-hash*))
 
-(defun ensure-color (body)
-  (let ((color (gethash body *color-hash*)))
-    (or color
-        (setf (gethash body *color-hash*)
-              (list (random 0.9) (random 0.9) (random 0.9) 1)))))
+(defun ensure-color (shape)
+  (or (gethash shape *color-hash*)
+      (setf (gethash shape *color-hash*)
+            (list (random 0.9) (random 0.9) (random 0.9) 1))))
 
 (defun draw-body (body)
   (map nil #'draw-shape (body-shapes body)))
