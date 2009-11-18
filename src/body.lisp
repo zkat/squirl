@@ -2,21 +2,22 @@
 (in-package :squirl)
 
 (defmacro defbody (name)
-  `(progn 
+  `(progn
      (defstruct (,name
                   (:include body)
                   (:constructor ,(intern (concatenate 'string "%MAKE-" (symbol-name name)))
                                 (%mass %inertia position
                                        velocity force actor
                                        %angle angular-velocity
-                                       &aux (inverse-mass
-                                             #+clisp(ext:without-floating-point-underflow
-                                                        (if (zerop %mass) 0d0 (/ %mass)))
-                                             #-clisp (if (zerop %mass) 0d0 (/ %mass)))
+                                       &aux
+                                       (inverse-mass
+                                        (#-clisp progn
+                                                 #+clisp ext:without-floating-point-underflow
+                                                 (if (zerop %mass) 0d0 (/ %mass))))
                                        (inverse-inertia
-                                        #+clisp(ext:without-floating-point-underflow
-                                                   (/ %inertia))
-                                        #-clisp(/ %inertia))
+                                        (#-clisp progn
+                                                 #+clisp ext:without-floating-point-underflow
+                                                   (/ %inertia)))
                                        (rotation (angle->vec %angle))))))
      (defun ,(intern (concatenate 'string "MAKE-" (symbol-name name)))
          (&key (mass 0d0) (inertia most-positive-double-float)
@@ -31,15 +32,16 @@
 (defstruct (body
              (:constructor
               %make-body (%mass %inertia position velocity force actor %angle angular-velocity
-                                &aux (inverse-mass
-                                      #+clisp(ext:without-floating-point-underflow
-                                                 (if (zerop %mass) 0d0 (/ %mass)))
-                                      #-clisp (if (zerop %mass) 0d0 (/ %mass)))
-                                     (inverse-inertia
-                                      #+clisp(ext:without-floating-point-underflow
-                                                 (/ %inertia))
-                                      #-clisp(/ %inertia))
-                                     (rotation (angle->vec %angle)))))
+                                &aux
+                                (inverse-mass
+                                 (#-clisp progn
+                                          #+clisp ext:without-floating-point-underflow
+                                          (if (zerop %mass) 0d0 (/ %mass))))
+                                (inverse-inertia
+                                 (#-clisp progn
+                                          #+clisp ext:without-floating-point-underflow
+                                          (/ %inertia)))
+                                (rotation (angle->vec %angle)))))
   world                 ; world that this body is attached to, if any.
   actor                 ; Actor used for the COLLIDE "callback"
   %shapes               ; shapes associated with this body.
