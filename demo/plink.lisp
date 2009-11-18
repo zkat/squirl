@@ -45,8 +45,8 @@
   (setf (world demo) (make-world :iterations 5 :gravity (vec 0 -100)))
   (resize-world-active-hash (world demo) 40 999)
   (resize-world-static-hash (world demo) 30 2999)
-  (create-static-triangles demo)
   (world-add-body (world demo) (demo-static-body demo))
+  (create-static-triangles demo)
   (create-polygons demo)
   (world demo))
 
