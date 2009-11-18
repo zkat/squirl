@@ -166,6 +166,22 @@
 (defmethod draw-constraint ((joint breakable-joint))
   (draw-constraint (squirl::breakable-joint-delegate joint)))
 
+(defparameter *spring-vertices* '((0 . 0)
+                                  (0.2 . 0)
+                                  (0.25 . 3)
+                                  (0.3 . -6.0)
+                                  (0.35 . 6)
+                                  (0.4 . -6)
+                                  (0.45 . 6)
+                                  (0.5 . -6)
+                                  (0.55 . 6)
+                                  (0.60 . -6)
+                                  (0.65 . 6)
+                                  (0.7 . -3)
+                                  (0.75 . 6)
+                                  (0.8 . 0)
+                                  (1 . 0)))
+
 (defmethod draw-constraint ((spring damped-spring))
   (let* ((body-a (constraint-body-a spring))
          (body-b (constraint-body-b spring))
@@ -175,26 +191,27 @@
          (point-b (vec+ (body-position body-b)
                         (vec-rotate (squirl::damped-spring-anchor2 spring)
                                     (body-rotation body-b))))
-         (delta (vec- point-a point-b))
-         (k (spring-stiffness spring)))
-    ;; Establish transformation
-    (gl:matrix-mode :modelview)
+         (delta (vec- point-b point-a)))
+    (gl:point-size 5)
+    (gl:with-primitives :points
+      (gl:vertex (vec-x point-a) (vec-y point-a))
+      (gl:vertex (vec-x point-b) (vec-y point-b)))
     (gl:with-pushed-matrix
-      (gl:load-identity)
-      (gl:rotate (vec->angle delta) 0 0 0)
-      (gl:translate (vec-x point-a) (vec-x point-b) 0)
-      (gl:scale (vec-x delta) (vec-y delta) 0)
-    ;; Draw spring
-      (gl:line-width *line-width*)
-      (gl:with-primitives :lines
-        (gl:vertex 0 0)
-        (gl:vertex 0 1)
-        (gl:vertex 1 1.25)
-        (loop for i from 1 to (ceiling k) do
-             (gl:vertex -1 i)
-             (gl:vertex 1 i)
-             finally
-             (gl:vertex 0 (1+ i)))))))
+      (let ((x (vec-x point-a))
+            (y (vec-y point-a))
+            (cos (vec-x delta))
+            (sin (vec-y delta))
+            (s (/ (vec-length delta))))
+        (gl:mult-matrix (make-array '(4 4)
+                                    :initial-contents
+                                    (list (list cos sin 0 0)
+                                          (list (* (- sin) s) (* cos s) 0 0)
+                                          (list 0 0 1 1)
+                                          (list x y 0 1))))
+        (gl:line-width *line-width*)
+        (gl:with-primitives :line-strip
+          (loop for (x . y) in *spring-vertices*
+             do (gl:vertex x y)))))))
 
 ;;;
 ;;; Drawing the world.
