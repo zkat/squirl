@@ -49,6 +49,7 @@
              (:file "draw-world" :depends-on ("squirl-demo"))
              (:file "logo-smash" :depends-on ("squirl-demo"))
              (:file "planet" :depends-on ("squirl-demo"))
+             (:file "tumble" :depends-on ("squirl-demo"))
              (:file "pyramid" :depends-on ("squirl-demo"))))))
 
 (asdf:defsystem squirl.demo-2
