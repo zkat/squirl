@@ -75,32 +75,26 @@
 (defmacro defcollision (&rest args)
   (multiple-value-bind (qualifiers lambda-list body)
       (parse-defmethod args)
-    (destructuring-bind (actor1-and-spec actor2-and-spec contacts-name) lambda-list
-      (flet ((parse-specified-arg (arg)
-               (etypecase arg
-                 (symbol (values arg t))
-                 (list (destructuring-bind (arg-name specializer) arg
-                         (values arg-name specializer))))))
-        (multiple-value-bind (actor1-name actor1-spec)
-            (parse-specified-arg actor1-and-spec)
-          (multiple-value-bind (actor2-name actor2-spec)
-              (parse-specified-arg actor2-and-spec)
-            (if (equal actor1-spec actor2-spec)
-                `(defmethod collide ,@qualifiers ,lambda-list ,@body)
-                `(flet ((inner (,actor1-name ,actor2-name ,contacts-name) ,@body))
-                   (defmethod collide ,@qualifiers
-                       (,actor1-and-spec ,actor2-and-spec ,contacts-name)
-                     (funcall #'inner ,actor1-name ,actor2-name ,contacts-name))
-                   (defmethod collide ,@qualifiers
-                       (,actor2-and-spec ,actor1-and-spec ,contacts-name)
-                     (funcall #'inner ,actor1-name ,actor2-name
-                              ;; Because the actors are reversed, we should reverse the normals
-                              ;; FIXME: I suck! Stack allocate me or something!
-                              (mapcar (fun (with-accessors ((point contact-point)
-                                                            (distance contact-distance)
-                                                            (normal contact-normal)) _
-                                             (make-contact point (vec- normal) distance)))
-                                      ,contacts-name)))))))))))
+    (assert (= 3 (length lambda-list)))
+    (let* ((first (first lambda-list))
+           (second (second lambda-list))
+           (actor-a (or (first first) first))
+           (spec-a (or (second first) t))
+           (actor-b (or (first second) second))
+           (spec-b (or (second second) t))
+           (contacts (car (last lambda-list)))
+           (handler (gensym))
+           (cnm-sym (gensym))
+           (nmp-sym (gensym)))
+      `(flet ((,handler (,actor-a ,actor-b ,contacts ,cnm-sym ,nmp-sym)
+                (flet ((call-next-method () (funcall ,cnm-sym))
+                       (next-method-p () (funcall ,nmp-sym)))
+                  ,@body)))
+         (defmethod collide ,@qualifiers ((,actor-a ,spec-a) (,actor-b ,spec-b) ,contacts)
+           (,handler ,actor-a ,actor-b ,contacts #'call-next-method #'next-method-p))
+         ,(unless (equal spec-a spec-b)
+            `(defmethod collide ,@qualifiers ((,actor-b ,spec-b) (,actor-a ,spec-a) ,contacts)
+                        (,handler ,actor-a ,actor-b (mapc (fun (setf (contact-normal _) (vec- (contact-normal _)))) contacts) #'call-next-method #'next-method-p)))))))
 
 ;;;
 ;;; Body, Shape, and Joint Management
