@@ -2,7 +2,7 @@
 
 (defclass springies-demo (demo)
   ((static-body :initarg :box :accessor static-body))
-  (:default-initargs :name "Sproing twang!"))
+  (:default-initargs :name "Sproing twang!" :physics-timestep (float 1/60 1d0)))
 
 (defstruct (springy-spring (:include damped-spring)
                            (:constructor
