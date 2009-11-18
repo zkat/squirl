@@ -163,7 +163,9 @@ makes sure that the current world is updated by 1 time unit per second."
                               #\\Return restarts the current demo~@
                               Use the mouse to grab objects~@
                               Arrow keys control some demos~@
-                              #\\A toggles anti-aliasing."))))
+                              #\\A toggles anti-aliasing~@
+                              #\\[ and #\\] control the size of body points~@
+                              #\\{ and #\\} control the size of collision points."))))
 
 (defun draw-fps ()
   (let ((x -300) (y 100))
@@ -211,6 +213,8 @@ makes sure that the current world is updated by 1 time unit per second."
 
 (defmethod glut:keyboard ((w squirl-window) key x y)
   (declare (ignore x y))
+  (when (upper-case-p key)
+    (setf key (char-downcase key)))
   (case key
     (#\Esc (glut:destroy-current-window))
     (#\Return (run-demo (class-of *current-demo*)))
@@ -221,7 +225,11 @@ makes sure that the current world is updated by 1 time unit per second."
     (#\p (run-demo (elt *demos*
                         (mod (1- (position (class-name (class-of *current-demo*)) *demos*))
                              (length *demos*)))))
-    (#\a (toggle-anti-aliasing))))
+    (#\a (toggle-anti-aliasing))
+    (#\] (incf (body-point-size *current-demo*)))
+    (#\[ (decf (body-point-size *current-demo*)))
+    (#\} (incf (collision-point-size *current-demo*)))
+    (#\{ (decf (collision-point-size *current-demo*)))))
 
 (defun toggle-anti-aliasing ()
   (if *aa-enabled-p*

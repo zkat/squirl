@@ -42,7 +42,7 @@
 (defclass logo-smash (demo)
   ()
   (:default-initargs :name "Smash that damn logo." :physics-timestep 1/60
-    :draw-shapes-p nil :draw-bb-p nil :body-point-size 3 :collision-point-size 2))
+    :draw-shapes-p nil :draw-bb-p nil :body-point-size 3 :collision-point-size 0))
 
 (defun get-pixel (x y)
   (logand (ash (svref *logo* (+ (ash x -3) (* y *image-row-length*)))
