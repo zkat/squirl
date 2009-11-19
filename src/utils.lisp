@@ -60,6 +60,12 @@ producing a symbol in the current package."
             (replace name x :start1 index)
             (incf index (length x))))))))
 
+(macrolet ((define-ensure-foo (place) ; Lisp macros are nice
+             `(defun ,(symbolicate "ENSURE-" place) (place &optional (default place))
+                (if (atom place) default (,place place)))))
+  (define-ensure-foo car)
+  (define-ensure-foo cadr))
+
 (defmacro push-cons (cons place)
   "Like `cl:push', but reuses CONS"
   (with-gensyms (cons-sym)
