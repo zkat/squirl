@@ -8,19 +8,19 @@
            :ensure-list
            :clamp
            :maybe/
-           :fun
+           :fun :_
            :deletef
            :delete-iff
            :with-gensyms
            :symbolicate
            :ensure-car
            :ensure-cadr
+           :push-cons
+           :define-constant
            :define-print-object
            :do-vector
            :with-place
-           :aprog1
-           :aif
-           :awhen
+           :aprog1 :aif :awhen :it
            :parse-defmethod
            :pop-declarations))
 

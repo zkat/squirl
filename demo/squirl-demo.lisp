@@ -1,5 +1,5 @@
 (defpackage #:squirl-demo
-  (:use :cl :squirl)
+  (:use :cl :squirl :squirl.utils)
   (:export :run-all-demos))
 (in-package :squirl-demo)
 
@@ -21,12 +21,6 @@
 ;;;
 ;;; Utils
 ;;;
-(defmacro fun (&body body)
-  "This macro puts the FUN back in LAMBDA"
-  `(lambda (&optional _)
-     (declare (ignorable _))
-     ,@body))
-
 (defun now ()
   (/ (get-internal-real-time) internal-time-units-per-second))
 
