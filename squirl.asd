@@ -54,6 +54,7 @@
              (:file "pump" :depends-on ("squirl-demo"))
              (:file "pyramid" :depends-on ("squirl-demo"))
              (:file "pyramid-stack" :depends-on ("squirl-demo"))
+             (:file "theo-jansen" :depends-on ("squirl-demo"))
              (:file "springies" :depends-on ("squirl-demo"))))))
 
 (asdf:defsystem squirl.demo-2
