@@ -214,35 +214,82 @@
                                    (vec. line-vec line-vec))
                                 0d0 1d0))))
 
+(defun segment-intersection (a b &aux
+                             (a-a (segment-trans-a a))
+                             (a-b (segment-trans-b a))
+                             (b-a (segment-trans-a b))
+                             (b-b (segment-trans-b b)))
+  ;; Based on http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline2d/
+  (with-vecs (a-a a-b b-a b-b)
+    (let ((x-factor-num (- (* (- b-b.x b-a.x) (- a-a.y b-a.y))
+                           (* (- a-a.x b-a.x) (- b-b.y b-a.y))))
+          (y-factor-num (- (* (- a-b.x b-a.x) (- a-a.y b-a.y))
+                           (* (- a-a.x b-a.x) (- a-b.y a-a.y))))
+          (denom (- (* (- a-b.x a-a.x) (- b-b.y b-a.y))
+                    (* (- b-b.x b-a.x) (- a-b.y a-a.y)))))
+      (cond
+        ((= 0 denom x-factor-num y-factor-num) ; Coincident
+         (vec* (vec- a-b a-a) 0.5d0))
+        ((= 0 denom) nil) ; Parallel
+        (t (let* ((intersection (vec+ a-a
+                                      (vec (* (/ x-factor-num denom)
+                                              (- a-b.x a-a.x))
+                                           (* (/ y-factor-num denom)
+                                              (- a-b.y a-a.y)))))
+                  (delta-a (vec- intersection a-a))
+                  (delta-b (vec- intersection b-a))
+                  (vec-a (vec- a-b a-a))
+                  (vec-b (vec- b-b b-a)))
+             (when (and (< (vec-length-sq delta-a)
+                           (vec-length-sq vec-a))
+                        (< (vec-length-sq delta-b)
+                           (vec-length-sq vec-b))
+                        ;; Make sure we're going along, not away from, the segment.
+                        (< (abs (- (vec->angle vec-a)
+                                   (vec->angle delta-a)))
+                           pi)
+                        (< (abs (- (vec->angle vec-b)
+                                   (vec->angle delta-b)))
+                           pi))
+               intersection)))))))
+
+(defun segment-center (segment)
+  (vec* (vec+ (segment-trans-a segment) (segment-trans-b segment))
+        0.5d0))
+
 (defun segment-to-segment (a b &aux
                            (end-a-a (segment-trans-a a))
                            (end-a-b (segment-trans-b a))
                            (end-b-a (segment-trans-a b))
                            (end-b-b (segment-trans-b b))
                            (radius-a (segment-radius a))
-                           (radius-b (segment-radius b))
-                           contacts)
-  (awhen (circle-to-circle-query
-          (closest-point-on-segment a end-b-a) end-b-a
-          radius-a radius-b)
-    (push it contacts))
-  (awhen (circle-to-circle-query
-          (closest-point-on-segment a end-b-b) end-b-b
-          radius-a radius-b)
-    (push it contacts))
-  (when (< (length contacts) 2)
-    (awhen (circle-to-circle-query
-            (closest-point-on-segment b end-a-a) end-a-a
-            radius-b radius-a)
-      (setf (contact-normal it) (vec- (contact-normal it)))
-      (push it contacts))
-    (when (< (length contacts) 2)
-      (awhen (circle-to-circle-query
-              (closest-point-on-segment b end-a-b) end-a-b
-              radius-b radius-a)
-        (setf (contact-normal it) (vec- (contact-normal it)))
-        (push it contacts))))
-  contacts)
+                           (radius-b (segment-radius b)))
+  (if (= 0 radius-a radius-b)
+      (progn
+        (awhen (segment-intersection a b)
+          (let ((delta (vec- (segment-center b) (segment-center a))))
+           (list (make-contact it (vec-normalize delta) (vec-length delta))))))
+      (let (contacts)
+        (awhen (circle-to-circle-query
+                (closest-point-on-segment a end-b-a) end-b-a
+                radius-a radius-b)
+          (push it contacts))
+        (awhen (circle-to-circle-query
+                (closest-point-on-segment a end-b-b) end-b-b
+                radius-a radius-b)
+          (push it contacts))
+        (when (< (length contacts) 2)
+          (awhen (circle-to-circle-query
+                  (closest-point-on-segment b end-a-a) end-a-a
+                  radius-b radius-a)
+            (setf (contact-normal it) (vec- (contact-normal it)))
+            (push it contacts))
+          (when (< (length contacts) 2)
+            (awhen (circle-to-circle-query
+                    (closest-point-on-segment b end-a-b) end-a-b
+                    radius-b radius-a)
+              (setf (contact-normal it) (vec- (contact-normal it)))
+              (push it contacts)))))))
 
 ;;;
 ;;; Generic function
