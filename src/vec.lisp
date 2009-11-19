@@ -44,6 +44,11 @@ WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
   "Checks whether VEC is a zero vector"
   (= vec +zero-vector+))
 
+(declaim (ftype (function (vec vec) boolean) vec-equal)
+         (inline vec-equal))
+(defun vec-equal (a b)
+  (= a b))
+
 (declaim (ftype (function (real) vec) angle->vec)
          (inline angle->vec))
 (defun angle->vec (angle)
