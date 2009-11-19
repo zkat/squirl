@@ -243,8 +243,7 @@
       (gl:rotate (+ 90 (* (vec->angle delta) (/ 180 pi))) 0 0 1)
       (gl:scale width (/ (vec-length delta) ziggy) 1)
       (gl:with-primitive :line-strip
-        (gl:vertex 0 0)
-        (loop for i from 1 below ziggy do
+        (loop for i from 0 below ziggy do
              (gl:vertex -1 i)
              (gl:vertex 1 (+ i 1/2)))
         (gl:vertex 0 ziggy)))))
