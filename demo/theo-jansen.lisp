@@ -10,7 +10,7 @@
 
 (defmethod update-demo :before ((demo theo-jansen) dt)
   (declare (ignore dt))
-  (let* ((coef (/ (+ 2 (vec-y *arrow-direction*))))
+  (let* ((coef (/ (+ 2 (vec-y *arrow-direction*)) 3))
          (rate (* (vec-x *arrow-direction*) 10 coef)))
     (setf (squirl::simple-motor-rate (demo-motor demo)) rate
           (squirl::simple-motor-max-force (demo-motor demo)) (if (zerop rate) 0d0 100000))))
