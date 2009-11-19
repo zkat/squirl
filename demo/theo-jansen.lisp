@@ -25,7 +25,7 @@
 (defcollision ((a walker) (b (eql :not-grabbable)) contacts) (declare (ignore a b contacts)) t)
 
 (defun make-leg (world side offset walker anchor &aux (leg-mass 1))
-  (let* ((upper-leg (world-add-body 
+  (let* ((upper-leg (world-add-body
                      world
                      (make-body :mass leg-mass :position (vec offset 0) :actor walker
                                 :shapes (list
@@ -71,13 +71,13 @@
                                                            :restitution 1 :friction 1)))))
   (let ((offset 30) (chassis-mass 2) (crank-mass 1) (crank-radius 13d0) (side 30) (num-legs 2))
     (setf (walker-chassis (demo-walker demo))
-          (world-add-body (world demo) 
+          (world-add-body (world demo)
                           (make-body :mass chassis-mass :actor (demo-walker demo)
                                      :shapes (list (make-segment (vec (- offset) 0)
                                                                  (vec offset 0)
                                                                  :radius *seg-radius*))))
           (walker-crank (demo-walker demo))
-          (world-add-body (world demo) 
+          (world-add-body (world demo)
                           (make-body :mass crank-mass :actor (demo-walker demo)
                                      :shapes (list (make-circle crank-radius)))))
     (world-add-constraint (world demo)
