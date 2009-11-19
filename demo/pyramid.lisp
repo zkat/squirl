@@ -44,19 +44,19 @@
                      (nconc
                       (list (make-body
                              :mass 1
-                             :inertia (moment-for-poly 1 verts)
+                             :inertia (moment-of-inertia-for-poly 1 verts)
                              :position (vec+ (vec (* j 60) -220)
                                              offset))
                             (make-body
                              :mass 1
-                             :inertia (moment-for-poly 1 verts)
+                             :inertia (moment-of-inertia-for-poly 1 verts)
                              :position (vec+ (vec (* j 60) -197)
                                              offset)
                              :angle (/ pi 2)))
                       (unless (= j (1- i))
                         (list (make-body
                                :mass 1
-                               :inertia (moment-for-poly 1 verts)
+                               :inertia (moment-of-inertia-for-poly 1 verts)
                                :position (vec+ (vec (+ (* j 60) 30)
                                                     -191)
                                                offset)
@@ -69,13 +69,13 @@
                  (world-add-body (world demo) body))
                (list (make-body
                       :mass 1
-                      :inertia (moment-for-poly 1 verts)
+                      :inertia (moment-of-inertia-for-poly 1 verts)
                       :position (vec+ (vec -17
                                            -174)
                                       offset))
                      (make-body
                       :mass 1
-                      :inertia (moment-for-poly 1 verts)
+                      :inertia (moment-of-inertia-for-poly 1 verts)
                       :position (vec+ (vec (+ (* (1- i) 60) 17)
                                            -174)
                                       offset))))))

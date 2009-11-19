@@ -12,6 +12,7 @@
            :deletef
            :delete-iff
            :with-gensyms
+           :without-floating-point-underflow
            :symbolicate
            :ensure-car
            :ensure-cadr
@@ -97,9 +98,9 @@
    :detach-shape
 
    ;; moments
-   :moment-for-circle
-   :moment-for-segment
-   :moment-for-poly
+   :moment-of-inertia-for-circle
+   :moment-of-inertia-for-segment
+   :moment-of-inertia-for-poly
 
    ;; world
    :world

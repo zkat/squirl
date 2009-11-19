@@ -22,7 +22,7 @@
               (setf (body-position ball) (vec -224 200))))))
 
 (defun add-ball (world pos)
-  (world-add-body world (make-body :mass 1 :inertia (moment-for-circle 1 30 0) :position pos
+  (world-add-body world (make-body :mass 1 :inertia (moment-of-inertia-for-circle 1 30 0) :position pos
                                    :shapes (list (make-circle 30 :friction 0.5)))))
 
 (defun setup-static-body (world)
@@ -53,7 +53,7 @@
 
 (defun add-small-gear (world static-body)
   (let ((gear (world-add-body
-               world (make-body :mass 10 :inertia (moment-for-circle 10 80 0) :angle (/ pi -2)
+               world (make-body :mass 10 :inertia (moment-of-inertia-for-circle 10 80 0) :angle (/ pi -2)
                                 :position (vec -160 -160) :shapes (list (make-circle 80)) :actor 0))))
     ;; todo - this needs to be in a different 'layer'
     (world-add-constraint world (make-pivot-joint static-body gear (vec -160 -160) +zero-vector+))
@@ -61,7 +61,7 @@
 
 (defun add-big-gear (world static-body)
   (let ((gear (world-add-body
-               world (make-body :mass 40 :inertia (moment-for-circle 40 160 0)
+               world (make-body :mass 40 :inertia (moment-of-inertia-for-circle 40 160 0)
                                 :position (vec 80 -160) :angle (/ pi 2) :actor 0
                                 :shapes (list (make-circle 160))))))
     ;; todo - different layer
@@ -74,7 +74,7 @@
 
 (defun add-feeder (world static-body small-gear)
   (let* ((bottom -300) (top 32) (length (- top bottom))
-         (feeder (make-body :mass 1 :inertia (moment-for-segment 1 (vec -224 bottom) (vec -224 top))
+         (feeder (make-body :mass 1 :inertia (moment-of-inertia-for-segment 1 (vec -224 bottom) (vec -224 top))
                             :position (vec -224 (/ (+ bottom top) 2))
                             :shapes (list (make-segment (vec 0 (/ length 2)) (vec 0 (- (/ length 2)))
                                                         :radius 20)))))

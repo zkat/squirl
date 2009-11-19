@@ -34,7 +34,7 @@
 (defun create-polygons (demo)
   (let* ((verts (loop for i below (plink-num-verts demo)
                    collect (vec* (angle->vec (* i (plink-angle demo))) 10d0)))
-         (inertia (moment-for-poly 1 verts)))
+         (inertia (moment-of-inertia-for-poly 1 verts)))
     (dotimes (i 300)
       (world-add-body (world demo)
                       (make-body :mass 1 :inertia inertia :position (vec (- (random 640) 320) 350)

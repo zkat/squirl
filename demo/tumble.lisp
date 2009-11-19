@@ -39,7 +39,7 @@
                       (vec -30 15)
                       (vec 30 15)
                       (vec 30 -15)))
-         (inertia (moment-for-poly 1 verts)))
+         (inertia (moment-of-inertia-for-poly 1 verts)))
     (dotimes (i 3)
       (dotimes (j 7)
         (world-add-body (world demo)

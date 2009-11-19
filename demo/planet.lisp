@@ -33,7 +33,7 @@
                         (vec (- size) size)
                         (vec size size)
                         (vec size (- size))))
-           (body (make-planetary-body :mass mass :inertia (moment-for-poly mass verts)
+           (body (make-planetary-body :mass mass :inertia (moment-of-inertia-for-poly mass verts)
                                       :position (random-position (vec-length (vec size size)))
                                       :velocity (vec* (angle->vec (* pi (random 2d0)))
                                                       (random 200d0)))))
