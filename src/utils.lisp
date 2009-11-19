@@ -87,8 +87,8 @@ CLASS can be a list of the form (VARIABLE CLASS-NAME), in which case
 the `print-object' method will be specialized on class CLASS-NAME and VARIABLE
 will be used as the parameter name. Alternatively, as shorthand, CLASS can be a
 single symbol, which will be used for both the variable and the class name."
-  (let ((object (if (listp class) (car class) class))
-        (class-name (if (listp class) (cadr class) class)))
+  (let ((object (ensure-car class))
+        (class-name (ensure-cadr class)))
     (with-gensyms (stream)
       `(defmethod print-object ((,object ,class-name) ,stream)
          (print-unreadable-object (,object ,stream :type ,type :identity ,identity)
@@ -97,8 +97,8 @@ single symbol, which will be used for both the variable and the class name."
 (defmacro do-vector ((var vector-form &optional result) &body body)
   "See `dolist'. If VAR is a list of the form (INDEX VAR), then INDEX is used
 as the index vector. Note that this macro doesn't handle declarations properly."
-  (let ((var-name (if (listp var) (cadr var) var))
-        (idx-name (if (listp var) (car var) (gensym "INDEX"))))
+  (let ((var-name (ensure-cadr var))
+        (idx-name (ensure-car var (gensym "INDEX"))))
     (with-gensyms (vector)
       `(let ((,vector ,vector-form) ,var-name)
          (declare (ignorable ,var-name) (vector ,vector))
@@ -107,11 +107,11 @@ as the index vector. Note that this macro doesn't handle declarations properly."
 
 (defmacro with-place (conc-name (&rest slots) form &body body)
   (flet ((conc (a b) (intern (format nil "~A~A" a b) :squirl)))
-    (let ((sm-prefix (if (atom conc-name) conc-name (first conc-name)))
-          (acc-prefix (if (atom conc-name) conc-name (second conc-name))))
+    (let ((sm-prefix (ensure-car conc-name))
+          (acc-prefix (ensure-cadr conc-name)))
       `(with-accessors
-             ,(mapcar (fun `(,(conc sm-prefix (if (atom _) _ (car _)))
-                              ,(conc acc-prefix (if (atom _) _ (cadr _)))))
+             ,(mapcar (fun (list (conc sm-prefix (ensure-car _))
+                                 (conc acc-prefix (ensure-cadr _))))
                       slots)
            ,form
          ,@body))))
