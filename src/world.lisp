@@ -297,7 +297,7 @@
             (arbiter-apply-impulse arbiter t))
           (map nil #'apply-impulse constraints))))
 
-(defun integrate-velocities (world dt &aux (damping (expt (world-damping world) (- dt))))
+(defun integrate-velocities (world dt &aux (damping (expt (/ (world-damping world)) (- dt))))
   (with-place (|| world-) (active-bodies arbiters gravity) world
     ;; Apply gravity forces.
     (do-vector (body active-bodies)
