@@ -16,11 +16,11 @@ A solid circle has an inner diameter of 0."
 (defun moment-of-inertia-for-poly (m verts &optional (offset +zero-vector+))
   "Calculate the moment of inertia for a solid convex polygon."
   (flet ((transform-vertex (vertex) (vec+ vertex offset)))
-    (loop
-       for vertex in verts
-       for v1 = (transform-vertex vertex)
-       and v2 = (transform-vertex (car (last verts))) then v1
-       for a = (vec-cross v2 v1) sum a into sum2
-       sum (* a (+ (vec. v1 v1) (vec. v1 v2) (vec. v2 v2))) into sum1
-       finally (return (/ (* m sum1) (* 6 sum2))))))
-
+    (let ((vertices (coerce verts 'list))) ; I would dx, but shitux.
+      (loop
+         for vertex in vertices
+         for v1 = (transform-vertex vertex)
+         and v2 = (transform-vertex (car (last vertices))) then v1
+         for a = (vec-cross v2 v1) sum a into sum2
+         sum (* a (+ (vec. v1 v1) (vec. v1 v2) (vec. v2 v2))) into sum1
+         finally (return (/ (* m sum1) (* 6 sum2)))))))
