@@ -196,7 +196,7 @@
       (let* ((dn (- (vec. seg-tnormal point) (vec. seg-ta seg-tnormal)))
              (dist (- (abs dn) seg-r)))
         (if (plusp dist)
-            (return-from shape-point-query t)
+            (return-from shape-point-query nil)
             ;; calculate tangential distance along segment
             (let ((dt (- (vec-cross seg-tnormal point)))
                   (dt-min (- (vec-cross seg-tnormal seg-ta)))
