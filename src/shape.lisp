@@ -36,14 +36,16 @@
 (defun calculate-inertia (body)
   (if (= 0 (body-mass body))
       most-positive-double-float
-      (loop for shape in (body-shapes body)
-         summing
-         (etypecase shape
-           (circle (moment-of-inertia-for-circle (body-mass body) 1
-                                                 (circle-radius shape) (circle-center shape)))
-           (segment (moment-of-inertia-for-segment (body-mass body)
-                                                   (segment-a shape) (segment-b shape)))
-           (poly (moment-of-inertia-for-poly (body-mass body) (poly-vertices shape)))))))
+      (float
+       (loop for shape in (body-shapes body)
+          summing
+          (etypecase shape
+            (circle (moment-of-inertia-for-circle (body-mass body) 1
+                                                  (circle-radius shape) (circle-center shape)))
+            (segment (moment-of-inertia-for-segment (body-mass body)
+                                                    (segment-a shape) (segment-b shape)))
+            (poly (moment-of-inertia-for-poly (body-mass body) (poly-vertices shape)))))
+       1d0)))
 
 (defun %attach-shape (shape body)
   (setf (shape-body shape) body)
