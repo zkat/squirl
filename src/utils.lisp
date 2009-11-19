@@ -20,7 +20,7 @@
 )                                     ; LOCALLY
 
 (declaim (inline maybe/)
-         (ftype (function (double-float double-float) double-float) maybe/))
+         (ftype (function (double-float &optional double-float) double-float) maybe/))
 (defun maybe/ (a &optional b)
   ;; Don't declare me (optimize speed), because that chokes SBCL
   (if (zerop b) 0d0 (/ a b)))
