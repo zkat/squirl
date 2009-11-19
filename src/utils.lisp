@@ -1,5 +1,5 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
-(in-package :squirl)
+(in-package :squirl.utils)
 
 (locally (declare (optimize speed))
 

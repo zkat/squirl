@@ -2,8 +2,30 @@
 
 (in-package :cl-user)
 
-(defpackage squirl
+(defpackage squirl.utils
   (:use :cl)
+  (:export :make-adjustable-vector
+           :ensure-list
+           :clamp
+           :maybe/
+           :fun
+           :deletef
+           :delete-iff
+           :with-gensyms
+           :symbolicate
+           :ensure-car
+           :ensure-cadr
+           :define-print-object
+           :do-vector
+           :with-place
+           :aprog1
+           :aif
+           :awhen
+           :parse-defmethod
+           :pop-declarations))
+
+(defpackage squirl
+  (:use :cl :squirl.utils)
   (:export
 
    ;; Vector math
