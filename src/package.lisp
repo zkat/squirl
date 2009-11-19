@@ -95,6 +95,7 @@
    :make-poly
    :poly-transformed-vertices
    :attach-shape
+   :attach-shapes
    :detach-shape
 
    ;; moments

@@ -25,7 +25,7 @@
          (aprog1 (,(symbolicate "%MAKE-" name)
                   (float mass 0d0) (float inertia 1d0) calculate-inertia-p position velocity
                   force actor (float angle 0d0) (float angular-velocity 0d0))
-           (add-shapes it shapes))))))
+           (squirl:attach-shapes it shapes))))))
 
 (defstruct (body
              (:constructor
