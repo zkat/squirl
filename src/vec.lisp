@@ -27,9 +27,10 @@
   (name form)
 where NAME is a symbol, and FORM evaluates to a `vec'.
 WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
-  (let ((name (if (listp form) (first form) form))
-        (place (if (listp form) (second form) form)))
-    `(with-place (,(format nil "~A." name) vec-)
+  (let* ((name (ensure-car form))
+         (place (ensure-cadr form))
+         (*package* (symbol-package name)))
+    `(with-place (,(symbolicate name ".") vec-)
          (x y) ,place
        ,@body)))
 
