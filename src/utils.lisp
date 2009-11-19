@@ -49,6 +49,17 @@ the result of calling DELETE with PREDICATE, place, and the REMOVE-KEYWORDS.")
   `(let ,(loop for var in vars collect `(,var (gensym ,(symbol-name var))))
      ,@body))
 
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defun symbolicate (&rest things)
+    "Concatenate together the names of some strings and symbols,
+producing a symbol in the current package."
+    (let ((name (make-string (reduce #'+ things :key (fun (length (string _)))))))
+      (let ((index 0))
+        (dolist (thing things (values (intern name)))
+          (let ((x (string thing)))
+            (replace name x :start1 index)
+            (incf index (length x))))))))
+
 (defmacro push-cons (cons place)
   "Like `cl:push', but reuses CONS"
   (with-gensyms (cons-sym)
