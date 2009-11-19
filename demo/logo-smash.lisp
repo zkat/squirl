@@ -45,8 +45,8 @@
     :draw-shapes-p nil :draw-bb-p nil :body-point-size 3 :collision-point-size 0))
 
 (defun get-pixel (x y)
-  (logand (ash (svref *logo* (+ (ash x -3) (* y *image-row-length*)))
-               (- (logand (lognot x) 7))) 1))
+  (oddp (ash (svref *logo* (+ (ash x -3) (* y *image-row-length*)))
+             (- (mod x 8) 7))))
 
 (defun make-ball (x y)
   (make-body :mass 1.0 :position (vec x y) :shapes (list (make-circle 0.95))))
@@ -61,7 +61,7 @@
   (loop for y below *image-height*
      do (loop for x below *image-width*
            for x-jitter = (random 0.05) for y-jitter = (random 0.05)
-           unless (zerop (get-pixel x y))
+           when (get-pixel x y)
            do (let ((ball (make-ball (* 2 (- x (/ *image-width* 2) (- x-jitter)))
                                      (* 2 (- (/ *image-height* 2) y (- y-jitter))))))
                 (world-add-body (world demo) ball))))
