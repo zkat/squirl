@@ -80,10 +80,12 @@
      never (> (vec. (poly-axis-normal axis) vertex)
               (poly-axis-distance axis))))
 
+(declaim (ftype (function (poly vec vec) boolean) partial-poly-contains-vertex-p)
+         (inline partial-poly-contains-vertex-p))
 (defun partial-poly-contains-vertex-p (poly vertex normal)
   "Same as POLY-CONTAINS-VERTEX-P, but ignores faces pointing away from NORMAL."
   (loop for axis across (poly-transformed-axes poly)
-     never (unless (> 0d0 (vec. (poly-axis-normal axis) normal))
+     never (unless (minusp (vec. (poly-axis-normal axis) normal))
              (> (vec. (poly-axis-normal axis) vertex)
                 (poly-axis-distance axis)))))
 

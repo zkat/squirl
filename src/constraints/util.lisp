@@ -1,38 +1,10 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
-(declaim (ftype (function (body body vec vec) vec) relative-velocity)
-         (inline relative-velocity))
-(defun relative-velocity (body1 body2 r1 r2)
-  (vec- (vec+ (body-velocity body2)
-              (vec* (vec-perp r2)
-                    (body-angular-velocity body2)))
-        (vec+ (body-velocity body1)
-              (vec* (vec-perp r1)
-                    (body-angular-velocity body1)))))
-
-(declaim (ftype (function (body body vec vec vec) double-float) normal-relative-velocity)
-         (inline normal-relative-velocity))
-(defun normal-relative-velocity (body1 body2 r1 r2 normal)
-  (vec. (relative-velocity body1 body2 r1 r2) normal))
-
 (defun apply-impulses (body1 body2 r1 r2 j)
   (body-apply-impulse body1 (vec- j) r1)
   (body-apply-impulse body2 j r2)
   (values))
-
-(declaim (ftype (function (body body vec vec vec) double-float) k-scalar)
-         (inline k-scalar))
-(defun k-scalar (body1 body2 r1 r2 normal)
-  (let ((mass-sum (+ (body-inverse-mass body1)
-                     (body-inverse-mass body2)))
-        (r1-cross-normal (vec-cross r1 normal))
-        (r2-cross-normal (vec-cross r2 normal)))
-    (+ mass-sum
-       (* r1-cross-normal r1-cross-normal
-          (body-inverse-inertia body1))
-       (* r2-cross-normal r2-cross-normal
-          (body-inverse-inertia body2)))))
 
 (defun k-tensor (body1 body2 r1 r2)
   ;; calculate mass matrix

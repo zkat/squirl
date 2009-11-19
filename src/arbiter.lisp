@@ -4,6 +4,7 @@
 (define-constant +bias-coefficient+ 0.1d0
   "Determines how fast penetrations resolve themselves.")
 
+(declaim (inline make-contact))
 (defstruct (contact (:constructor make-contact (point normal distance &optional hash)))
   ;; Contact point and normal
   (point +zero-vector+ :type vec)
@@ -79,6 +80,34 @@
               (contact-jt-acc new-contact) (contact-jt-acc old-contact)))))
   (setf (arbiter-contacts arbiter) contacts)
   arbiter)
+
+(declaim (ftype (function (body body vec vec vec) double-float) k-scalar)
+         (inline k-scalar))
+(defun k-scalar (body1 body2 r1 r2 normal)
+  (let ((mass-sum (+ (body-inverse-mass body1)
+                     (body-inverse-mass body2)))
+        (r1-cross-normal (vec-cross r1 normal))
+        (r2-cross-normal (vec-cross r2 normal)))
+    (+ mass-sum
+       (* r1-cross-normal r1-cross-normal
+          (body-inverse-inertia body1))
+       (* r2-cross-normal r2-cross-normal
+          (body-inverse-inertia body2)))))
+
+(declaim (ftype (function (body body vec vec) vec) relative-velocity)
+         (inline relative-velocity))
+(defun relative-velocity (body1 body2 r1 r2)
+  (vec- (vec+ (body-velocity body2)
+              (vec* (vec-perp r2)
+                    (body-angular-velocity body2)))
+        (vec+ (body-velocity body1)
+              (vec* (vec-perp r1)
+                    (body-angular-velocity body1)))))
+
+(declaim (ftype (function (body body vec vec vec) double-float) normal-relative-velocity)
+         (inline normal-relative-velocity))
+(defun normal-relative-velocity (body1 body2 r1 r2 normal)
+  (vec. (relative-velocity body1 body2 r1 r2) normal))
 
 (defun arbiter-prestep (arbiter dt-inverse)
   (declare (optimize speed) (double-float dt-inverse))
