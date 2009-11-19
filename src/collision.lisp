@@ -229,7 +229,7 @@
                     (* (- b-b.x b-a.x) (- a-b.y a-a.y)))))
       (cond
         ((= 0 denom x-factor-num y-factor-num) ; Coincident
-         (vec* (vec- a-b a-a) 0.5d0))
+         (vec* (vec- (segment-center a) (segment-center b)) 0.5d0))
         ((= 0 denom) nil) ; Parallel
         (t (let* ((intersection (vec+ a-a
                                       (vec (* (/ x-factor-num denom)
