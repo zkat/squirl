@@ -7,7 +7,7 @@
   :components
   ((:module "src"
             :components
-            ((:file "arbiter"        :depends-on ("vec" "shape" "constraints"))
+            ((:file "arbiter"        :depends-on ("vec" "shape" "collision"))
              (:file "body"           :depends-on ("vec"))
              (:file "bounding-box"   :depends-on ("vec"))
              (:file "collision"      :depends-on ("shape" "poly-shape"))
@@ -20,7 +20,7 @@
              (:file "vec"            :depends-on ("utils"))
              (:file "world"          :depends-on ("vec" "arbiter" "body"))
              (:file "world-hash"     :depends-on ("hash-set" "vec"))
-             (:module "constraints"  :depends-on ("shape" "poly-shape" "collision")
+             (:module "constraints"  :depends-on ("shape" "poly-shape" "arbiter")
                       :components
                       ((:file "breakable-joint"      :depends-on ("constraints"))
                        (:file "constraints"          :depends-on ("util"))
