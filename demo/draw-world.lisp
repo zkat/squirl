@@ -236,17 +236,17 @@
                                     (body-rotation body-b))))
          (delta (vec- point-a point-b))
          (ziggy (floor (/ (spring-stiffness spring) 10)))
-         (half-width (/ ziggy 3)))
+         (width (/ ziggy 3)))
     (gl:line-width 2)
     (gl:with-pushed-matrix
       (gl:translate (vec-x point-a) (vec-y point-a) 0)
       (gl:rotate (+ 90 (* (vec->angle delta) (/ 180 pi))) 0 0 1)
-      (gl:scale 1 (/ (vec-length delta) ziggy) 1)
+      (gl:scale width (/ (vec-length delta) ziggy) 1)
       (gl:with-primitive :line-strip
         (gl:vertex 0 0)
         (loop for i from 1 below ziggy do
-             (gl:vertex (- half-width) i)
-             (gl:vertex half-width (+ i 1/2)))
+             (gl:vertex -1 i)
+             (gl:vertex 1 (+ i 1/2)))
         (gl:vertex 0 ziggy)))))
 
 ;;;
