@@ -106,15 +106,15 @@ as the index vector. Note that this macro doesn't handle declarations properly."
            (let ((,var-name (aref ,vector ,idx-name))) ,@body))))))
 
 (defmacro with-place (conc-name (&rest slots) form &body body)
-  (flet ((conc (a b) (intern (format nil "~A~A" a b) :squirl)))
-    (let ((sm-prefix (ensure-car conc-name))
-          (acc-prefix (ensure-cadr conc-name)))
-      `(with-accessors
-             ,(mapcar (fun (list (conc sm-prefix (ensure-car _))
-                                 (conc acc-prefix (ensure-cadr _))))
-                      slots)
-           ,form
-         ,@body))))
+  (let* ((sm-prefix (ensure-car conc-name))
+         (acc-prefix (ensure-cadr conc-name))
+         (*package* (symbol-package sm-prefix)))
+    `(with-accessors
+           ,(mapcar (fun (list (symbolicate sm-prefix (ensure-car _))
+                               (symbolicate acc-prefix (ensure-cadr _))))
+                    slots)
+         ,form
+       ,@body)))
 
 (defmacro aprog1 (result &body body)
   `(let ((it ,result)) ,@body it))
