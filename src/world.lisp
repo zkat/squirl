@@ -70,7 +70,7 @@
 (defgeneric collide (actor1 actor2 contacts)
   (:method ((actor1 t) (actor2 t) (contacts t)) t))
 
-(defmacro defcollision (&rest args)
+(defmacro defcollision (&body args)
   (multiple-value-bind (qualifiers lambda-list body)
       (parse-defmethod args)
     (destructuring-bind (arg-a arg-b contacts) lambda-list

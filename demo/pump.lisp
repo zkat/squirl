@@ -100,7 +100,9 @@
     (motorize-gear (world demo) (demo-static-body demo) big-gear))
   (world demo))
 
-(defcollision ((a number) (b symbol) constraints) (unless (and (= a 0) (eq b :not-grabbable)) t))
+(defcollision ((a number) (b symbol) collisions)
+  (declare (ignore collisions))
+  (unless (and (= a 0) (eq b :not-grabbable)) t))
 (defcollision ((a number) (b number) constraints) (= a b))
 
 (pushnew 'pump-demo *demos*)
