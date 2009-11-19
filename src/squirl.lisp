@@ -4,16 +4,11 @@
 (defun moment-for-circle (mass inner-diameter outer-diameter &optional (offset +zero-vector+))
   "Calculate the moment of inertia for a circle.
 A solid circle has an inner diameter of 0."
-  ;; c version: return (1.0f/2.0f)*m*(inner*inner + outer*outer) + m*cpvdot(offset, offset);
   (+ (* mass 1/2 (+ (expt inner-diameter 2) (expt outer-diameter 2)))
      (* mass (vec-length-sq offset))))
 
 (defun moment-for-segment (mass point-a point-b)
   "Calculate the moment of inertia for a line segment connecting POINT-A to POINT-B."
-  ;; C version:
-  ;; cpFloat length = cpvlength(cpvsub(b, a));
-  ;; cpVect offset = cpvmult(cpvadd(a, b), 1.0f/2.0f);
-  ;; return m*length*length/12.0f + m*cpvdot(offset, offset);
   (let ((length (vec-length (vec- point-b point-a))))
     (+ (* mass length (/ length 12))
        (* mass (vec-length-sq (vec* (vec+ point-a point-b) 0.5d0))))))
@@ -22,26 +17,6 @@ A solid circle has an inner diameter of 0."
                         &aux (num-verts (length verts))
                              (t-verts (make-array num-verts)))
   "Calculate the moment of inertia for a solid convex polygon."
-  ;; C version:
-  ;; cpVect *tVerts = (cpVect *)calloc(numVerts, sizeof(cpVect));
-  ;; for(int i=0; i<numVerts; i++)
-  ;;  tVerts[i] = cpvadd(verts[i], offset);
-
-  ;; cpFloat sum1 = 0.0f;
-  ;; cpFloat sum2 = 0.0f;
-  ;; for(int i=0; i<numVerts; i++){
-  ;;  cpVect v1 = tVerts[i];
-  ;;  cpVect v2 = tVerts[(i+1)%numVerts];
-
-  ;;  cpFloat a = cpvcross(v2, v1);
-  ;;  cpFloat b = cpvdot(v1, v1) + cpvdot(v1, v2) + cpvdot(v2, v2);
-
-  ;;  sum1 += a*b;
-  ;;  sum2 += a;
-  ;; }
-
-  ;; free(tVerts);
-  ;; return (m*sum1)/(6.0f*sum2);
   (dotimes (i num-verts)
     (setf (svref t-verts i) (vec+ (elt verts i) offset)))
   (loop
