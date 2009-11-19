@@ -207,13 +207,44 @@
             (find-vertices poly1 poly2 (poly-axis-normal msa1) min1)
             (find-vertices poly1 poly2 (vec- (poly-axis-normal msa2)) min2))))))
 
+(defun closest-point-on-segment (segment point &aux
+                                 (a (segment-trans-a segment))
+                                 (line-vec (vec- (segment-trans-b segment) a)))
+  (vec+ a (vec* line-vec (clamp (/ (vec. (vec- point a) line-vec)
+                                   (vec. line-vec line-vec))
+                                0d0 1d0))))
+
+(defun segment-to-segment (a b &aux
+                           (end-a-a (segment-trans-a a))
+                           (end-a-b (segment-trans-b a))
+                           (end-b-a (segment-trans-a b))
+                           (end-b-b (segment-trans-b b))
+                           (radius-a (segment-radius a))
+                           (radius-b (segment-radius b))
+                           contacts)
+  (awhen (circle-to-circle-query
+          (closest-point-on-segment a end-b-a) end-b-a
+          radius-a radius-b)
+    (push it contacts))
+  (awhen (circle-to-circle-query
+          (closest-point-on-segment a end-b-b) end-b-b
+          radius-a radius-b)
+    (push it contacts))
+  (awhen (circle-to-circle-query
+          (closest-point-on-segment b end-a-a) end-a-a
+          radius-b radius-a)
+    (push it contacts))
+  (awhen (circle-to-circle-query
+          (closest-point-on-segment b end-a-b) end-a-b
+          radius-b radius-a)
+    (push it contacts))
+  contacts)
+
 ;;;
 ;;; Generic function
 ;;;
 (defgeneric collide-shapes (a b)
   (:documentation "Collide shapes A and B together!")
-  ;; Note that we don't handle segment-to-segment (yet?)
-  ;; This method always returns a list.
   (:method ((shape-1 circle) (shape-2 circle))
     (ensure-list (circle-to-circle-query (circle-transformed-center shape-1)
                                          (circle-transformed-center shape-2)
@@ -234,6 +265,5 @@
   (:method ((poly1 poly) (poly2 poly))
     (poly-to-poly poly1 poly2))
   (:method ((seg1 segment) (seg2 segment))
-    ;; todo
-    nil))
+    (segment-to-segment seg1 seg2)))
 
