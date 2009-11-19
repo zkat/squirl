@@ -120,16 +120,19 @@
 (defun world-add-body (world body)
   ;; FLET or MACROLET this up please
   (cond ((staticp body)
+         (assert (not (find body (world-static-bodies world))))
          (vector-push-extend body (world-static-bodies world))
          (dolist (shape (body-shapes body))
            (world-add-static-shape world shape)))
-        (t (vector-push-extend body (world-active-bodies world))
+        (t (assert (not (find body (world-active-bodies world))))
+           (vector-push-extend body (world-active-bodies world))
            (dolist (shape (body-shapes body))
              (world-add-active-shape world shape))))
   (setf (body-world body) world)
   body)
 
 (defun world-add-constraint (world constraint)
+  (assert (not (find constraint (world-constraints world))))
   (vector-push-extend constraint (world-constraints world))
   constraint)
 
@@ -312,15 +315,17 @@
        (do-vector (constraint constraints)
          (apply-impulse constraint)))))
 
-(defun world-step (world timestep &aux (dt (float timestep 0d0)) (dt-inv (/ dt)))
+(defun world-step (world timestep)
   "Step the physical state of WORLD by DT seconds."
-  (with-place (|| world-) (active-bodies active-shapes) world
-    (flush-arbiters world)
-    (do-vector (body active-bodies)
-      (body-update-position body dt)) ; Integrate positions
-    (resolve-collisions world)
-    (prestep-world world dt dt-inv)
-    (apply-elastic-impulses world)
-    (integrate-velocities world dt)
-    (solve-impulses world)
-    (incf (world-timestamp world))))
+  (assert (not (zerop timestep)) (world) "Cannot step ~A by 0" world)
+  (let* ((dt (float timestep 0d0)) (dt-inv (/ dt)))
+    (with-place (|| world-) (active-bodies active-shapes) world
+      (flush-arbiters world)
+      (do-vector (body active-bodies)
+        (body-update-position body dt)) ; Integrate positions
+      (resolve-collisions world)
+      (prestep-world world dt dt-inv)
+      (apply-elastic-impulses world)
+      (integrate-velocities world dt)
+      (solve-impulses world)
+      (incf (world-timestamp world)))))
