@@ -16,7 +16,7 @@
                                             (if (zerop %mass) 0d0 (/ %mass))))
                                          (inverse-inertia
                                           (without-floating-point-underflow
-                                            (if (zerop %mass) 0d0 (/ %inertia))))
+                                            (if (zerop %inertia) 0d0 (/ %inertia))))
                                          (rotation (angle->vec %angle))))))
        (defun ,(symbolicate "MAKE-" name)
          (&key (mass 0d0) (inertia most-positive-double-float) (calculate-inertia-p t)
@@ -37,7 +37,7 @@
                                    (if (zerop %mass) 0d0 (/ %mass))))
                                 (inverse-inertia
                                  (without-floating-point-underflow
-                                   (if (zerop %mass) 0d0 (/ %inertia))))
+                                   (if (zerop %inertia) 0d0 (/ %inertia))))
                                 (rotation (angle->vec %angle)))))
   world                 ; world that this body is attached to, if any.
   actor                 ; Actor used for the COLLIDE "callback"
