@@ -237,6 +237,10 @@
          (delta (vec- point-a point-b))
          (ziggy (floor (/ (spring-stiffness spring) 10)))
          (width (/ ziggy 3)))
+    (gl:point-size 8)
+    (gl:with-primitives :points
+      (gl:vertex (vec-x point-a) (vec-y point-a))
+      (gl:vertex (vec-x point-b) (vec-y point-b)))
     (gl:line-width 2)
     (gl:with-pushed-matrix
       (gl:translate (vec-x point-a) (vec-y point-a) 0)
