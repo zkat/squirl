@@ -5,10 +5,10 @@
                       (:constructor
                        make-pin-joint
                        (body-a body-b anchor1 anchor2 &aux
-                               (point-1 (vec+ (body-position body-a)
-                                              (vec-rotate anchor1 (body-rotation body-a))))
-                               (point-2 (vec+ (body-position body-b)
-                                              (vec-rotate anchor2 (body-rotation body-b))))
+                               (point-1 (vec+ (body-position body-b)
+                                              (vec-rotate anchor1 (body-rotation body-b))))
+                               (point-2 (vec+ (body-position body-a)
+                                              (vec-rotate anchor2 (body-rotation body-a))))
                                (distance (vec-length (vec- point-1 point-2))))))
   anchor1 anchor2
   distance
