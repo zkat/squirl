@@ -13,8 +13,8 @@
   body                           ; Body to which the shape is attached
   bbox                           ; Cached BBox for the shape
   ;; Surface Properties
-  (restitution 0d0 :type double-float)                 ; Coefficient of restitution.
-  (friction 0d0 :type double-float)                   ; Coefficient of friction.
+  (restitution 0d0 :type double-float)  ; Coefficient of restitution.
+  (friction 0d0 :type double-float)     ; Coefficient of friction.
   (surface-velocity +zero-vector+ :type vec) ; Surface velocity used when solving for friction
   ;; Unique ID, used internally for hashing
   (id (prog1 *shape-id-counter* (incf *shape-id-counter*))
@@ -77,9 +77,10 @@
 ;;;
 (defstruct (circle (:constructor %make-circle (radius center restitution friction))
                    (:include shape))
-  radius
+  (radius (assert nil) :type double-float)
   ;; Center, in body-relative and world coordinates
-  center transformed-center)
+  (center (assert nil) :type vec)
+  (transformed-center +zero-vector+ :type vec))
 
 (defun make-circle (radius &key (center +zero-vector+) (restitution 0d0) (friction 0d0))
   (%make-circle (float radius 1d0) center (float restitution 1d0) (float friction 1d0)))
@@ -89,6 +90,7 @@
           (circle-center circle) (circle-radius circle)))
 
 (defmethod compute-shape-bbox ((circle circle))
+  (declare (optimize speed))
   (with-vec (vec (circle-transformed-center circle))
     (let ((r (circle-radius circle)))
       (make-bbox (- vec.x r) (- vec.y r) (+ vec.x r) (+ vec.y r)))))

@@ -1,9 +1,13 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
+(declaim (inline make-bbox))
 (defstruct (bbox (:constructor make-bbox (left bottom right top)))
   "Bounding box used to simplify collision detection"
-  left bottom right top)
+  (left (assert nil) :type double-float)
+  (bottom (assert nil) :type double-float)
+  (right (assert nil) :type double-float)
+  (top (assert nil) :type double-float))
 
 (defun bbox-intersects-p (a b)
   "Tests whether `bbox' A and B intersect"
