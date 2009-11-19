@@ -33,15 +33,36 @@
                     (print-unreadable-object ((shape-body shape)
                                               *standard-output* :identity t :type nil))))))
 
-(defun attach-shape (shape body)
-  "Attaches SHAPE to BODY. All shapes must be attached to a body before they're used."
+(defun calculate-inertia (body)
+  (loop for shape in (body-shapes body)
+     summing
+     (etypecase shape
+       (circle (moment-of-inertia-for-circle (body-mass body) 1 
+                                             (circle-radius shape) (circle-center shape)))
+       (segment (moment-of-inertia-for-segment (body-mass body) (segment-a shape) (segment-b shape)))
+       (poly (moment-of-inertia-for-poly (body-mass body) (poly-vertices shape))))))
+
+(defun %attach-shape (shape body)
   (setf (shape-body shape) body)
   (pushnew shape (body-%shapes (shape-body shape)))
   (shape-cache-data shape)
   (when (body-world body)
     (if (staticp body)
         (world-add-static-shape (body-world body) shape)
-        (world-add-active-shape (body-world body) shape)))
+        (world-add-active-shape (body-world body) shape))))
+
+(defun attach-shape (shape body)
+  "Attaches SHAPE to BODY. All shapes must be attached to a body before they're used."
+  (%attach-shape shape body)
+  (when (body-calculate-inertia-p body)
+    (setf (body-inertia body) (calculate-inertia body)))
+  body)
+
+(defun attach-shapes (shapes body)
+  "Attaches multiple shapes to BODY. This function adds all the shapes before recalculating inertia."
+  (map nil (fun (%attach-shape _ body)) shapes)
+  (when (body-calculate-inertia-p body)
+    (setf (body-inertia body) (calculate-inertia body)))
   body)
 
 (defun detach-shape (shape body)
@@ -50,6 +71,8 @@
   (setf (shape-body shape) nil)
   (when (body-world body)
     (world-remove-shape (body-world body) shape))
+  (when (body-calculate-inertia-p body)
+    (setf (body-inertia body) (calculate-inertia body)))
   shape)
 
 (defgeneric compute-shape-bbox (shape)

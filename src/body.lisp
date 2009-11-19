@@ -7,7 +7,7 @@
        (defstruct (,name
                     (:include body)
                     (:constructor ,(symbolicate "%MAKE-" name)
-                                  (%mass %inertia position
+                                (%mass %inertia calculate-inertia-p position
                                          velocity force actor
                                          %angle angular-velocity
                                          &aux
@@ -19,17 +19,18 @@
                                             (/ %inertia)))
                                          (rotation (angle->vec %angle))))))
        (defun ,(symbolicate "MAKE-" name)
-           (&key (mass 0d0) (inertia most-positive-double-float)
+         (&key (mass 0d0) (inertia most-positive-double-float) (calculate-inertia-p t)
             (position +zero-vector+) (velocity +zero-vector+) (force +zero-vector+)
             actor shapes (angle 0d0) (angular-velocity 0d0))
          (aprog1 (,(symbolicate "%MAKE-" name)
-                   (float mass 0d0) (float inertia 1d0) position velocity
-                   force actor (float angle 0d0) (float angular-velocity 0d0))
+                  (float mass 0d0) (float inertia 1d0) calculate-inertia-p position velocity
+                  force actor (float angle 0d0) (float angular-velocity 0d0))
            (dolist (shape shapes) (attach-shape shape it)))))))
 
 (defstruct (body
              (:constructor
-              %make-body (%mass %inertia position velocity force actor %angle angular-velocity
+              %make-body (%mass %inertia calculate-inertia-p
+                                position velocity force actor %angle angular-velocity
                                 &aux
                                 (inverse-mass
                                  (without-floating-point-underflow
@@ -46,6 +47,7 @@
   (inverse-mass (assert nil) :type double-float)
   (%inertia (assert nil) :type double-float)
   (inverse-inertia (assert nil) :type double-float)
+  (calculate-inertia-p t :type boolean)
   ;; Linear components of motion
   (position +zero-vector+ :type vec)
   (velocity +zero-vector+ :type vec)
@@ -59,10 +61,10 @@
   (velocity-bias +zero-vector+ :type vec)
   (angular-velocity-bias 0d0 :type double-float))
 
-(defun make-body (&key (mass 0d0) (inertia most-positive-double-float)
+(defun make-body (&key (mass 0d0) (inertia most-positive-double-float) (calculate-inertia-p t)
                   (position +zero-vector+) (velocity +zero-vector+) (force +zero-vector+) actor
                   shapes (angle 0d0) (angular-velocity 0d0))
-  (let ((body (%make-body (float mass 0d0) (float inertia 1d0) position velocity
+  (let ((body (%make-body (float mass 0d0) (float inertia 1d0) calculate-inertia-p position velocity
                           force actor (float angle 0d0) (float angular-velocity 0d0))))
     (map nil (fun (attach-shape _ body)) shapes)
     body))
