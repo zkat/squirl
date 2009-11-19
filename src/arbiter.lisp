@@ -18,9 +18,9 @@
   (tangent-mass 0d0 :type double-float)
   (bounce 0d0 :type double-float)
   ;; Persistant contact information
-  (jn-acc 0d0 :type double-float)
-  (jt-acc 0d0 :type double-float)
-  (j-bias 0d0 :type double-float)
+  (accumulated-normal-impulse 0d0 :type double-float)
+  (accumulated-frictional-impulse 0d0 :type double-float)
+  (impulse-bias 0d0 :type double-float)
   (bias 0d0 :type double-float)
   ;; Hash value used as a (mostly) unique ID
   (hash 0 :type fixnum))
@@ -28,12 +28,12 @@
 (defun contacts-sum-impulses (&rest contacts)
   (reduce #'vec+ contacts :initial-value +zero-vector+
           :key (fun (vec* (contact-normal _)
-                          (contact-jn-acc _)))))
+                          (contact-accumulated-normal-impulse _)))))
 
 (defun contact-impulse-with-friction (contact)
   (vec-rotate (contact-normal contact)
-              (vec (contact-jn-acc contact)
-                   (contact-jt-acc contact))))
+              (vec (contact-accumulated-normal-impulse contact)
+                   (contact-accumulated-frictional-impulse contact))))
 
 (defun contacts-sum-impulses-with-friction (&rest contacts)
   (reduce #'vec+ contacts :initial-value +zero-vector+
@@ -76,8 +76,10 @@
     (dolist (new-contact contacts)
       (when (= (contact-hash new-contact)
                (contact-hash old-contact))
-        (setf (contact-jn-acc new-contact) (contact-jn-acc old-contact)
-              (contact-jt-acc new-contact) (contact-jt-acc old-contact)))))
+        (setf (contact-accumulated-normal-impulse new-contact)
+              (contact-accumulated-normal-impulse old-contact)
+              (contact-accumulated-frictional-impulse new-contact)
+              (contact-accumulated-frictional-impulse old-contact)))))
   (setf (arbiter-contacts arbiter) contacts)
   arbiter)
 
@@ -141,7 +143,7 @@
                dt-inverse
                (min 0d0 (+ (contact-distance contact)
                            +collision-slop+)))
-            (contact-j-bias contact)
+            (contact-impulse-bias contact)
             0d0
             (contact-bounce contact)
             (* (shape-restitution shape-a)
@@ -165,8 +167,8 @@
                         (contact-r1 contact)
                         (contact-r2 contact)
                         (vec-rotate (contact-normal contact)
-                                    (vec (contact-jn-acc contact)
-                                         (contact-jt-acc contact))))))))
+                                    (vec (contact-accumulated-normal-impulse contact)
+                                         (contact-accumulated-frictional-impulse contact))))))))
 
 (declaim (ftype (function (arbiter boolean)) arbiter-apply-impulse))
 (defun arbiter-apply-impulse (arbiter elasticp)
@@ -191,9 +193,9 @@
           ;; Calculate and clamp bias impulse
           (let ((jbn (* (- (contact-bias contact) vbn)
                         (contact-normal-mass contact)))
-                (jbn-old (contact-j-bias contact)))
-            (setf (contact-j-bias contact) (max 0d0 (+ jbn-old jbn))
-                  jbn (- (contact-j-bias contact) jbn-old))
+                (jbn-old (contact-impulse-bias contact)))
+            (setf (contact-impulse-bias contact) (max 0d0 (+ jbn-old jbn))
+                  jbn (- (contact-impulse-bias contact) jbn-old))
             ;; Apply bias impulse
             (body-apply-bias-impulse body-a (vec* n (- jbn)) r1)
             (body-apply-bias-impulse body-b (vec* n jbn) r2))
@@ -204,18 +206,19 @@
                      (* (- (+ (* (contact-bounce contact) e-coef) nrv))
                         (contact-normal-mass contact))))
               (let ((jn (calculate-normal-impulse contact e-coefficient n-relative-velocity))
-                    (jn-old (contact-jn-acc contact)))
-                (setf (contact-jn-acc contact) (max 0d0 (+ jn-old jn))
-                      jn (- (contact-jn-acc contact) jn-old))
+                    (jn-old (contact-accumulated-normal-impulse contact)))
+                (setf (contact-accumulated-normal-impulse contact) (max 0d0 (+ jn-old jn))
+                      jn (- (contact-accumulated-normal-impulse contact) jn-old))
                 (let* ((relative-tangent-velocity (vec. (vec+ relative-velocity
                                                               (arbiter-target-velocity arbiter))
                                                         (vec-perp n)))
                        ;; Calculate and clamp friction impulse
                        (jt-max (* (arbiter-friction arbiter)
-                                  (contact-jn-acc contact)))
+                                  (contact-accumulated-normal-impulse contact)))
                        (jt (* (- relative-tangent-velocity) (contact-tangent-mass contact)))
-                       (jt-old (contact-jt-acc contact)))
-                  (setf (contact-jt-acc contact) (clamp (+ jt-old jt) (- jt-max) jt-max)
-                        jt (- (contact-jt-acc contact) jt-old))
+                       (jt-old (contact-accumulated-frictional-impulse contact)))
+                  (setf (contact-accumulated-frictional-impulse contact) (clamp (+ jt-old jt)
+                                                                                (- jt-max) jt-max)
+                        jt (- (contact-accumulated-frictional-impulse contact) jt-old))
                   (apply-impulses body-a body-b r1 r2
                                   (vec-rotate n (vec jn jt))))))))))))
