@@ -13,19 +13,13 @@ A solid circle has an inner diameter of 0."
     (+ (* mass length (/ length 12))
        (* mass (vec-length-sq (vec* (vec+ point-a point-b) 0.5d0))))))
 
-(defun moment-for-poly (m verts &optional (offset +zero-vector+)
-                        &aux (num-verts (length verts))
-                             (t-verts (make-array num-verts)))
+(defun moment-for-poly (m verts &optional (offset +zero-vector+))
   "Calculate the moment of inertia for a solid convex polygon."
-  (dotimes (i num-verts)
-    (setf (svref t-verts i) (vec+ (elt verts i) offset)))
-  (loop
-     for i below num-verts
-     for v1 across t-verts
-     for v2 = (svref t-verts (mod (1+ i) num-verts))
-     for a = (vec-cross v2 v1)
-     for b = (+ (vec. v1 v1) (vec. v1 v2) (vec. v2 v2))
-     sum (* a b) into sum1
-     sum a into sum2
-     finally (return (/ (* m sum1)
-                        (* 6 sum2)))))
+  (flet ((transform-vertex (vertex) (vec+ vertex offset)))
+    (loop
+       for vertex in verts
+       for v1 = (transform-vertex vertex)
+       and v2 = (transform-vertex (car (last verts))) then v1
+       for a = (vec-cross v2 v1) sum a into sum2
+       sum (* a (+ (vec. v1 v1) (vec. v1 v2) (vec. v2 v2))) into sum1
+       finally (return (/ (* m sum1) (* 6 sum2))))))
