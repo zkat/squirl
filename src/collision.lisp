@@ -230,14 +230,18 @@
           (closest-point-on-segment a end-b-b) end-b-b
           radius-a radius-b)
     (push it contacts))
-  (awhen (circle-to-circle-query
-          (closest-point-on-segment b end-a-a) end-a-a
-          radius-b radius-a)
-    (push it contacts))
-  (awhen (circle-to-circle-query
-          (closest-point-on-segment b end-a-b) end-a-b
-          radius-b radius-a)
-    (push it contacts))
+  (when (< (length contacts) 2)
+    (awhen (circle-to-circle-query
+            (closest-point-on-segment b end-a-a) end-a-a
+            radius-b radius-a)
+      (setf (contact-normal it) (vec- (contact-normal it)))
+      (push it contacts))
+    (when (< (length contacts) 2)
+      (awhen (circle-to-circle-query
+              (closest-point-on-segment b end-a-b) end-a-b
+              radius-b radius-a)
+        (setf (contact-normal it) (vec- (contact-normal it)))
+        (push it contacts))))
   contacts)
 
 ;;;
