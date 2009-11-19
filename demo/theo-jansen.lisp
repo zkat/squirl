@@ -85,10 +85,10 @@
                                             (walker-crank (demo-walker demo))
                                             +zero-vector+ +zero-vector+))
     ;; add the legs...
-    (loop for i upto num-legs do
+    (loop for i below num-legs do
          (make-leg (world demo) side offset (demo-walker demo)
                    (vec* (angle->vec (/ (* 2 i) (* num-legs pi))) crank-radius))
-         (make-leg (world demo) side offset (demo-walker demo)
+         (make-leg (world demo) side (- offset) (demo-walker demo)
                    (vec* (angle->vec (/ (* 2 (1+ i)) (* num-legs pi))) crank-radius)))
     (setf (demo-motor demo)
           (world-add-constraint (world demo)
