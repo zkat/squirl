@@ -49,6 +49,10 @@ the result of calling DELETE with PREDICATE, place, and the REMOVE-KEYWORDS.")
   `(let ,(loop for var in vars collect `(,var (gensym ,(symbol-name var))))
      ,@body))
 
+(defmacro without-floating-point-underflow (form)
+  #+clisp `(ext:without-floating-point-underflow ,form)
+  form)
+
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun symbolicate (&rest things)
     "Concatenate together the names of some strings and symbols,

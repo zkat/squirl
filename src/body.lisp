@@ -12,13 +12,11 @@
                                          %angle angular-velocity
                                          &aux
                                          (inverse-mass
-                                          (#-clisp values
-                                                   #+clisp ext:without-floating-point-underflow
-                                                   (if (zerop %mass) 0d0 (/ %mass))))
+                                          (without-floating-point-underflow
+                                            (if (zerop %mass) 0d0 (/ %mass))))
                                          (inverse-inertia
-                                          (#-clisp values
-                                                   #+clisp ext:without-floating-point-underflow
-                                                   (/ %inertia)))
+                                          (without-floating-point-underflow
+                                            (/ %inertia)))
                                          (rotation (angle->vec %angle))))))
        (defun ,(symbolicate "MAKE-" name)
            (&key (mass 0d0) (inertia most-positive-double-float)
@@ -34,13 +32,11 @@
               %make-body (%mass %inertia position velocity force actor %angle angular-velocity
                                 &aux
                                 (inverse-mass
-                                 (#-clisp values
-                                          #+clisp ext:without-floating-point-underflow
-                                          (if (zerop %mass) 0d0 (/ %mass))))
+                                 (without-floating-point-underflow
+                                   (if (zerop %mass) 0d0 (/ %mass))))
                                 (inverse-inertia
-                                 (#-clisp values
-                                          #+clisp ext:without-floating-point-underflow
-                                          (/ %inertia)))
+                                 (without-floating-point-underflow
+                                   (/ %inertia)))
                                 (rotation (angle->vec %angle)))))
   world                 ; world that this body is attached to, if any.
   actor                 ; Actor used for the COLLIDE "callback"
