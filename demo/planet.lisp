@@ -32,23 +32,24 @@
     (let* ((verts (list (vec (- size) (- size))
                         (vec (- size) size)
                         (vec size size)
-                        (vec size (- size))))
-           (body (make-planetary-body :mass mass :inertia (moment-of-inertia-for-poly mass verts)
-                                      :position (random-position (vec-length (vec size size)))
-                                      :velocity (vec* (angle->vec (* pi (random 2d0)))
-                                                      (random 200d0)))))
-      (attach-shape (make-poly verts :friction 0.7 :restitution 1) body)
-      (world-add-body (world *current-demo*) body))))
+                        (vec size (- size)))))
+      (world-add-body
+       (world *current-demo*)
+       (make-planetary-body :mass mass
+                            :position (random-position (vec-length (vec size size)))
+                            :velocity (vec* (angle->vec (* pi (random 2d0)))
+                                            (random 200d0))
+                            :shapes (list
+                                     (make-poly verts :friction 0.7 :restitution 1)))))))
 
 (defmethod init-demo ((demo planet-demo))
-  (let ((planet-body (make-body :angular-velocity 0.3 :actor :not-grabbable))
-        (shape (make-circle 70 :restitution 1 :friction 0.8)))
-    (attach-shape shape planet-body)
-    (setf (planet demo) planet-body)
+  (setf (planet demo)
+          (make-body :angular-velocity 0.3 :actor :not-grabbable
+                     :shapes (list (make-circle 70 :restitution 1 :friction 0.8))))
     (reset-shape-id-counter)
     (setf (world demo) (make-world :iterations 20))
     (loop repeat 22 do (add-box))
-    (world-add-body (world demo) planet-body)
-    (world demo)))
+    (world-add-body (world demo) (planet demo))
+    (world demo))
 
 (pushnew 'planet-demo *demos*)
