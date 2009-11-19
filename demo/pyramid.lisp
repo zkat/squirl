@@ -36,9 +36,7 @@
        do (loop
              for j from 0 below i do
                (mapc (lambda (body)
-                       (attach-shape (make-poly verts
-                                                :friction friction
-                                                :restitution 0)
+                       (attach-shape (make-poly verts :friction friction)
                                      body)
                        (world-add-body (world demo) body))
                      (nconc
@@ -59,9 +57,7 @@
                                                offset)
                                :angle (/ pi 2)))))))
          (mapc (lambda (body)
-                 (attach-shape (make-poly verts
-                                          :friction friction
-                                          :restitution 0)
+                 (attach-shape (make-poly verts :friction friction)
                                body)
                  (world-add-body (world demo) body))
                (list (make-body
