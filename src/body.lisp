@@ -2,32 +2,32 @@
 (in-package :squirl)
 
 (defmacro defbody (name)
-  `(progn
-     (defstruct (,name
-                  (:include body)
-                  (:constructor ,(intern (concatenate 'string "%MAKE-" (symbol-name name)))
-                                (%mass %inertia position
-                                       velocity force actor
-                                       %angle angular-velocity
-                                       &aux
-                                       (inverse-mass
-                                        (#-clisp values
-                                                 #+clisp ext:without-floating-point-underflow
-                                                 (if (zerop %mass) 0d0 (/ %mass))))
-                                       (inverse-inertia
-                                        (#-clisp values
-                                                 #+clisp ext:without-floating-point-underflow
+  (let ((*package* (symbol-package name)))
+    `(progn
+       (defstruct (,name
+                    (:include body)
+                    (:constructor ,(symbolicate "%MAKE-" name)
+                                  (%mass %inertia position
+                                         velocity force actor
+                                         %angle angular-velocity
+                                         &aux
+                                         (inverse-mass
+                                          (#-clisp values
+                                                   #+clisp ext:without-floating-point-underflow
+                                                   (if (zerop %mass) 0d0 (/ %mass))))
+                                         (inverse-inertia
+                                          (#-clisp values
+                                                   #+clisp ext:without-floating-point-underflow
                                                    (/ %inertia)))
-                                       (rotation (angle->vec %angle))))))
-     (defun ,(intern (concatenate 'string "MAKE-" (symbol-name name)))
-         (&key (mass 0d0) (inertia most-positive-double-float)
-          (position +zero-vector+) (velocity +zero-vector+) (force +zero-vector+)
-          actor shapes (angle 0d0) (angular-velocity 0d0))
-       (let ((body (,(intern (concatenate 'string "%MAKE-" (symbol-name name)))
-                     (float mass 0d0) (float inertia 1d0) position velocity
-                     force actor (float angle 0d0) (float angular-velocity 0d0))))
-         (map nil (lambda (_) (attach-shape _ body)) shapes)
-         body))))
+                                         (rotation (angle->vec %angle))))))
+       (defun ,(symbolicate "MAKE-" name)
+           (&key (mass 0d0) (inertia most-positive-double-float)
+            (position +zero-vector+) (velocity +zero-vector+) (force +zero-vector+)
+            actor shapes (angle 0d0) (angular-velocity 0d0))
+         (aprog1 (,(symbolicate "%MAKE-" name)
+                   (float mass 0d0) (float inertia 1d0) position velocity
+                   force actor (float angle 0d0) (float angular-velocity 0d0))
+           (dolist (shape shapes) (attach-shape shape it)))))))
 
 (defstruct (body
              (:constructor
