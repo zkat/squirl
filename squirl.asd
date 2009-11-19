@@ -53,6 +53,7 @@
              (:file "plink" :depends-on ("squirl-demo"))
              (:file "pump" :depends-on ("squirl-demo"))
              (:file "pyramid" :depends-on ("squirl-demo"))
+             (:file "pyramid-stack" :depends-on ("squirl-demo"))
              (:file "springies" :depends-on ("squirl-demo"))))))
 
 (asdf:defsystem squirl.demo-2
