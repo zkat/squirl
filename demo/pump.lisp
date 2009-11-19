@@ -15,15 +15,16 @@
          (rate (* (vec-x *arrow-direction*) 30 coef)))
     (setf (squirl::simple-motor-rate *motor*) rate
           (squirl::simple-motor-max-force *motor*) (if (zerop rate) 0 1000000))
+    (sleep 0.016)
     (world-step (world demo) (physics-timestep demo))
     (loop for ball in (demo-balls demo)
-       do (if (> (vec-x (body-position ball)) 320)
-              (setf (body-velocity ball) +zero-vector+)
-              (setf (body-position ball) (vec -224 200))))))
+       do (when (> (vec-x (body-position ball)) 320)
+            (setf (body-velocity ball) +zero-vector+)
+            (setf (body-position ball) (vec -224 200))))))
 
 (defun add-ball (world pos)
   (world-add-body world (make-body :mass 1 :inertia (moment-of-inertia-for-circle 1 30 0) :position pos
-                                   :shapes (list (make-circle 30 :friction 0.5)))))
+                                   :shapes (list (make-circle 30 :friction 0.5)) :actor 1)))
 
 (defun setup-static-body (world)
   (world-add-body world
@@ -53,9 +54,9 @@
 
 (defun add-small-gear (world static-body)
   (let ((gear (world-add-body
-               world (make-body :mass 10 :inertia (moment-of-inertia-for-circle 10 80 0) :angle (/ pi -2)
-                                :position (vec -160 -160) :shapes (list (make-circle 80)) :actor 0))))
-    ;; todo - this needs to be in a different 'layer'
+               world (make-body :mass 10 :angle (/ pi -2)
+                                :position (vec -160 -160) :shapes (list (make-circle 80))
+                                :actor 0))))
     (world-add-constraint world (make-pivot-joint static-body gear (vec -160 -160) +zero-vector+))
     gear))
 
@@ -64,7 +65,6 @@
                world (make-body :mass 40 :inertia (moment-of-inertia-for-circle 40 160 0)
                                 :position (vec 80 -160) :angle (/ pi 2) :actor 0
                                 :shapes (list (make-circle 160))))))
-    ;; todo - different layer
     (world-add-constraint world (make-pivot-joint static-body gear (vec 80 -160) +zero-vector+))
     gear))
 
@@ -74,10 +74,11 @@
 
 (defun add-feeder (world static-body small-gear)
   (let* ((bottom -300) (top 32) (length (- top bottom))
-         (feeder (make-body :mass 1 :inertia (moment-of-inertia-for-segment 1 (vec -224 bottom) (vec -224 top))
+         (feeder (make-body :mass 1 :actor 1
                             :position (vec -224 (/ (+ bottom top) 2))
                             :shapes (list (make-segment (vec 0 (/ length 2)) (vec 0 (- (/ length 2)))
                                                         :radius 20)))))
+    (world-add-body world feeder)
     (world-add-constraint world (make-pivot-joint static-body feeder
                                                   (vec -224 bottom) (vec 0 (- (/ length 2)))))
     (world-add-constraint world (make-pin-joint feeder small-gear
@@ -90,13 +91,14 @@
 (defmethod init-demo ((demo pump-demo))
   (setf (world demo) (make-world :gravity (vec 0 -600)))
   (setf (demo-static-body demo) (setup-static-body (world demo)))
-  (dotimes (i *num-balls*) (pushnew (add-ball (world demo) (vec -224 (+ 80 (* i 64))))
-                                    (demo-balls demo)))
+  (dotimes (i *num-balls*)
+    (pushnew (add-ball (world demo) (vec -224 (+ 80 (* i 64))))
+             (demo-balls demo)))
   (let* ((plunger (add-plunger (world demo)))
          (small-gear (add-small-gear (world demo) (demo-static-body demo)))
          (big-gear (add-big-gear (world demo) (demo-static-body demo))))
-    (add-feeder (world demo) (demo-static-body demo) small-gear)
     (add-constraints (world demo) small-gear plunger big-gear)
+    (add-feeder (world demo) (demo-static-body demo) small-gear)
     (motorize-gear (world demo) (demo-static-body demo) big-gear))
   (world demo))
 
