@@ -289,7 +289,8 @@
                     (closest-point-on-segment b end-a-b) end-a-b
                     radius-b radius-a)
               (setf (contact-normal it) (vec- (contact-normal it)))
-              (push it contacts)))))))
+              (push it contacts))))
+        contacts)))
 
 ;;;
 ;;; Generic function
