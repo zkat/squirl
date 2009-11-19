@@ -21,9 +21,12 @@
 
 (declaim (inline maybe/)
          (ftype (function (double-float double-float) double-float) maybe/))
-(defun maybe/ (a b)
+(defun maybe/ (a &optional b)
   ;; Don't declare me (optimize speed), because that chokes SBCL
   (if (zerop b) 0d0 (/ a b)))
+
+(defun maybe-inverse (x)
+  (if (zerop x) 0d0 (/ x)))
 
 (defmacro fun (&body body)
   `(lambda (&optional _) (declare (ignorable _)) ,@body))

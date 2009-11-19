@@ -89,8 +89,8 @@
                      (defun (setf ,external) (new-value body)
                        (setf (,internal body) new-value
                              (,cached body) (,wrapper new-value))))))
-  (wrap body-mass body-%mass body-inverse-mass /)
-  (wrap body-inertia body-%inertia body-inverse-inertia /)
+  (wrap body-mass body-%mass body-inverse-mass maybe-inverse)
+  (wrap body-inertia body-%inertia body-inverse-inertia maybe-inverse)
   (wrap body-angle body-%angle body-rotation angle->vec))
 
 (defgeneric body-update-velocity (body gravity damping dt)
