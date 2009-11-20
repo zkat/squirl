@@ -164,7 +164,7 @@ makes sure that the current world is updated by 1 time unit per second."
                               #\\[ and #\\] control the size of body points~@
                               #\\{ and #\\} control the size of collision points.~@
                               #\\V toggles velocity vectors~@
-                              #\\F toggles velocity vectors"))))
+                              #\\F toggles force vectors"))))
 
 (defun draw-fps ()
   (let ((x -300) (y 0))
