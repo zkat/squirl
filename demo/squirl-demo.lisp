@@ -162,10 +162,12 @@ makes sure that the current world is updated by 1 time unit per second."
                               Arrow keys control some demos~@
                               #\\A toggles anti-aliasing~@
                               #\\[ and #\\] control the size of body points~@
-                              #\\{ and #\\} control the size of collision points."))))
+                              #\\{ and #\\} control the size of collision points.~@
+                              #\\V toggles velocity vectors~@
+                              #\\F toggles velocity vectors"))))
 
 (defun draw-fps ()
-  (let ((x -300) (y 100))
+  (let ((x -300) (y 0))
     (draw-string x y (format nil "Last FPS: ~7,2f~%Mean FPS: ~7,2f~%Cumulative Mean FPS:~7,2f"
                              (last-fps) (mean-fps) (cumulative-mean-fps)))))
 
@@ -228,7 +230,9 @@ makes sure that the current world is updated by 1 time unit per second."
            (decf (body-point-size *current-demo*))))
     (#\} (incf (collision-point-size *current-demo*)))
     (#\{ (unless (<= (collision-point-size *current-demo*) 0)
-           (decf (collision-point-size *current-demo*))))))
+           (decf (collision-point-size *current-demo*))))
+    (#\v (setf (draw-velocity-p *current-demo*) (not (draw-velocity-p *current-demo*))))
+    (#\f (setf (draw-force-p *current-demo*) (not (draw-force-p *current-demo*))))))
 
 (defun toggle-anti-aliasing ()
   (if *aa-enabled-p*
