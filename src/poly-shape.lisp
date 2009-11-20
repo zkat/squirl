@@ -135,4 +135,4 @@
                        (dt-min (- (vec-cross normal vert)))
                        (dt-max (- (vec-cross normal (aref vertices (rem (1+ i) (length vertices)))))))
                   (when (<= dt-min dt dt-max)
-                    (values poly ratio normal)))))))))
+                    (return-from shape-segment-query (values poly ratio normal))))))))))
