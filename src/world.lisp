@@ -51,7 +51,7 @@
                 (rotatef shape1 shape2))
               (when (collision-possible-p shape1 shape2)
                 (awhen (collide-shapes shape1 shape2)
-                  (let ((arbiter (ensure-arbiter shape1 shape2 contact-set timestamp)))
+                  (let ((arbiter (ensure-arbiter world shape1 shape2 contact-set timestamp)))
                     ;; This is also a kludge... got any better ideas?
                     (setf (arbiter-shape-a arbiter) shape1
                           (arbiter-shape-b arbiter) shape2)
@@ -255,13 +255,13 @@
                         contact-set)
     (setf (fill-pointer arbiters) 0)))
 
-(defun ensure-arbiter (shape1 shape2 hash-set timestamp)
+(defun ensure-arbiter (world shape1 shape2 hash-set timestamp)
   (let* ((hash (hash-pair (shape-id shape1) (shape-id shape2)))
          (arbiter (hash-set-find-if (fun (arbiter-has-shapes-p _ shape1 shape2))
                                     hash-set hash)))
     (if arbiter
         (prog1 arbiter (setf (arbiter-stamp arbiter) timestamp))
-        (hash-set-insert hash-set hash (make-arbiter nil shape1 shape2 timestamp)))))
+        (hash-set-insert hash-set hash (make-arbiter world nil shape1 shape2 timestamp)))))
 
 ;;;
 ;;; All-Important WORLD-STEP Function
