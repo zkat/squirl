@@ -252,6 +252,34 @@
              (gl:vertex 1 (+ i 1/2)))
         (gl:vertex 0 ziggy)))))
 
+(defun draw-arrow ()
+  (gl:with-primitive :lines
+    (gl:vertex 0 0)
+    (gl:vertex 1 1)
+    
+    (gl:vertex 1 1)
+    (gl:vertex 1.25 0.75)
+
+    (gl:vertex 1 1)
+    (gl:vertex 0.75 0.75)))
+
+(defun draw-vector (origin vector)
+  (gl:with-pushed-matrix
+    (gl:translate (vec-x origin) (vec-y origin) 0)
+    (gl:rotate (+ 90 (* (vec->angle vector) (/ 180 pi))) 0 0 1)
+    (gl:scale 1 (vec-length vector) 1)
+    (draw-arrow)))
+
+(defun draw-velocity (body)
+  (gl:color 0 0 1)
+  (gl:line-width 2)
+  (draw-vector (body-position body) (body-velocity body)))
+
+(defun draw-force (body)
+  (gl:color 0 1 0)
+  (gl:line-width 2)
+  (draw-vector (body-position body) (body-force body)))
+
 ;;;
 ;;; Drawing the world.
 ;;;
@@ -265,7 +293,8 @@
      do (gl:vertex (vec-x contact-position) (vec-y contact-position))))
 
 (defun draw-world (world &key (line-thickness 1)
-                   draw-bb-p (draw-shapes-p t) (body-point-size 2) (collision-point-size 2))
+                   draw-bb-p (draw-shapes-p t) (body-point-size 2) (collision-point-size 2)
+                   draw-force draw-velocity)
   (gl:line-width line-thickness)
   (when draw-shapes-p
     (map-world #'draw-body world))
@@ -283,4 +312,8 @@
     (gl:point-size collision-point-size)
     (gl:with-primitives :points
       (apply #'gl:color *collision-color*)
-      (map nil #'set-collision-points (squirl::world-arbiters world)))))
+      (map nil #'set-collision-points (squirl::world-arbiters world))))
+  (when draw-velocity
+    (map-world #'draw-velocity world))
+  (when draw-force
+    (map-world #'draw-force world)))
