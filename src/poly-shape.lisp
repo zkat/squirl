@@ -119,8 +119,10 @@
   (and (bbox-containts-vec-p (poly-bbox poly) point)
        (poly-contains-vertex-p poly point)))
 
-(defmethod shape-segment-query ((poly poly) a b &aux (vertices (poly-transformed-vertices poly)))
-  (loop for vert across vertices
+(defmethod shape-segment-query ((poly poly) a b &aux (vertices (poly-transformed-vertices poly))
+                                ret-poly ret-ratio ret-normal)
+  (loop
+     for vert across vertices
      for axis across (poly-transformed-axes poly)
      for i from 0
      do (let* ((normal (poly-axis-normal axis))
@@ -135,4 +137,6 @@
                        (dt-min (- (vec-cross normal vert)))
                        (dt-max (- (vec-cross normal (aref vertices (rem (1+ i) (length vertices)))))))
                   (when (<= dt-min dt dt-max)
-                    (return-from shape-segment-query (values poly ratio normal))))))))))
+                    (setf ret-poly poly ret-ratio ratio ret-normal normal))))))))
+  (when ret-poly
+    (values ret-poly ret-ratio ret-normal)))
