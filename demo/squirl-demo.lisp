@@ -173,7 +173,7 @@ makes sure that the current world is updated by 1 time unit per second."
 
 (defun draw-pause-state ()
   (when (pausedp *current-demo*)
-    (draw-string -300 112 "SIMULATION PAUSED")))
+    (draw-string -300 10 "SIMULATION PAUSED")))
 
 (defmethod glut:idle ((w squirl-window))
   (unless (pausedp *current-demo*)
