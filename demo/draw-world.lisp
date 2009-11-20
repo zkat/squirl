@@ -252,24 +252,21 @@
              (gl:vertex 1 (+ i 1/2)))
         (gl:vertex 0 ziggy)))))
 
-(defun draw-arrow ()
-  (gl:with-primitive :lines
-    (gl:vertex 0 0)
-    (gl:vertex 0 1)
-    
-    (gl:vertex 0 1)
-    (gl:vertex 0.25 0.75)
-
-    (gl:vertex 0 1)
-    (gl:vertex -0.25 0.75)))
-
 (defun draw-vector (origin vector)
   (unless (vec-zerop vector)
    (gl:with-pushed-matrix
      (gl:translate (vec-x origin) (vec-y origin) 0)
      (gl:rotate (- (* (vec->angle vector) (/ 180 pi)) 90) 0 0 1)
      (gl:scale 10 (vec-length vector) 1)
-     (draw-arrow))))
+     (gl:with-primitive :lines
+       (gl:vertex 0 0)
+       (gl:vertex 0 1)
+       
+       (gl:vertex 0 1)
+       (gl:vertex 0.25 0.75)
+
+       (gl:vertex 0 1)
+       (gl:vertex -0.25 0.75)))))
 
 (defun draw-velocity (body)
   (gl:color 0 0 1)
