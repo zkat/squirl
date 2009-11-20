@@ -41,6 +41,7 @@
    :vec-length
    :vec-lerp
    :vec-zerop
+   :vec-equal
    :angle->vec
    :vec->angle
    :vec.
