@@ -76,7 +76,8 @@
         (push (make-contact vertex normal distance (hash-pair (shape-id poly1) i)) contacts))))
   (do-vector ((i vertex) (poly-transformed-vertices poly2) contacts)
     (when (partial-poly-contains-vertex-p poly1 vertex normal)
-      (push (make-contact vertex normal distance (hash-pair (shape-id poly2) i)) contacts))))
+      (push (make-contact vertex normal distance (hash-pair (shape-id poly2) i)) contacts)))
+  contacts)
 
 (defun segment-value-on-axis (segment normal distance)
   (- (min (- (vec. normal (segment-trans-a segment)) (segment-radius segment))
@@ -97,7 +98,8 @@
         (let ((dt (vec-cross segment-normal vertex)))
           (when (>= dta dt dtb)
             (push (make-contact vertex normal p-dist (hash-pair (shape-id poly) i))
-                  contacts)))))))
+                  contacts)))))
+    contacts))
 
 ;;; This is complicated. Not gross, but just complicated. It needs to be simpler
 ;;; and/or commented, preferably both.
