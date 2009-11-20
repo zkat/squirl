@@ -255,19 +255,19 @@
 (defun draw-arrow ()
   (gl:with-primitive :lines
     (gl:vertex 0 0)
-    (gl:vertex 1 1)
+    (gl:vertex 0 1)
     
-    (gl:vertex 1 1)
-    (gl:vertex 1.25 0.75)
+    (gl:vertex 0 1)
+    (gl:vertex 0.25 0.75)
 
-    (gl:vertex 1 1)
-    (gl:vertex 0.75 0.75)))
+    (gl:vertex 0 1)
+    (gl:vertex -0.25 0.75)))
 
 (defun draw-vector (origin vector)
   (gl:with-pushed-matrix
     (gl:translate (vec-x origin) (vec-y origin) 0)
-    (gl:rotate (+ 90 (* (vec->angle vector) (/ 180 pi))) 0 0 1)
-    (gl:scale 1 (vec-length vector) 1)
+    (gl:rotate (- (* (vec->angle vector) (/ 180 pi)) 90) 0 0 1)
+    (gl:scale 10 (vec-length vector) 1)
     (draw-arrow)))
 
 (defun draw-velocity (body)
