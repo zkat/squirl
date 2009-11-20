@@ -264,11 +264,12 @@
     (gl:vertex -0.25 0.75)))
 
 (defun draw-vector (origin vector)
-  (gl:with-pushed-matrix
-    (gl:translate (vec-x origin) (vec-y origin) 0)
-    (gl:rotate (- (* (vec->angle vector) (/ 180 pi)) 90) 0 0 1)
-    (gl:scale 10 (vec-length vector) 1)
-    (draw-arrow)))
+  (unless (vec-zerop vector)
+   (gl:with-pushed-matrix
+     (gl:translate (vec-x origin) (vec-y origin) 0)
+     (gl:rotate (- (* (vec->angle vector) (/ 180 pi)) 90) 0 0 1)
+     (gl:scale 10 (vec-length vector) 1)
+     (draw-arrow))))
 
 (defun draw-velocity (body)
   (gl:color 0 0 1)
