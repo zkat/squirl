@@ -46,9 +46,7 @@
      sum (vec-length impulse) into scalar-sum
      finally (return (- 1 (/ (vec-length vec-sum) scalar-sum)))))
 
-(defstruct (arbiter (:constructor make-arbiter (world contacts shape-a shape-b stamp)))
-  ;; world this arbiter arbitrates for
-  (world (assert nil) :type world)
+(defstruct (arbiter (:constructor make-arbiter (contacts shape-a shape-b stamp)))
   ;; Information on the contact points between the objects
   (contacts (assert nil) :type list)
   ;; The two shapes involved in the collision
