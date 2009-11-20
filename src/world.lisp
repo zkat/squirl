@@ -67,13 +67,13 @@
           (+ (length (world-active-bodies world))
              (length (world-static-bodies world)))))
 
-(defgeneric collide (actor1 actor2 contacts)
-  (:method ((actor1 t) (actor2 t) (contacts t)) t))
+(defgeneric collide (actor1 actor2 arbiter)
+  (:method ((actor1 t) (actor2 t) (arbiter t)) t))
 
 (defmacro defcollision (&body args)
   (multiple-value-bind (qualifiers lambda-list body)
       (parse-defmethod args)
-    (destructuring-bind (arg-a arg-b contacts) lambda-list
+    (destructuring-bind (arg-a arg-b arbiter) lambda-list
       (flet ((parse-specialized-arg (arg)
                (etypecase arg
                  (symbol (values arg t))
@@ -86,20 +86,17 @@
             (with-gensyms (cnm-sym nmp-sym)
               (if (equal spec-a spec-b)
                   `(defmethod collide ,@qualifiers ,lambda-list ,@body)
-                  `(flet ((handler (,actor-a ,actor-b ,contacts ,cnm-sym ,nmp-sym)
+                  `(flet ((handler (,actor-a ,actor-b ,arbiter ,cnm-sym ,nmp-sym)
                             ,@(pop-declarations body)
                             (flet ((call-next-method (&rest cnm-args)
                                      (apply ,cnm-sym cnm-args))
                                    (next-method-p () (funcall ,nmp-sym)))
                               (declare (ignorable #'call-next-method #'next-method-p))
                               ,@body)))
-                     (defmethod collide ,@qualifiers (,arg-a ,arg-b ,contacts)
-                       (handler ,actor-a ,actor-b ,contacts #'call-next-method #'next-method-p))
-                     (defmethod collide ,@qualifiers (,arg-b ,arg-a ,contacts)
-                       (handler ,actor-a ,actor-b
-                                (mapc (fun (setf (contact-normal _) (vec- (contact-normal _))))
-                                      (mapcar #'copy-contact ,contacts))
-                                #'call-next-method #'next-method-p)))))))))))
+                     (defmethod collide ,@qualifiers (,arg-a ,arg-b ,arbiter)
+                       (handler ,actor-a ,actor-b ,arbiter #'call-next-method #'next-method-p))
+                     (defmethod collide ,@qualifiers (,arg-b ,arg-a ,arbiter)
+                       (handler ,actor-a ,actor-b ,arbiter #'call-next-method #'next-method-p)))))))))))
 
 ;;;
 ;;; Body, Shape, and Joint Management
@@ -249,7 +246,7 @@
   (delete-iff (world-arbiters world)
               (fun (let ((a (body-actor (shape-body (arbiter-shape-a _))))
                          (b (body-actor (shape-body (arbiter-shape-b _)))))
-                     (when (or a b) (not (collide a b (arbiter-contacts _))))))))
+                     (when (or a b) (not (collide a b _)))))))
 
 (defun flush-arbiters (world)
   "Flush outdated arbiters."
