@@ -278,6 +278,12 @@
   (gl:line-width 2)
   (draw-vector (body-position body) (body-force body)))
 
+(defun draw-collision-normal (arbiter)
+  (loop for contact in (squirl::arbiter-contacts arbiter)
+     for normal = (squirl::contact-normal contact)
+     for position = (squirl::contact-point contact)
+     do (draw-vector position normal)))
+
 ;;;
 ;;; Drawing the world.
 ;;;
@@ -292,7 +298,7 @@
 
 (defun draw-world (world &key (line-thickness 1)
                    draw-bb-p (draw-shapes-p t) (body-point-size 2) (collision-point-size 2)
-                   draw-force draw-velocity)
+                   draw-force draw-velocity draw-collision-normal)
   (gl:line-width line-thickness)
   (when draw-shapes-p
     (map-world #'draw-body world))
@@ -311,6 +317,8 @@
     (gl:with-primitives :points
       (apply #'gl:color *collision-color*)
       (map nil #'set-collision-points (squirl::world-arbiters world))))
+  (when draw-collision-normal
+    (map nil #'draw-collision-normal (squirl::world-arbiters world)))
   (when draw-velocity
     (map-world #'draw-velocity world))
   (when draw-force
