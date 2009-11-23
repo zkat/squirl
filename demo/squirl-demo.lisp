@@ -89,7 +89,8 @@ Returns both the difference in time and the current-time used in the computation
    (draw-force-p :initarg :draw-force-p :initform nil :accessor draw-force-p)
    (draw-velocity-p :initarg :draw-velocity-p :initform nil :accessor draw-velocity-p)
    (body-point-size :initarg :body-point-size :initform 0 :accessor body-point-size)
-   (collision-point-size :initarg :collision-point-size :initform 2 :accessor collision-point-size)))
+   (collision-point-size :initarg :collision-point-size :initform 2 :accessor collision-point-size)
+   (draw-collision-normal-p :initarg :draw-collision-normal-p :initform nil :accessor draw-collision-normal-p)))
 
 (defgeneric mouse-position (demo)
   (:method ((demo demo)) (body-position (mouse-body demo))))
@@ -105,12 +106,13 @@ Returns both the difference in time and the current-time used in the computation
 
 (defgeneric draw-demo (demo)
   (:method ((demo demo))
-    (with-slots (line-thickness draw-shapes-p draw-bb-p body-point-size collision-point-size draw-force-p draw-velocity-p)
+    (with-slots (line-thickness draw-shapes-p draw-bb-p body-point-size collision-point-size draw-force-p draw-velocity-p draw-collision-normal-p)
         *current-demo*
       (draw-world (world *current-demo*) :draw-shapes-p draw-shapes-p
                   :draw-bb-p draw-bb-p :line-thickness line-thickness
                   :body-point-size body-point-size :collision-point-size collision-point-size
-                  :draw-force draw-force-p :draw-velocity draw-velocity-p))))
+                  :draw-force draw-force-p :draw-velocity draw-velocity-p
+                  :draw-collision-normal draw-collision-normal-p))))
 
 (defgeneric update-demo (demo dt))
 (defgeneric init-demo (demo))
