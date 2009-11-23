@@ -279,10 +279,12 @@
   (draw-vector (body-position body) (body-force body)))
 
 (defun draw-collision-normal (arbiter)
+  (gl:color 1 0 0)
+  (gl:line-width 2)
   (loop for contact in (squirl::arbiter-contacts arbiter)
      for normal = (squirl::contact-normal contact)
      for position = (squirl::contact-point contact)
-     do (draw-vector position normal)))
+     do (draw-vector position (vec* normal 10d0))))
 
 ;;;
 ;;; Drawing the world.
