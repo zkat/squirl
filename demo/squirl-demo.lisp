@@ -166,7 +166,8 @@ makes sure that the current world is updated by 1 time unit per second."
                               #\\[ and #\\] control the size of body points~@
                               #\\{ and #\\} control the size of collision points.~@
                               #\\V toggles velocity vectors~@
-                              #\\F toggles force vectors"))))
+                              #\\F toggles force vectors~@
+                              #\\C toggles collision normals"))))
 
 (defun draw-fps ()
   (let ((x -300) (y 0))
@@ -234,7 +235,8 @@ makes sure that the current world is updated by 1 time unit per second."
     (#\{ (unless (<= (collision-point-size *current-demo*) 0)
            (decf (collision-point-size *current-demo*))))
     (#\v (setf (draw-velocity-p *current-demo*) (not (draw-velocity-p *current-demo*))))
-    (#\f (setf (draw-force-p *current-demo*) (not (draw-force-p *current-demo*))))))
+    (#\f (setf (draw-force-p *current-demo*) (not (draw-force-p *current-demo*))))
+    (#\c (setf (draw-collision-normal-p *current-demo*) (not (draw-collision-normal-p *current-demo*))))))
 
 (defun toggle-anti-aliasing ()
   (if *aa-enabled-p*
