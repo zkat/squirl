@@ -132,7 +132,7 @@
    ;; constraints
    :body-a
    :body-b
-   :anchor2
+   :anchor1
    :anchor2
    :rest-length
    :stiffness
