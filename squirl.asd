@@ -7,10 +7,11 @@
   :components
   ((:module "src"
             :components
-            ((:file "arbiter"        :depends-on ("vec" "shape" "collision"))
+            ((:file "arbiter"        :depends-on ("vec" "shape" "collision" "contact"))
              (:file "body"           :depends-on ("vec"))
              (:file "bounding-box"   :depends-on ("vec"))
-             (:file "collision"      :depends-on ("shape" "poly-shape"))
+             (:file "collision"      :depends-on ("shape" "poly-shape" "contact"))
+             (:file "contact"        :depends-on ("vec"))
              (:file "hash-set"       :depends-on ("utils"))
              (:file "package")
              (:file "shape"          :depends-on ("vec" "bounding-box" "body"))
