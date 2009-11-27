@@ -130,6 +130,13 @@
    :world-step
 
    ;; constraints
+   :body-a
+   :body-b
+   :anchor2
+   :anchor2
+   :rest-length
+   :stiffness
+   :damping
    :constraint-body-a
    :constraint-body-b
    :breakable-joint
