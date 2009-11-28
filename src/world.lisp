@@ -10,9 +10,12 @@
 (defparameter *initial-count* 1000)
 (defparameter *initial-array-length* 4)
 
+(defgeneric collide (actor1 actor2 arbiter)
+  (:method ((actor1 t) (actor2 t) (arbiter t)) t))
+
 (defstruct (world
              (:constructor %make-world
-                           (&key iterations elastic-iterations gravity damping)))
+                           (&key iterations elastic-iterations gravity damping collision-callback)))
   ;; Number of iterations to use in the impulse solver to solve contacts.
   (iterations *default-iterations* :type fixnum)
   ;; Number of iterations to use in the impulse solver to solve elastic collisions.
@@ -35,7 +38,10 @@
   (contact-set (make-hash-set 0 #'arbiter-shapes-equal) :type hash-set) ; Persistent contact set.
   ;; Constraints in the system.
   (constraints (make-adjustable-vector *initial-array-length*) :type (vector t))
-  arbitrator)
+  arbitrator
+
+  ;; Collision callback
+  (collision-callback #'collide))
 
 (defun make-world (&rest keys)
   (declare (dynamic-extent keys))
@@ -66,9 +72,6 @@
           (world-gravity world)
           (+ (length (world-active-bodies world))
              (length (world-static-bodies world)))))
-
-(defgeneric collide (actor1 actor2 arbiter)
-  (:method ((actor1 t) (actor2 t) (arbiter t)) t))
 
 (defmacro defcollision (&body args)
   (multiple-value-bind (qualifiers lambda-list body)
@@ -246,7 +249,7 @@
   (delete-iff (world-arbiters world)
               (fun (let ((a (body-actor (shape-body (arbiter-shape-a _))))
                          (b (body-actor (shape-body (arbiter-shape-b _)))))
-                     (when (or a b) (not (collide a b _)))))))
+                     (when (or a b) (not (funcall (world-collision-callback world) a b _)))))))
 
 (defun flush-arbiters (world)
   "Flush outdated arbiters."

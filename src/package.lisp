@@ -168,6 +168,7 @@
    :make-spring
 
    ;; callbacks
+   :world-collision-callback
    :collide
    :defcollision
    ))
