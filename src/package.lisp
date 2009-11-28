@@ -171,4 +171,11 @@
    :world-collision-callback
    :collide
    :defcollision
+
+   ;; convenience
+   :make-rectangle
+   :make-circle-body
+   :make-segment-body
+   :make-poly-body
+   :make-rectangle-body
    ))

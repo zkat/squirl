@@ -12,6 +12,7 @@
              (:file "bounding-box"   :depends-on ("vec"))
              (:file "collision"      :depends-on ("shape" "poly-shape" "contact"))
              (:file "contact"        :depends-on ("vec"))
+             (:file "convenience"    :depends-on ("body" "shape" "poly-shape" "vec"))
              (:file "hash-set"       :depends-on ("utils"))
              (:file "package")
              (:file "shape"          :depends-on ("vec" "bounding-box" "body"))
