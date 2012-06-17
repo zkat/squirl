@@ -3,6 +3,9 @@
 
 (declaim (optimize speed))
 
+
+;;; The vector type
+
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (deftype vec ()
     '(complex double-float))
@@ -20,7 +23,7 @@
     (defun vec-y (vec)
       (imagpart vec))))
 
-(define-constant +zero-vector+ (vec 0 0))
+;;; Helper macros
 
 (defmacro with-vec (form &body body)
   "FORM is either a symbol bound to a `vec', or a list of the form:
@@ -38,16 +41,17 @@ WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
   "Convenience macro for nesting WITH-VEC forms"
   `(with-vec ,form ,@(if forms `((with-vecs ,forms ,@body)) body)))
 
+;;; The zero vector
+
+(define-constant +zero-vector+ (vec 0 0))
+
 (declaim (ftype (function (vec) boolean) vec-zerop)
          (inline vec-zerop))
 (defun vec-zerop (vec)
   "Checks whether VEC is a zero vector"
   (= vec +zero-vector+))
 
-(declaim (ftype (function (vec vec) boolean) vec-equal)
-         (inline vec-equal))
-(defun vec-equal (a b)
-  (= a b))
+;;; Polar conversions
 
 (declaim (ftype (function (real) vec) angle->vec)
          (inline angle->vec))
@@ -62,6 +66,13 @@ WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
   (declare (vec vec))
   (with-vec vec
     (atan vec.y vec.x)))
+
+;;; Vector arithmetic
+
+(declaim (ftype (function (vec vec) boolean) vec-equal)
+         (inline vec-equal))
+(defun vec-equal (a b)
+  (= a b))
 
 (define-compiler-macro vec+ (&rest rest)
   (declare (list rest))
@@ -106,6 +117,8 @@ WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
     (- (* v1.x v2.y)
        (* v1.y v2.x))))
 
+;;; Vector rotations
+
 (declaim (ftype (function (vec) vec) vec-perp vec-rperp)
          (inline vec-perp vec-rperp))
 (defun vec-perp (vec)
@@ -119,11 +132,6 @@ WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
   (declare (vec vec))
   (with-vec vec
     (vec vec.y (- vec.x))))
-
-(defun vec-project (v1 v2)
-  "Returns the projection of V1 onto V2"
-  (declare (vec v1 v2))
-  (vec* v2 (/ (vec. v1 v2) (vec. v2 v2))))
 
 (define-compiler-macro vec-rotate (&whole whole vec-form rot-form)
   (if (and (listp rot-form) (eq (car rot-form) 'vec))
@@ -160,6 +168,13 @@ This function is symmetric between VEC and ROT."
             (* vec.y rot.y))
          (- (* vec.y rot.x)
             (* vec.x rot.y)))))
+
+;;; More messy stuff
+
+(defun vec-project (v1 v2)
+  "Returns the projection of V1 onto V2"
+  (declare (vec v1 v2))
+  (vec* v2 (/ (vec. v1 v2) (vec. v2 v2))))
 
 (declaim (ftype (function (vec) (double-float 0d0)) vec-length vec-length-sq)
          (inline vec-length vec-length-sq))
