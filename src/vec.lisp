@@ -53,16 +53,19 @@ WITH-VEC binds NAME.x and NAME.y in the same manner as `with-accessors'."
 
 ;;; Polar conversions
 
-(declaim (ftype (function (real) vec) angle->vec)
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (deftype radian-angle () 'double-float))
+
+(declaim (ftype (function (radian-angle) vec) angle->vec)
          (inline angle->vec))
 (defun angle->vec (angle)
-  "Convert radians to a normalized vector"
+  "Convert an angle, in radians, to a normalized vector"
   (cis angle))
 
-(declaim (ftype (function (vec) real) vec->angle)
+(declaim (ftype (function (vec) radian-angle) vec->angle)
          (inline vec->angle))
 (defun vec->angle (vec)
-  "Convert a vector to radians."
+  "Convert a vector to an angle, in radians."
   (declare (vec vec))
   (with-vec vec
     (atan vec.y vec.x)))
