@@ -1,7 +1,8 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 (in-package :squirl)
 
-(declaim (inline make-contact))
+;;; SBCL chokes when this constructor is inlined
+#-sbcl (declaim (inline make-contact))
 (defstruct (contact (:constructor make-contact (point normal distance &optional hash)))
   ;; Contact point and normal
   (point +zero-vector+ :type vec)
